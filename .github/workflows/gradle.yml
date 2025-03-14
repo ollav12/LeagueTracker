@@ -35,6 +35,7 @@ jobs:
 
     - name: Build with Gradle Wrapper
       run: |
+        chmod +x ./gradlew
         cd backend
         ./gradlew build
 
