@@ -16,7 +16,8 @@ Before you begin, ensure you have the following installed on your machine:
 - [Gradle](https://gradle.org/install/)
 - [Node.js and npm](https://nodejs.org/) (version 14 or later)
 
-You also need a riot games dev api key, read more at https://developer.riotgames.com/
+You also need a riot games dev api key, read more at https://developer.riotgames.com/ on how to get one.
+Create your .env file inside `backend`, the `.env.example` shows how it should be.
 
 ## Backend Setup
 
