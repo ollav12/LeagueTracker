@@ -25,7 +25,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 @RequestMapping("/matches")
 public class MatchController /*~~(Could not parse as Java)~~>*/{
 
-
     @Autowired
     private MatchService matchService;
 

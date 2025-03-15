@@ -5,15 +5,12 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.leaguetracker.app.LeaguetrackerApplication;
+//import com.fasterxml.jackson.databind.ObjectMapper;
 import com.leaguetracker.app.config.EnvConfig;
 import com.leaguetracker.app.model.SummonerMatch;
 import com.leaguetracker.app.repository.MatchRepository;
@@ -21,11 +18,9 @@ import com.leaguetracker.app.repository.MatchRepository;
 @Service
 public class MatchService {
 
-    private final EnvConfig envConfig;
-
     private final String apiKey;
     private final RestTemplate restTemplate = new RestTemplate();
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    //private final ObjectMapper objectMapper = new ObjectMapper();
 
     private static final Logger logger = LoggerFactory.getLogger(MatchService.class);
 
@@ -34,7 +29,6 @@ public class MatchService {
 
     public MatchService(EnvConfig envConfig) {
         this.apiKey = envConfig.getApiKey();
-        this.envConfig = envConfig;
     }
 
     public SummonerMatch saveMatch(SummonerMatch match) {
@@ -57,8 +51,11 @@ public class MatchService {
         return matchRepository.findAllByPuuid(puuid);
     }
 
-
     // Riot api calls
+    public SummonerMatch get(){
+        return null;
+    }
+
     public List<SummonerMatch> fetchMatches(String puuid) {
         try {
             String region = "europe";
@@ -68,10 +65,12 @@ public class MatchService {
             
             logger.info("Fetching matches from URL: {}", matchUrl);
             
+            @SuppressWarnings("rawtypes")
             ResponseEntity<List> response = restTemplate.getForEntity(matchUrl, List.class);
 
             if(response.getStatusCode().is2xxSuccessful()) {
                 List<SummonerMatch> list = new ArrayList<>();
+                @SuppressWarnings("unchecked")
                 List<String> matches = response.getBody();
                 if (matches != null) {
                     for (String match : matches) {
@@ -93,5 +92,8 @@ public class MatchService {
 
         return new ArrayList<>();
     }
+
+
+
 
 }

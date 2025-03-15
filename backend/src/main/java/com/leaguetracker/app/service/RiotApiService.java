@@ -1,8 +1,6 @@
 package com.leaguetracker.app.service;
-import com.leaguetracker.app.LeaguetrackerApplication;
 import com.leaguetracker.app.config.EnvConfig;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -14,9 +12,6 @@ public class RiotApiService {
  
     private final RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper objectMapper = new ObjectMapper();
-
-    @Autowired
-    private SummonerService summonerService;
 
     private String apiKey;
 
