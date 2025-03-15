@@ -18,6 +18,10 @@ public class SummonerMatch {
         this.puuid = puuid;
     }
 
+    public SummonerMatch() { 
+        
+    }
+
     public String getMatchId() {
         return matchId;
     }
