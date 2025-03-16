@@ -3,8 +3,8 @@
       <img :src="profileIconUrl" alt="Profile Icon" class="profile-icon" />
       <h2>{{ summonerName }}</h2>
       <p>Level: {{ summonerLevel }}</p>
-      <p>Rank: {{ summonerRank }}</p>
-      <p>{{ wins }}W - {{ losses }}L ({{ winPercentage}}%)</p>
+      <p>Ranked Solo: {{ summonerRank }}    |          {{ wins }}W - {{ losses }}L ({{ winPercentage }}%)</p>
+      <p>Ranked Flex: {{ summonerRankFlex }}    |          {{ winsFlex }}W - {{ lossesFlex }}L ({{ winPercentageFlex }}%)</p>
     </div>
   </template>
   
@@ -15,19 +15,29 @@
       summonerName: String,
       summonerLevel: Number,
       summonerRank: String,
-      wins: String,
-      losses: String,
+      wins: Number,
+      losses: Number,
+      summonerRankFlex: String,
+      winsFlex: Number,
+      lossesFlex: Number,
     },
     computed: {
         winPercentage() {
-        const totalGames = this.wins + this.losses;
-        if (totalGames === 0) {
-            return 0;
-        }
-        return Math.round((this.wins / totalGames) * 100);
+            const totalGames = this.wins + this.losses;
+            if (totalGames === 0) {
+                return 0;
             }
+            return Math.round((this.wins / totalGames) * 100);
+        },
+        winPercentageFlex() {
+            const totalGames = this.winsFlex + this.lossesFlex;
+            if (totalGames === 0) {
+                return 0;
+            }
+            return Math.round((this.winsFlex / totalGames) * 100);
         }
-    }
+  }
+}
   </script>
   
   <style scoped>

@@ -35,6 +35,9 @@
         :summonerRank="summonerRank"
         :wins="wins"
         :losses="losses"
+        :summonerRankFlex="summonerRankFlex"
+        :winsFlex="winsFlex"
+        :lossesFlex="lossesFlex"
       />
       <MatchHistory :matches="matches" />
     </div>
@@ -62,6 +65,9 @@ export default {
       summonerRank: '',
       wins: 0,
       losses: 0,
+      summonerRankFlex: '',
+      winsFlex: 0,
+      lossesFlex: 0,
       matches: [],
       toggle: false,
       darkmode: localStorage.getItem('darkmode'),
@@ -118,10 +124,20 @@ export default {
         });
       
         console.log(rankResponse.data);
-        const soloRank = rankResponse.data[0];
+        let soloRank = rankResponse.data[0]
+        let flexRank = rankResponse.data[1]
+        if (soloRank.queueType == "RANKED_FLEX_SR") {
+          soloRank = rankResponse.data[1]
+          flexRank = rankResponse.data[0]
+        }
+
         this.summonerRank = soloRank.tier + " " + soloRank.rank + " " + soloRank.leaguePoints + "LP";
         this.wins = soloRank.wins
         this.losses = soloRank.losses
+
+        this.summonerRankFlex = flexRank.tier + " " + flexRank.rank + " " + flexRank.leaguePoints + "LP";
+        this.winsFlex = flexRank.wins
+        this.lossesFlex = flexRank.losses
         this.matches = summonerResponse.data.matches; // Adjust based on actual response structure
       } catch (error) {
         console.error('Error fetching summoner data:', error);
