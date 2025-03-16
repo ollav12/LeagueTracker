@@ -1,0 +1,17 @@
+meta {
+  name: Fetch ranks  for user from riot api
+  type: http
+  seq: 3
+}
+
+post {
+  url: http://localhost:8080/ranks
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "puuid": "9TPHO9-qOK4KKl7vHcJEVDiLMXRlYQozqZuFuRR3ExfZJnk9CvMc_ZO2xV0T9tTAYthTohr7kJRHCA"
+  }
+}

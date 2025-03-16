@@ -7,13 +7,15 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "summoner_ranks")
 public class SummonerRank {
-    
+
     @Id
+    private String leagueId;
     private String puuid;
     private String queueType;
     private String rank;
+    private String summonerId;
     private String tier;
-    private String lp;
+    private String leaguePoints;
     private int wins;
     private int losses;
     private boolean veteran;
@@ -21,12 +23,14 @@ public class SummonerRank {
     private boolean freshBlood;
     private boolean hotStreak;
 
-    public SummonerRank(String puuid, String queueType, String rank, String tier, String lp, int wins, int losses, boolean veteran, boolean inactive, boolean freshBlood, boolean hotStreak) {
+    public SummonerRank(String leagueId, String summonerId, String puuid, String queueType, String rank, String tier, String leaguePoints, int wins, int losses, boolean veteran, boolean inactive, boolean freshBlood, boolean hotStreak) {
+        this.leagueId = leagueId;
+        this.summonerId = summonerId;
         this.puuid = puuid;
         this.queueType = queueType;
         this.rank = rank;
         this.tier = tier;
-        this.lp = lp;
+        this.leaguePoints = leaguePoints;
         this.wins = wins;
         this.losses = losses;
         this.veteran = veteran;
@@ -44,8 +48,8 @@ public class SummonerRank {
     public int getLosses() {
         return losses;
     }
-    public String getLp() {
-        return lp;
+    public String getLeaguePoints() {
+        return leaguePoints;
     }
     public String getQueueType() {
         return queueType;
@@ -75,6 +79,14 @@ public class SummonerRank {
         return this.hotStreak;
     }
 
+    public String getLeagueId() {
+        return leagueId;
+    }
+
+    public String getSummonerId() {
+        return summonerId;
+    }
+
     public void setFreshBlood(boolean freshBlood) {
         this.freshBlood = freshBlood;
     }
@@ -91,8 +103,8 @@ public class SummonerRank {
         this.losses = losses;
     }
 
-    public void setLp(String lp) {
-        this.lp = lp;
+    public void setLeaguePoints(String lp) {
+        this.leaguePoints = lp;
     }
 
     public void setQueueType(String queueType) {
@@ -117,5 +129,13 @@ public class SummonerRank {
     
     public void setWins(int wins) {
         this.wins = wins;
+    }
+
+    public void setLeagueId(String leagueId) {
+        this.leagueId = leagueId;
+    }
+
+    public void setSummonerId(String summonerId) {
+        this.summonerId = summonerId;
     }
 }
