@@ -16,7 +16,7 @@ import com.leaguetracker.app.model.SummonerRank;
 import com.leaguetracker.app.service.RankService;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:8080")
+@CrossOrigin(origins = "http://localhost:5173")
 @RequestMapping("/ranks")
 public class RankController {
 
