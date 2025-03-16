@@ -26,22 +26,25 @@
     </nav>
 
     <!-- Content Area -->
-    <div class="content">
-      <h1>Summoner found</h1>
-      <UserProfile
-        :profileIconUrl="profileIconUrl"
-        :summonerName="summonerName"
-        :summonerLevel="summonerLevel"
-        :summonerRank="summonerRank"
-        :wins="wins"
-        :losses="losses"
-        :summonerRankFlex="summonerRankFlex"
-        :winsFlex="winsFlex"
-        :lossesFlex="lossesFlex"
-      />
-      <MatchHistory :matches="matches" />
+    <div class="page-container">
+      <div class="content">
+        <div class="user-profile">
+          <UserProfile
+            :profileIconUrl="profileIconUrl"
+            :summonerName="summonerName"
+            :summonerLevel="summonerLevel"
+            :summonerRank="summonerRank"
+            :wins="wins"
+            :losses="losses"
+            :summonerRankFlex="summonerRankFlex"
+            :winsFlex="winsFlex"
+            :lossesFlex="lossesFlex"
+          />
+        </div>
+        </div class="matches">
+        <MatchHistory :matches="matches" />
+        </div>
     </div>
-  </div>
 </template>
 
 <script>
@@ -166,6 +169,7 @@ body {
   --button-color: #1c1c1e;
   --primary-color: #3a435d;
   --nav-bar: #5f7fd2;
+  --grey-background: #edeef2:
 }
 
 /* Dark Mode Toggle Button */
@@ -176,6 +180,14 @@ body {
   --button-color: #1c1c1e;
   --primary-color: #3a435d;
   --nav-bar: #5f7fd2;
+}
+
+.page-container {
+  position: relative;
+  width: 100%;
+  padding-top: 60px; /* Equal to navbar height */
+  min-height: 100vh; /* Full viewport height */
+  box-sizing: border-box;
 }
 
 #theme-switch {
@@ -249,15 +261,36 @@ nav {
   justify-content: center;
 }
 
-/* Profile Icon Styling */
-.profile-icon {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
+.content {
+  position: relative;
+  width: 100%;
+  max-width: 100%; /* Full width as requested */
+  padding: 40px 0 0 0; /* Small top padding instead of margin */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
-.content {
-  text-align: center;
-  margin-top: 20px;
+.user-profile {
+  text-align: left;
+  margin-top: 0;
+  margin-left: 200px;
+  padding-bottom: 30px;
+}
+
+.user-profile::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%; /* Control border width without affecting content */
+  height: 1px;
+  background-color: #edeef2;
+}
+
+.matches {
+  text-align: left;
+  margin-top: 0;
+  margin-left: 300px;
 }
 </style>

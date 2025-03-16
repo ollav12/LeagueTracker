@@ -1,10 +1,12 @@
 <template>
     <div class="user-profile">
-      <img :src="profileIconUrl" alt="Profile Icon" class="profile-icon" />
-      <h2>{{ summonerName }}</h2>
+      <div class="profile-header">
+        <img :src="profileIconUrl" alt="Profile Icon" class="profile-icon" />
+        <h2 class="summoner-name">{{ summonerName }}</h2>
+      </div>
       <p>Level: {{ summonerLevel }}</p>
-      <p>Ranked Solo: {{ summonerRank }}    |          {{ wins }}W - {{ losses }}L ({{ winPercentage }}%)</p>
-      <p>Ranked Flex: {{ summonerRankFlex }}    |          {{ winsFlex }}W - {{ lossesFlex }}L ({{ winPercentageFlex }}%)</p>
+      <p>Ranked Solo: {{ summonerRank }}|{{ wins }}W - {{ losses }}L ({{ winPercentage }}%)</p>
+      <p>Ranked Flex: {{ summonerRankFlex }} | {{ winsFlex }}W - {{ lossesFlex }}L ({{ winPercentageFlex }}%)</p>
     </div>
   </template>
   
@@ -38,16 +40,30 @@
         }
   }
 }
-  </script>
+</script>
+
+<style scoped>
+.user-profile {
+  text-align: left;
   
-  <style scoped>
-  .user-profile {
-    text-align: center;
-  }
-  
-  .profile-icon {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-  }
-  </style>
+}
+
+.profile-header {
+  display: flex;
+  align-items: top;
+  margin-bottom: 15px;
+}
+
+.profile-icon {
+  width: 100px;
+  height: 100px;
+  border-radius: 20%;
+  margin-right: 15px;
+}
+
+.summoner-name {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 550;
+}
+</style>
