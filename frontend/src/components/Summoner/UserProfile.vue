@@ -15,18 +15,71 @@
           <p v-else-if="hasBeenUpdated" class="cooldown-text">Last updated: {{ lastUpdatedText }}</p>
         </div>
       </div>
-      <div class="rank-row">
-        <div class="rank-icon-container">
-          <img :src="localRankSoloIconUrl" alt="Solo Rank" class="rank-icon" />
-        </div>
-        <p>{{ localSummonerRank }} | {{ localWins }}W - {{ localLosses }}L ({{ winPercentage }}%)</p>
-      </div>
       
-      <div class="rank-row">
-        <div class="rank-icon-container">
-          <img :src="localRankFlexIconUrl" alt="Flex Rank" class="rank-icon" />
+      <!-- Add the nav bar here -->
+      <div class="profile-nav">
+        <button 
+          class="nav-item" 
+          :class="{ 'active': activeTab === 'summary' }"
+          @click="activeTab = 'summary'"
+        >
+          Summary
+        </button>
+        <button 
+          class="nav-item" 
+          :class="{ 'active': activeTab === 'champions' }"
+          @click="activeTab = 'champions'"
+        >
+          Champions
+        </button>
+        <button 
+          class="nav-item" 
+          :class="{ 'active': activeTab === 'mastery' }"
+          @click="activeTab = 'mastery'"
+        >
+          Mastery
+        </button>
+        <button 
+          class="nav-item" 
+          :class="{ 'active': activeTab === 'live' }"
+          @click="activeTab = 'live'"
+        >
+          Live Game
+        </button>
+      </div>
+
+
+      <!-- Tab content -->
+      <div class="tab-content">
+        <!-- Summary tab (current content) -->
+        <div v-if="activeTab === 'summary'">
+          <div class="rank-row">
+            <div class="rank-icon-container">
+              <img :src="localRankSoloIconUrl" alt="Solo Rank" class="rank-icon" />
+            </div>
+            <p class="rankText">{{ localSummonerRank }} | {{ localWins }}W - {{ localLosses }}L ({{ winPercentage }}%)</p>
+          </div>
+          
+          <div class="rank-row">
+            <div class="rank-icon-container">
+              <img :src="localRankFlexIconUrl" alt="Flex Rank" class="rank-icon" />
+            </div>
+            <p class="rankText">{{ localSummonerRankFlex }} | {{ localWinsFlex }}W - {{ localLossesFlex }}L ({{ winPercentageFlex }}%)</p>
+          </div>
         </div>
-        <p>{{ localSummonerRankFlex }} | {{ localWinsFlex }}W - {{ localLossesFlex }}L ({{ winPercentageFlex }}%)</p>
+        
+        <!-- Placeholder for other tabs -->
+        <div v-else-if="activeTab === 'champions'" class="placeholder-content">
+          Champions stats will be shown here
+        </div>
+        
+        <div v-else-if="activeTab === 'mastery'" class="placeholder-content">
+          Mastery information will be shown here
+        </div>
+        
+        <div v-else-if="activeTab === 'live'" class="placeholder-content">
+          Live game data will be shown here
+        </div>
       </div>
     </div>
   </template>
@@ -68,7 +121,9 @@
         lastUpdatedAt: null,
         hasBeenUpdated: false,
         updateInterval: null,
-        updateTicker: 0
+        updateTicker: 0,
+
+        activeTab: 'summary'
       }
     },
     watch: {
@@ -232,6 +287,44 @@
 }
 </script>
 <style scoped>
+.profile-nav {
+  display: flex;
+  margin-bottom: 16px;
+  border-bottom: 1px solid #e9e9e9;
+}
+
+.nav-item {
+  padding: 10px 16px;
+  margin-right: 8px;
+  background: none;
+  border: none;
+  font-size: 14px;
+  line-height: 36px;
+  color: #7d7d7d;
+  cursor: pointer;
+  position: relative;
+  transition: color 0.2s;
+  font-weight: 700;
+}
+
+.nav-item:hover {
+  color: #4f84ea;
+}
+
+.nav-item.active {
+  color: #4f84ea;
+}
+
+.nav-item.active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background-color: #4f84ea;
+}
+
 .ladder-rank {
   margin: 0px 0;
   font-size: 12px;
@@ -244,6 +337,7 @@
   display: flex;
   align-items: center;
   margin-bottom: 0px;
+  font-weight: 700;
 }
 
 .rank-icon {
@@ -275,6 +369,7 @@
   align-items: center;
   /* This makes sure the container doesn't resize */
   flex-shrink: 0;
+  font-weight: 700;
 }
 
 .icon-container {
@@ -288,7 +383,7 @@
 .profile-header {
   display: flex;
   align-items: top;
-  margin-bottom: 15px;
+  margin-bottom: 60px;
 }
 
 .profile-icon {
@@ -351,12 +446,24 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  position: relative;
+  padding-bottom: 20px;
 }
 
 .cooldown-text {
-  margin-top: 5px;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  margin: 0;
   font-size: 12px;
   color: #8a8a8a;
+  height: 16px; /* Fixed height to prevent layout shifts */
+}
+
+.rankText {
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 28px;
 }
 
 /* Optional: Adjust font size for larger numbers */
