@@ -63,9 +63,9 @@ export default {
   data() {
     return {
       puuid: null,
-      profileIconUrl: "https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/profile-icons/",
-      soloRankIconUrl: "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-",
-      flexRankIconUrl: "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-",
+      profileIconUrl: "",
+      soloRankIconUrl: "",
+      flexRankIconUrl: "",
       summonerName: '',
       summonerLevel: null,
       soloRank: '',
@@ -110,17 +110,19 @@ export default {
     },
     handleFormSubmit(summoner, region) {
       // Handle the form submission event
+      //console.log("hello")
       console.log(`Summoner: ${summoner}, Region: ${region}`);
       // Fetch the summoner data and update the profileIconUrl
       this.fetchSummonerData(region, summoner);
     },
     async fetchSummonerData(region, summoner) {
       try {
+        //console.log("hello")
         const summonerResponse = await axios.get(`/summoners/${region}/${summoner}-${region}`);
         // Handle the response data
         console.log(summonerResponse.data);
         // Update the profile data
-        this.profileIconUrl += summonerResponse.data.summonerProfileIconId + ".jpg";
+        this.profileIconUrl = "https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/profile-icons/" + summonerResponse.data.summonerProfileIconId + ".jpg";
         this.summonerName = summonerResponse.data.summonerName + "#" + region;
         this.summonerLevel = summonerResponse.data.summonerLevel;
         this.puuid = summonerResponse.data.puuid;
@@ -137,13 +139,13 @@ export default {
           flexRankRes = rankResponse.data[0]
         }
 
-        this.soloRank = soloRankRes.tier + " " + soloRankRes.rank + " " + soloRankRes.leaguePoints + "LP";
-        this.soloRankIconUrl += soloRankRes.tier.toLowerCase() + ".png"
+        this.soloRank = soloRankRes.tier + " " + soloRankRes.rank + " " + soloRankRes.leaguePoints + " LP";
+        this.soloRankIconUrl = "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-" + soloRankRes.tier.toLowerCase() + ".png"
         this.soloWins = soloRankRes.wins
         this.soloLosses = soloRankRes.losses
 
-        this.flexRank = flexRankRes.tier + " " + flexRankRes.rank + " " + flexRankRes.leaguePoints + "LP";
-        this.flexRankIconUrl += flexRankRes.tier.toLowerCase() + ".png"
+        this.flexRank = flexRankRes.tier + " " + flexRankRes.rank + " " + flexRankRes.leaguePoints + " LP";
+        this.flexRankIconUrl = "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-" + flexRankRes.tier.toLowerCase() + ".png"
         this.flexWins = flexRankRes.wins
         this.flexLosses = flexRankRes.losses
 
@@ -181,7 +183,7 @@ body {
   --button-color: #1c1c1e;
   --primary-color: #3a435d;
   --nav-bar: #5f7fd2;
-  --grey-background: #edeef2:
+  --grey-background: #edeef2;  /* Fixed syntax error */
 }
 
 /* Dark Mode Toggle Button */
@@ -192,6 +194,7 @@ body {
   --button-color: #1c1c1e;
   --primary-color: #3a435d;
   --nav-bar: #5f7fd2;
+  --grey-background: #1a1c23; /* Add dark mode grey */
 }
 
 .page-container {
@@ -200,6 +203,7 @@ body {
   padding-top: 60px; /* Equal to navbar height */
   min-height: 100vh; /* Full viewport height */
   box-sizing: border-box;
+  background-color: #edeef2; /* Add this line */
 }
 
 #theme-switch {
@@ -231,7 +235,7 @@ body {
 }
 
 .summoner-view {
-  background-color: var(--base-color);
+  background-color: #f7f7f9;
 }
 
 nav {
@@ -271,28 +275,5 @@ nav {
   flex: 1;
   display: flex;
   justify-content: center;
-}
-
-.content {
-  position: relative;
-  width: 100%;
-  max-width: 100%; /* Full width as requested */
-  padding: 40px 0 0 0; /* Small top padding instead of margin */
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-}
-
-.user-profile {
-  text-align: left;
-  margin-top: 0;
-  margin-left: 200px;
-  padding-bottom: 30px;
-}
-
-.matches {
-  text-align: left;
-  margin-top: 0;
-  margin-left: 300px;
 }
 </style>

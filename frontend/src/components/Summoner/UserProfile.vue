@@ -142,10 +142,10 @@
       rankFlexIconUrl(newVal) { this.localRankFlexIconUrl = newVal; },
       summonerName(newVal) { this.localSummonerName = newVal; },
       summonerLevel(newVal) { this.localSummonerLevel = newVal; },
-      summonerRank(newVal) { this.localSummonerRank = newVal; },
+      soloRank(newVal) { this.localSummonerRank = newVal; },
       wins(newVal) { this.localWins = newVal; },
       losses(newVal) { this.localLosses = newVal; },
-      summonerRankFlex(newVal) { this.localSummonerRankFlex = newVal; },
+      flexRank(newVal) { this.localSummonerRankFlex = newVal; },
       winsFlex(newVal) { this.localWinsFlex = newVal; },
       lossesFlex(newVal) { this.localLossesFlex = newVal; },
       matches(newVal) { this.localMatches = newVal },
@@ -211,12 +211,12 @@
             flexRank = rankResponse.data[0]
           }
 
-          this.localSummonerRank = soloRank.tier + " " + soloRank.rank + " " + soloRank.leaguePoints + "LP";
+          this.localSummonerRank = soloRank.tier + " " + soloRank.rank + " " + soloRank.leaguePoints + " LP";
           this.localRankSoloIconUrl = "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-" + soloRank.tier.toLowerCase() + ".png";
           this.localWins = soloRank.wins
           this.localLosses = soloRank.losses
 
-          this.localSummonerRankFlex = flexRank.tier + " " + flexRank.rank + " " + flexRank.leaguePoints + "LP";
+          this.localSummonerRankFlex = flexRank.tier + " " + flexRank.rank + " " + flexRank.leaguePoints + " LP";
           this.localRankFlexIconUrl = "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-" + flexRank.tier.toLowerCase() + ".png";
           this.localWinsFlex = flexRank.wins
           this.localLossesFlex = flexRank.losses
@@ -290,53 +290,53 @@
 }
 </script>
 <style scoped>
+  
 .profile-nav {
-  display: flex;
   position: relative;
-  margin-bottom: 0;
-  padding: 0 20px;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.profile-nav::before {
-  top: 0; /* Border at the top */
-}
-
-.profile-nav::after {
-  bottom: 0; /* Border at the bottom */
+  background-color: transparent;
+  z-index: 1;
+  padding-left: 400px;
+  padding-top: 4px;       /* Add top padding */
+  padding-bottom: 4px;    /* Add bottom padding */
+  border-top: 1px solid #e9e9e9;    /* Add grey top border */
+  border-bottom: 1px solid #e9e9e9;  /* Add grey bottom border */
 }
 
 .nav-item {
-  padding: 10px 16px;
-  margin-right: 8px;
+  padding: 1px 16px;
+  margin-right: 5px;
   background: none;
   border: none;
   font-size: 14px;
   line-height: 36px;
-  color: #7d7d7d;
+  color: rgb(32, 45, 55);
   cursor: pointer;
   position: relative;
-  transition: color 0.2s;
-  font-weight: 700;
+  transition: all 0.2s;
+  font-weight: 400;
+  border-radius: 3px;
+  font-family: 'Roboto';
 }
 
 .nav-item:hover {
-  color: #4f84ea;
+  background-color: #f7f7f9;
 }
-
 .nav-item.active {
   color: #4f84ea;
+  font-weight: 700;
+  background-color: rgba(79, 132, 234, 0.1); /* Light blue background */
 }
 
-.nav-item.active::after {
-  content: '';
-  position: absolute;
-  bottom: -1px;
-  left: 0;
-  width: 100%;
-  height: 3px;
-  background-color: #4f84ea;
+
+
+
+.user-profile {
+  text-align: left;
+  position: relative; /* Add this to contain the nav bar */
+  overflow-x: hidden; /* Prevent horizontal scrollbar */
+  background-color: white;
+  padding-bottom: 20px;
+  size: 100%;
 }
 
 .ladder-rank {
@@ -345,12 +345,6 @@
   line-height: 16px;
   color: rgb(117, 133, 146);
   font-weight: 400;
-}
-
-.user-profile {
-  text-align: left;
-  position: relative; /* Add this to contain the nav bar */
-  overflow-x: hidden; /* Prevent horizontal scrollbar */
 }
 
 .icon-container {
@@ -365,6 +359,10 @@
   display: flex;
   align-items: top;
   margin-bottom: 60px;
+  padding: 20px;
+  position: relative; /* Keep content above the white background */
+  padding-top: 40px;
+  padding-left: 400px;
 }
 
 .profile-icon {
@@ -373,7 +371,6 @@
   border-radius: 20%;
   object-fit: cover; /* Ensures the image covers the entire container */
 }
-
 
 .summoner-name {
   margin: 0;
@@ -431,17 +428,6 @@
   padding-bottom: 20px;
 }
 
-.profile-nav::before,
-.profile-nav::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%; /* Control border width without affecting content */
-  height: 1px;
-  background-color: #edeef2;
-}
-
 .cooldown-text {
   position: absolute;
   bottom: 0;
@@ -457,6 +443,7 @@
   font-size: 20px;
   line-height: 28px;
 }
+
 
 /* Optional: Adjust font size for larger numbers */
 @media screen and (max-width: 720px) {
