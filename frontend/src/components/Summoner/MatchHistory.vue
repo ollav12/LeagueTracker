@@ -30,25 +30,28 @@
       matches: Array,
     },
   }
-  </script>
+</script>
   
-  <style scoped>
-  .match-history {
-    margin-top: 20px;
-  }
-  
-  table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-  
-  th, td {
-    border: 1px solid #ddd;
-    padding: 8px;
-  }
-  
-  th {
-    background-color: #f2f2f2;
-    text-align: left;
-  }
-  </style>
+<style scoped>
+.match-history {
+  margin-top: 20px;
+  background-color: #f7f7f9; /* Light grey background */
+  padding: 16px;             /* Add padding for better spacing */
+  border-radius: 4px;        /* Optional: rounded corners */
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+th {
+  background-color: #f2f2f2;
+  text-align: left;
+}
+</style>

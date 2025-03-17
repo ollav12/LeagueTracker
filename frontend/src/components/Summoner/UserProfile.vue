@@ -53,19 +53,16 @@
       <div class="tab-content">
         <!-- Summary tab (current content) -->
         <div v-if="activeTab === 'summary'">
-          <div class="rank-row">
-            <div class="rank-icon-container">
-              <img :src="localRankSoloIconUrl" alt="Solo Rank" class="rank-icon" />
-            </div>
-            <p class="rankText">{{ localSummonerRank }} | {{ localWins }}W - {{ localLosses }}L ({{ winPercentage }}%)</p>
-          </div>
-          
-          <div class="rank-row">
-            <div class="rank-icon-container">
-              <img :src="localRankFlexIconUrl" alt="Flex Rank" class="rank-icon" />
-            </div>
-            <p class="rankText">{{ localSummonerRankFlex }} | {{ localWinsFlex }}W - {{ localLossesFlex }}L ({{ winPercentageFlex }}%)</p>
-          </div>
+          <RankHistory
+            :soloRank="soloRank"
+            :soloWins="soloWins"
+            :soloLosses="soloLosses"
+            :soloRankIconUrl="soloRankIconUrl"
+            :flexRank="flexRank"
+            :flexWins="flexWins"
+            :flexLosses="flexLosses"
+            :flexRankIconUrl="flexRankIconUrl"/>
+          <MatchHistory :matches="localMatches"/>
         </div>
         
         <!-- Placeholder for other tabs -->
@@ -86,33 +83,43 @@
   
   <script>
   import axios from '@/plugins/axios';
+  import RankHistory from '@/components/Summoner/RankHistory.vue';
+  import MatchHistory from '@/components/Summoner/MatchHistory.vue';
+  
   export default {
+    components: {
+      RankHistory,
+      MatchHistory
+    },
     props: {
+      puuid: String,
       profileIconUrl: String,
       summonerName: String,
       summonerLevel: Number,
-      summonerRank: String,
-      wins: Number,
-      losses: Number,
-      summonerRankFlex: String,
-      winsFlex: Number,
-      lossesFlex: Number,
-      rankSoloIconUrl: String,
-      rankFlexIconUrl: String,
+      soloRank: String,
+      soloWins: Number,
+      soloLosses: Number,
+      flexRank: String,
+      flexWins: Number,
+      flexLosses: Number,
+      soloRankIconUrl: String,
+      flexRankIconUrl: String,
+      matches: Array,
     },
     data() {
       return {
+        localPuuid: this.puuid,
         localProfileIconUrl: this.profileIconUrl,
         localSummonerName: this.summonerName,
         localSummonerLevel: this.summonerLevel,
-        localSummonerRank: this.summonerRank,
-        localRankSoloIconUrl: this.rankSoloIconUrl,
-        localRankFlexIconUrl: this.rankFlexIconUrl,
-        localWins: this.wins,
-        localLosses: this.losses,
-        localSummonerRankFlex: this.summonerRankFlex,
-        localWinsFlex: this.winsFlex,
-        localLossesFlex: this.lossesFlex,
+        localSummonerRank: this.soloRank,
+        localRankSoloIconUrl: this.soloRankIconUrl,
+        localRankFlexIconUrl: this.flexRankIconUrl,
+        localWins: this.soloWins,
+        localLosses: this.soloLosses,
+        localSummonerRankFlex: this.flexRank,
+        localWinsFlex: this.flexWins,
+        localLossesFlex: this.flexLosses,
 
         isUpdating: false,
         cooldownActive: false,
@@ -123,10 +130,13 @@
         updateInterval: null,
         updateTicker: 0,
 
+        localMatches: this.matches,
+
         activeTab: 'summary'
       }
     },
     watch: {
+      puuid(newVal) { this.localPuuid = newVal; },
       profileIconUrl(newVal) { this.localProfileIconUrl = newVal; },
       rankSoloIconUrl(newVal) { this.localRankSoloIconUrl = newVal; },
       rankFlexIconUrl(newVal) { this.localRankFlexIconUrl = newVal; },
@@ -138,6 +148,7 @@
       summonerRankFlex(newVal) { this.localSummonerRankFlex = newVal; },
       winsFlex(newVal) { this.localWinsFlex = newVal; },
       lossesFlex(newVal) { this.localLossesFlex = newVal; },
+      matches(newVal) { this.localMatches = newVal },
     },
     computed: {
       lastUpdatedText() {
@@ -160,20 +171,6 @@
         if (this.cooldownActive) 
           return `Updated`;
         return 'Update';
-      },
-      winPercentage() {
-        const totalGames = this.wins + this.losses;
-        if (totalGames === 0) {
-          return 0;
-        }
-        return Math.round((this.wins / totalGames) * 100);
-      },
-      winPercentageFlex() {
-        const totalGames = this.winsFlex + this.lossesFlex;
-        if (totalGames === 0) {
-          return 0;
-        }
-        return Math.round((this.winsFlex / totalGames) * 100);
       }
     },
     mounted() {
@@ -224,6 +221,12 @@
           this.localWinsFlex = flexRank.wins
           this.localLossesFlex = flexRank.losses
 
+          const matchResponse = await axios.post('/matches', {
+            "puuid": this.localPuuid
+          });
+
+          console.log(matchResponse.data);
+          this.localMatches = matchResponse.data;
 
           this.isUpdating = false;
           this.startCooldown();
@@ -289,8 +292,19 @@
 <style scoped>
 .profile-nav {
   display: flex;
-  margin-bottom: 16px;
-  border-bottom: 1px solid #e9e9e9;
+  position: relative;
+  margin-bottom: 0;
+  padding: 0 20px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.profile-nav::before {
+  top: 0; /* Border at the top */
+}
+
+.profile-nav::after {
+  bottom: 0; /* Border at the bottom */
 }
 
 .nav-item {
@@ -333,43 +347,10 @@
   font-weight: 400;
 }
 
-.rank-row {
-  display: flex;
-  align-items: center;
-  margin-bottom: 0px;
-  font-weight: 700;
-}
-
-.rank-icon {
-  /* Make the image much larger than the container */
-  width: 130px;
-  height: 130px;
-  /* This centers the image and ensures it fills the container */
-  object-fit: cover;
-  /* Adjust these values to center the important part of the emblem */
-  object-position: center 85%;
-  /* Prevent the image from being squished */
-  transform: scale(1.3);
-}
-
 .user-profile {
   text-align: left;
-  
-}
-
-.rank-icon-container {
-  width: 72px;
-  height: 72px;
-  border-radius: 50%; 
-  overflow: hidden;
-  margin-right: 20px;
-  background-color: #f7f7f9;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  /* This makes sure the container doesn't resize */
-  flex-shrink: 0;
-  font-weight: 700;
+  position: relative; /* Add this to contain the nav bar */
+  overflow-x: hidden; /* Prevent horizontal scrollbar */
 }
 
 .icon-container {
@@ -448,6 +429,17 @@
   align-items: flex-start;
   position: relative;
   padding-bottom: 20px;
+}
+
+.profile-nav::before,
+.profile-nav::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%; /* Control border width without affecting content */
+  height: 1px;
+  background-color: #edeef2;
 }
 
 .cooldown-text {

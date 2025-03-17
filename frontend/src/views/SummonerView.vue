@@ -30,55 +30,54 @@
       <div class="content">
         <div class="user-profile">
           <UserProfile
+            :puuid="puuid"
             :profileIconUrl="profileIconUrl"
             :summonerName="summonerName"
             :summonerLevel="summonerLevel"
-            :summonerRank="summonerRank"
-            :wins="wins"
-            :losses="losses"
-            :summonerRankFlex="summonerRankFlex"
-            :winsFlex="winsFlex"
-            :lossesFlex="lossesFlex"
-            :rankSoloIconUrl="rankSoloIconUrl"
-            :rankFlexIconUrl="rankFlexIconUrl"
+            :soloRank="soloRank"
+            :soloWins="soloWins"
+            :soloLosses="soloLosses"
+            :flexRank="flexRank"
+            :flexWins="flexWins"
+            :flexLosses="flexLosses"
+            :soloRankIconUrl="soloRankIconUrl"
+            :flexRankIconUrl="flexRankIconUrl"
+            :matches="matches"
           />
         </div>
-        </div class="matches">
-        <MatchHistory :matches="matches" />
-        </div>
+      </div>
     </div>
+  </div>
 </template>
 
 <script>
 import axios from '@/plugins/axios'; // Import the configured axios instance
 import SearchForm from '@/components/Form/SearchForm.vue'
 import UserProfile from '@/components/Summoner/UserProfile.vue'
-import MatchHistory from '@/components/Summoner/MatchHistory.vue'
 
 export default {
   components: {
     SearchForm,
-    UserProfile,
-    MatchHistory
+    UserProfile
   },
   data() {
     return {
       puuid: null,
       profileIconUrl: "https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/profile-icons/",
-      rankSoloIconUrl: "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-",
-      rankFlexIconUrl: "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-",
+      soloRankIconUrl: "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-",
+      flexRankIconUrl: "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-",
       summonerName: '',
       summonerLevel: null,
-      summonerRank: '',
-      wins: 0,
-      losses: 0,
-      summonerRankFlex: '',
-      winsFlex: 0,
-      lossesFlex: 0,
-      matches: [],
+      soloRank: '',
+      soloWins: 0,
+      soloLosses: 0,
+      flexRank: '',
+      flexWins: 0,
+      flexLosses: 0,
       toggle: false,
       darkmode: localStorage.getItem('darkmode'),
-      themeSwitch: document.getElementById('themeSwitch')
+      themeSwitch: document.getElementById('themeSwitch'),
+      matches: [],
     }
   },
   mounted() {
@@ -131,23 +130,30 @@ export default {
         });
       
         console.log(rankResponse.data);
-        let soloRank = rankResponse.data[0]
-        let flexRank = rankResponse.data[1]
-        if (soloRank.queueType == "RANKED_FLEX_SR") {
-          soloRank = rankResponse.data[1]
-          flexRank = rankResponse.data[0]
+        let soloRankRes = rankResponse.data[0]
+        let flexRankRes = rankResponse.data[1]
+        if (soloRankRes.queueType == "RANKED_FLEX_SR") {
+          soloRankRes = rankResponse.data[1]
+          flexRankRes = rankResponse.data[0]
         }
 
-        this.summonerRank = soloRank.tier + " " + soloRank.rank + " " + soloRank.leaguePoints + "LP";
-        this.rankSoloIconUrl += soloRank.tier.toLowerCase() + ".png"
-        this.wins = soloRank.wins
-        this.losses = soloRank.losses
+        this.soloRank = soloRankRes.tier + " " + soloRankRes.rank + " " + soloRankRes.leaguePoints + "LP";
+        this.soloRankIconUrl += soloRankRes.tier.toLowerCase() + ".png"
+        this.soloWins = soloRankRes.wins
+        this.soloLosses = soloRankRes.losses
 
-        this.summonerRankFlex = flexRank.tier + " " + flexRank.rank + " " + flexRank.leaguePoints + "LP";
-        this.rankFlexIconUrl += flexRank.tier.toLowerCase() + ".png"
-        this.winsFlex = flexRank.wins
-        this.lossesFlex = flexRank.losses
-        this.matches = summonerResponse.data.matches; // Adjust based on actual response structure
+        this.flexRank = flexRankRes.tier + " " + flexRankRes.rank + " " + flexRankRes.leaguePoints + "LP";
+        this.flexRankIconUrl += flexRankRes.tier.toLowerCase() + ".png"
+        this.flexWins = flexRankRes.wins
+        this.flexLosses = flexRankRes.losses
+
+        const matchResponse = await axios.post('/matches', {
+            "puuid": this.puuid
+          });
+
+        console.log(matchResponse.data);
+        this.matches = matchResponse.data;
+
       } catch (error) {
         console.error('Error fetching summoner data:', error);
       }
@@ -282,16 +288,6 @@ nav {
   margin-top: 0;
   margin-left: 200px;
   padding-bottom: 30px;
-}
-
-.user-profile::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%; /* Control border width without affecting content */
-  height: 1px;
-  background-color: #edeef2;
 }
 
 .matches {
