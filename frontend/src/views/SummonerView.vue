@@ -39,6 +39,8 @@
             :summonerRankFlex="summonerRankFlex"
             :winsFlex="winsFlex"
             :lossesFlex="lossesFlex"
+            :rankSoloIconUrl="rankSoloIconUrl"
+            :rankFlexIconUrl="rankFlexIconUrl"
           />
         </div>
         </div class="matches">
@@ -62,7 +64,9 @@ export default {
   data() {
     return {
       puuid: null,
-      profileIconUrl: null,
+      profileIconUrl: "https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/profile-icons/",
+      rankSoloIconUrl: "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-",
+      rankFlexIconUrl: "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-",
       summonerName: '',
       summonerLevel: null,
       summonerRank: '',
@@ -117,10 +121,10 @@ export default {
         // Handle the response data
         console.log(summonerResponse.data);
         // Update the profile data
-        this.profileIconUrl = summonerResponse.data.summonerIconUrl; // Adjust based on actual response structure
-        this.summonerName = summonerResponse.data.accountData.gameName + "#" + region;
-        this.summonerLevel = summonerResponse.data.summonerData.summonerLevel;
-        this.puuid = summonerResponse.data.accountData.puuid;
+        this.profileIconUrl += summonerResponse.data.summonerProfileIconId + ".jpg";
+        this.summonerName = summonerResponse.data.summonerName + "#" + region;
+        this.summonerLevel = summonerResponse.data.summonerLevel;
+        this.puuid = summonerResponse.data.puuid;
 
         const rankResponse = await axios.post(`/ranks`, {
           "puuid": this.puuid
@@ -135,10 +139,12 @@ export default {
         }
 
         this.summonerRank = soloRank.tier + " " + soloRank.rank + " " + soloRank.leaguePoints + "LP";
+        this.rankSoloIconUrl += soloRank.tier.toLowerCase() + ".png"
         this.wins = soloRank.wins
         this.losses = soloRank.losses
 
         this.summonerRankFlex = flexRank.tier + " " + flexRank.rank + " " + flexRank.leaguePoints + "LP";
+        this.rankFlexIconUrl += flexRank.tier.toLowerCase() + ".png"
         this.winsFlex = flexRank.wins
         this.lossesFlex = flexRank.losses
         this.matches = summonerResponse.data.matches; // Adjust based on actual response structure

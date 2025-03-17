@@ -19,7 +19,7 @@ public class SummonerService {
     }
 
     public Summoner getSummoner(String puuid) {
-        return summonerRepository.findById(puuid).orElseThrow();
+        return summonerRepository.findById(puuid).orElse(null);
     }
 
     public List<Summoner> getAllSummoners() {

@@ -1,5 +1,7 @@
 package com.leaguetracker.app.model;
 
+import java.util.Date;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
@@ -14,6 +16,7 @@ public class Summoner {
     private String region;
     private int summonerProfileIconId;
     private long summonerLevel;
+    private Date lastUpdated;
 
     public Summoner(String puuid, String summonerName, String region, int summonerProfileIconId, long summonerLevel) {
         this.puuid = puuid;
@@ -21,9 +24,14 @@ public class Summoner {
         this.region = region;
         this.summonerProfileIconId = summonerProfileIconId;
         this.summonerLevel = summonerLevel;
+        this.lastUpdated = new Date();
     }
 
     public Summoner() {
+    }
+    
+    public Date getLastUpdated() {
+        return lastUpdated;
     }
 
     public String getPuuid() {
@@ -59,5 +67,9 @@ public class Summoner {
 
     public void setSummonerProfileIconId(int summonerProfileIconId) {
         this.summonerProfileIconId = summonerProfileIconId;
+    }
+
+    public void setLastUpdated(Date lastUpdated) {
+        this.lastUpdated = new Date();
     }
 }

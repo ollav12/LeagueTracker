@@ -2,11 +2,12 @@
     <div class="user-profile">
       <div class="profile-header">
         <div class="icon-container">
-          <img :src="profileIconUrl" alt="Profile Icon" class="profile-icon" />
-          <span class="level">{{ summonerLevel }}</span>
+          <img :src="localProfileIconUrl" alt="Profile Icon" class="profile-icon" />
+          <span class="level">{{ localSummonerLevel }}</span>
         </div>
           <div class="name-container">
-          <h2 class="summoner-name">{{ summonerName }}</h2>
+          <h2 class="summoner-name">{{ localSummonerName }}</h2>
+          <p class="ladder-rank">EUW | Ladder Rank 77,321 (3.71% of top)</p>
           <button class="update-button" @click="updateSummoner" :disabled="isUpdating || cooldownActive">
             {{ buttonText }}
           </button>
@@ -14,8 +15,19 @@
           <p v-else-if="hasBeenUpdated" class="cooldown-text">Last updated: {{ lastUpdatedText }}</p>
         </div>
       </div>
-      <p>Ranked Solo: {{ summonerRank }}|{{ wins }}W - {{ losses }}L ({{ winPercentage }}%)</p>
-      <p>Ranked Flex: {{ summonerRankFlex }} | {{ winsFlex }}W - {{ lossesFlex }}L ({{ winPercentageFlex }}%)</p>
+      <div class="rank-row">
+        <div class="rank-icon-container">
+          <img :src="localRankSoloIconUrl" alt="Solo Rank" class="rank-icon" />
+        </div>
+        <p>{{ localSummonerRank }} | {{ localWins }}W - {{ localLosses }}L ({{ winPercentage }}%)</p>
+      </div>
+      
+      <div class="rank-row">
+        <div class="rank-icon-container">
+          <img :src="localRankFlexIconUrl" alt="Flex Rank" class="rank-icon" />
+        </div>
+        <p>{{ localSummonerRankFlex }} | {{ localWinsFlex }}W - {{ localLossesFlex }}L ({{ winPercentageFlex }}%)</p>
+      </div>
     </div>
   </template>
   
@@ -32,9 +44,23 @@
       summonerRankFlex: String,
       winsFlex: Number,
       lossesFlex: Number,
+      rankSoloIconUrl: String,
+      rankFlexIconUrl: String,
     },
     data() {
       return {
+        localProfileIconUrl: this.profileIconUrl,
+        localSummonerName: this.summonerName,
+        localSummonerLevel: this.summonerLevel,
+        localSummonerRank: this.summonerRank,
+        localRankSoloIconUrl: this.rankSoloIconUrl,
+        localRankFlexIconUrl: this.rankFlexIconUrl,
+        localWins: this.wins,
+        localLosses: this.losses,
+        localSummonerRankFlex: this.summonerRankFlex,
+        localWinsFlex: this.winsFlex,
+        localLossesFlex: this.lossesFlex,
+
         isUpdating: false,
         cooldownActive: false,
         cooldownSeconds: 0,
@@ -44,6 +70,19 @@
         updateInterval: null,
         updateTicker: 0
       }
+    },
+    watch: {
+      profileIconUrl(newVal) { this.localProfileIconUrl = newVal; },
+      rankSoloIconUrl(newVal) { this.localRankSoloIconUrl = newVal; },
+      rankFlexIconUrl(newVal) { this.localRankFlexIconUrl = newVal; },
+      summonerName(newVal) { this.localSummonerName = newVal; },
+      summonerLevel(newVal) { this.localSummonerLevel = newVal; },
+      summonerRank(newVal) { this.localSummonerRank = newVal; },
+      wins(newVal) { this.localWins = newVal; },
+      losses(newVal) { this.localLosses = newVal; },
+      summonerRankFlex(newVal) { this.localSummonerRankFlex = newVal; },
+      winsFlex(newVal) { this.localWinsFlex = newVal; },
+      lossesFlex(newVal) { this.localLossesFlex = newVal; },
     },
     computed: {
       lastUpdatedText() {
@@ -101,6 +140,36 @@
           const [name, tag] = (this.summonerName || '').split('#');
           const summonerResponse = await axios.get(`/summoners/${tag}/${name}-${tag}`);
 
+          console.log(summonerResponse.data);
+          // Update the profile data
+          this.localProfileIconUrl = "https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/profile-icons/" + summonerResponse.data.summonerProfileIconId + ".jpg"; // Adjust based on actual response structure
+          this.localSummonerName = summonerResponse.data.summonerName + "#" + tag;
+          this.localSummonerLevel = summonerResponse.data.summonerLevel;
+          this.localPuuid = summonerResponse.data.puuid;
+
+          const rankResponse = await axios.post(`/ranks`, {
+            "puuid": this.localPuuid
+          });
+        
+          console.log(rankResponse.data);
+          let soloRank = rankResponse.data[0]
+          let flexRank = rankResponse.data[1]
+          if (soloRank.queueType == "RANKED_FLEX_SR") {
+            soloRank = rankResponse.data[1]
+            flexRank = rankResponse.data[0]
+          }
+
+          this.localSummonerRank = soloRank.tier + " " + soloRank.rank + " " + soloRank.leaguePoints + "LP";
+          this.localRankSoloIconUrl = "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-" + soloRank.tier.toLowerCase() + ".png";
+          this.localWins = soloRank.wins
+          this.localLosses = soloRank.losses
+
+          this.localSummonerRankFlex = flexRank.tier + " " + flexRank.rank + " " + flexRank.leaguePoints + "LP";
+          this.localRankFlexIconUrl = "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-" + flexRank.tier.toLowerCase() + ".png";
+          this.localWinsFlex = flexRank.wins
+          this.localLossesFlex = flexRank.losses
+
+
           this.isUpdating = false;
           this.startCooldown();
 
@@ -122,7 +191,7 @@
     },
     startCooldown() {
       this.cooldownActive = true;
-      this.cooldownSeconds = 10; // 1 minute cooldown
+      this.cooldownSeconds = 60; // 1 minute cooldown
       
       // Clear any existing timer
       if (this.cooldownTimer) {
@@ -162,16 +231,58 @@
   }
 }
 </script>
-
 <style scoped>
+.ladder-rank {
+  margin: 0px 0;
+  font-size: 12px;
+  line-height: 16px;
+  color: rgb(117, 133, 146);
+  font-weight: 400;
+}
+
+.rank-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0px;
+}
+
+.rank-icon {
+  /* Make the image much larger than the container */
+  width: 130px;
+  height: 130px;
+  /* This centers the image and ensures it fills the container */
+  object-fit: cover;
+  /* Adjust these values to center the important part of the emblem */
+  object-position: center 85%;
+  /* Prevent the image from being squished */
+  transform: scale(1.3);
+}
+
 .user-profile {
   text-align: left;
   
 }
 
+.rank-icon-container {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%; 
+  overflow: hidden;
+  margin-right: 20px;
+  background-color: #f7f7f9;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* This makes sure the container doesn't resize */
+  flex-shrink: 0;
+}
+
 .icon-container {
   position: relative;
   display: inline-block;
+  width: 100px; /* Match the profile icon width */
+  height: 100px; /* Match the profile icon height */
+  margin-right: 20px;
 }
 
 .profile-header {
@@ -181,11 +292,12 @@
 }
 
 .profile-icon {
-  width: 100px;
-  height: 100px;
+  width: 100%;
+  height: 100%;
   border-radius: 20%;
-  margin-right: 15px;
+  object-fit: cover; /* Ensures the image covers the entire container */
 }
+
 
 .summoner-name {
   margin: 0;
@@ -195,8 +307,8 @@
 
 .level {
   position: absolute;
-  bottom: -4px;
-  left: 50px;
+  bottom: -8px; /* Fixed position from the bottom */
+  left: 50%;
   transform: translateX(-50%);
   background-color: #202a38;
   color: white;
@@ -206,6 +318,7 @@
   min-width: 20px;
   max-width: 80px;
   text-align: center;
+  z-index: 2; /* Ensure it's above the image */
 }
 
 .update-button {
@@ -214,11 +327,14 @@
   color: white;
   border: none;
   border-radius: 3px;
-  padding: 10px 10px;
-  font-size: 17px;
+  padding: 9px 14px;
+  font-size: 14px;
   cursor: pointer;
   transition: background-color 0.3s;
   align-self: flex-start;
+  font-family: 'Roboto';
+  font-weight: 400;
+  line-height: 20px;
 }
 
 .update-button:hover {
