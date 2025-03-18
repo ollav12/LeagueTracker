@@ -10,7 +10,10 @@
         <span class="level">{{ localSummonerLevel }}</span>
       </div>
       <div class="name-container">
-        <h2 class="summoner-name">{{ localSummonerName }}</h2>
+        <h2 class="summoner-name">
+          {{ this.localSummonerName }}
+          <span class="tag"> #{{ formatTag(localTag) }}</span>
+        </h2>
         <p class="ladder-rank">EUW | Ladder Rank 77,321 (3.71% of top)</p>
         <button
           class="update-button"
@@ -42,7 +45,7 @@
         :class="{ active: activeTab === 'champions' }"
         @click="activeTab = 'champions'"
       >
-        Champions
+        Champions <span class="update-badge">U</span>
       </button>
       <button
         class="nav-item"
@@ -230,6 +233,10 @@ export default {
     }
   },
   methods: {
+    formatTag(tag) {
+      let [newTag, test] = tag.split("#");
+      return newTag;
+    },
     async updateSummoner() {
       // Existing update code...
       try {
@@ -247,6 +254,7 @@ export default {
         this.localSummonerLevel = summonerResponse.data.summonerLevel;
         this.localPuuid = summonerResponse.data.puuid;
 
+        console.log("Name ", this.localSummonerName);
         const rankResponse = await axios.post(`/ranks`, {
           puuid: this.localPuuid,
         });
@@ -356,6 +364,40 @@ export default {
 };
 </script>
 <style scoped>
+.tag {
+  font-size: 24px;
+  line-height: 28px;
+  font-weight: 400;
+  color: rgb(117, 133, 146);
+}
+
+.update-badge {
+  display: inline-block;
+  background-color: #e99e07;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  line-height: 1;
+  padding: 4px 5px;
+  border-radius: 5px;
+  margin-left: 3px;
+  position: relative;
+  top: -1px;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+/* Adjust padding on the Champions button to accommodate badge */
+.nav-item:has(.update-badge) {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+/* Make badge visible when button is active */
+.nav-item.active .update-badge {
+  background-color: #ffb900; /* Keep yellow even when button is active */
+}
+
 .profile-nav {
   position: relative;
   background-color: transparent;
@@ -365,6 +407,8 @@ export default {
   padding-bottom: 4px; /* Add bottom padding */
   border-top: 1px solid #e9e9e9; /* Add grey top border */
   border-bottom: 1px solid #e9e9e9; /* Add grey bottom border */
+  display: flex; /* Add this to create a flexbox layout */
+  flex-wrap: nowrap; /* Prevent wrapping of buttons */
 }
 
 .nav-item {
@@ -437,7 +481,10 @@ export default {
 .summoner-name {
   margin: 0;
   font-size: 24px;
-  font-weight: 550;
+  font-weight: 700;
+  line-height: 28px;
+  padding-bottom: 2px;
+  color: rgb(32, 45, 55);
 }
 
 .level {

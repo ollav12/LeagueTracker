@@ -117,8 +117,8 @@ export default {
     }
 
     // Fetch summoner data based on route parameters
-    const { region, summoner } = this.$route.params;
-    this.fetchSummonerData(region, summoner);
+    const { region, summoner, tag } = this.$route.params;
+    this.fetchSummonerData(region, summoner, tag);
   },
   methods: {
     goHome() {
@@ -136,34 +136,20 @@ export default {
         localStorage.setItem("darkmode", null);
       }
     },
-    handleFormSubmit(summoner, region) {
-      // Handle the form submission event
-      //console.log("hello")
-      console.log(`Summoner: ${summoner}, Region: ${region}`);
-      // Fetch the summoner data and update the profileIconUrl
-      this.fetchSummonerData(region, summoner);
+    handleFormSubmit(region, summoner, tag) {
+      console.log(`Region: ${region}, Summoner: ${summoner}, Tag: ${tag}`);
+      this.fetchSummonerData(region, summoner, tag);
     },
-    async fetchSummonerData(region, summoner) {
+    async fetchSummonerData(region, summoner, tag) {
       try {
-        let name, tag;
-
-        // Check if current summoner name includes a "#" to determine format
-        if (summoner && summoner.includes("#")) {
-          // Parse from stored summoner name
-          [name, tag] = summoner.split("#");
-        } else {
-          name = summoner;
-          tag = region;
-        }
-
         this.region = region;
         this.tag = tag;
-        console.log("name", name);
+        console.log("summoner", summoner);
         console.log("region: ", region);
         console.log("tag", tag);
 
         const summonerResponse = await axios.get(
-          `/summoners/${region}/${name}-${tag}`
+          `/summoners/${region}/${summoner}-${tag}`
         );
         // Handle the response data
         console.log(summonerResponse.data);
@@ -181,40 +167,57 @@ export default {
         });
 
         console.log(rankResponse.data);
-        let soloRankRes = rankResponse.data[0];
-        let flexRankRes = rankResponse.data[1];
-        if (soloRankRes.queueType == "RANKED_FLEX_SR") {
-          soloRankRes = rankResponse.data[1];
-          flexRankRes = rankResponse.data[0];
+        if (!rankResponse.data || rankResponse.data.length === 0) {
+          // Set defaults for unranked players
+          this.soloRank = "Unranked";
+          this.soloRankIconUrl =
+            "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-iron.png";
+          this.soloWins = 0;
+          this.soloLosses = 0;
+
+          this.flexRank = "Unranked";
+          this.flexRankIconUrl =
+            "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-iron.png";
+          this.flexWins = 0;
+          this.flexLosses = 0;
+        } else {
+          // Process ranks with safety checks
+          let soloRankRes = rankResponse.data[0] || {};
+          let flexRankRes = rankResponse.data[1] || {};
+
+          if (soloRankRes.queueType === "RANKED_FLEX_SR") {
+            soloRankRes = rankResponse.data[1] || {};
+            flexRankRes = rankResponse.data[0] || {};
+          }
+
+          // Solo queue rank
+          if (soloRankRes && soloRankRes.tier) {
+            this.soloRank = `${soloRankRes.tier} ${soloRankRes.rank} ${soloRankRes.leaguePoints} LP`;
+            this.soloRankIconUrl = `https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-${soloRankRes.tier.toLowerCase()}.png`;
+            this.soloWins = soloRankRes.wins || 0;
+            this.soloLosses = soloRankRes.losses || 0;
+          } else {
+            this.soloRank = "Unranked";
+            this.soloRankIconUrl =
+              "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-iron.png";
+            this.soloWins = 0;
+            this.soloLosses = 0;
+          }
+
+          // Flex queue rank
+          if (flexRankRes && flexRankRes.tier) {
+            this.flexRank = `${flexRankRes.tier} ${flexRankRes.rank} ${flexRankRes.leaguePoints} LP`;
+            this.flexRankIconUrl = `https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-${flexRankRes.tier.toLowerCase()}.png`;
+            this.flexWins = flexRankRes.wins || 0;
+            this.flexLosses = flexRankRes.losses || 0;
+          } else {
+            this.flexRank = "Unranked";
+            this.flexRankIconUrl =
+              "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-iron.png";
+            this.flexWins = 0;
+            this.flexLosses = 0;
+          }
         }
-
-        this.soloRank =
-          soloRankRes.tier +
-          " " +
-          soloRankRes.rank +
-          " " +
-          soloRankRes.leaguePoints +
-          " LP";
-        this.soloRankIconUrl =
-          "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-" +
-          soloRankRes.tier.toLowerCase() +
-          ".png";
-        this.soloWins = soloRankRes.wins;
-        this.soloLosses = soloRankRes.losses;
-
-        this.flexRank =
-          flexRankRes.tier +
-          " " +
-          flexRankRes.rank +
-          " " +
-          flexRankRes.leaguePoints +
-          " LP";
-        this.flexRankIconUrl =
-          "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-" +
-          flexRankRes.tier.toLowerCase() +
-          ".png";
-        this.flexWins = flexRankRes.wins;
-        this.flexLosses = flexRankRes.losses;
 
         const matchResponse = await axios.post("/matches", {
           puuid: this.puuid,
