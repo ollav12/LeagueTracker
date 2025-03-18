@@ -4,23 +4,47 @@
     <nav>
       <!-- Back to Home Button -->
       <button class="home-button" @click="goHome">
-        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f6368">
-          <path d="M160-120v-375l-72 55-48-64 440-336 440 336-48 63-72-54v375H160Zm160-240q-17 0-28.5-11.5T280-400q0-17 11.5-28.5T320-440q17 0 28.5 11.5T360-400q0 17-11.5 28.5T320-360Zm160 0q-17 0-28.5-11.5T440-400q0-17 11.5-28.5T480-440q17 0 28.5 11.5T520-400q0 17-11.5 28.5T480-360Zm160 0q-17 0-28.5-11.5T600-400q0-17 11.5-28.5T640-440q17 0 28.5 11.5T680-400q0 17-11.5 28.5T640-360Z"/>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          height="24px"
+          viewBox="0 -960 960 960"
+          width="24px"
+          fill="#5f6368"
+        >
+          <path
+            d="M160-120v-375l-72 55-48-64 440-336 440 336-48 63-72-54v375H160Zm160-240q-17 0-28.5-11.5T280-400q0-17 11.5-28.5T320-440q17 0 28.5 11.5T360-400q0 17-11.5 28.5T320-360Zm160 0q-17 0-28.5-11.5T440-400q0-17 11.5-28.5T480-440q17 0 28.5 11.5T520-400q0 17-11.5 28.5T480-360Zm160 0q-17 0-28.5-11.5T600-400q0-17 11.5-28.5T640-440q17 0 28.5 11.5T680-400q0 17-11.5 28.5T640-360Z"
+          />
         </svg>
       </button>
 
       <!-- Search Form -->
       <div class="searchForm">
-        <SearchForm @formSubmit="handleFormSubmit"/>
+        <SearchForm @formSubmit="handleFormSubmit" />
       </div>
 
       <!-- Dark Mode Toggle Button -->
       <button id="theme-switch" @click="toggleDarkMode">
-        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f6368">
-          <path d="M480-280q-83 0-141.5-58.5T280-480q0-83 58.5-141.5T480-680q83 0 141.5 58.5T680-480q0 83-58.5 141.5T480-280ZM200-440H40v-80h160v80Zm720 0H760v-80h160v80ZM440-760v-160h80v160h-80Zm0 720v-160h80v160h-80ZM256-650l-101-97 57-59 96 100-52 56Zm492 496-97-101 53-55 101 97-57 59Zm-98-550 97-101 59 57-100 96-56-52ZM154-212l101-97 55 53-97 101-59-57Z"/>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          height="24px"
+          viewBox="0 -960 960 960"
+          width="24px"
+          fill="#5f6368"
+        >
+          <path
+            d="M480-280q-83 0-141.5-58.5T280-480q0-83 58.5-141.5T480-680q83 0 141.5 58.5T680-480q0 83-58.5 141.5T480-280ZM200-440H40v-80h160v80Zm720 0H760v-80h160v80ZM440-760v-160h80v160h-80Zm0 720v-160h80v160h-80ZM256-650l-101-97 57-59 96 100-52 56Zm492 496-97-101 53-55 101 97-57 59Zm-98-550 97-101 59 57-100 96-56-52ZM154-212l101-97 55 53-97 101-59-57Z"
+          />
         </svg>
-        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f6368">
-          <path d="M480-120q-150 0-255-105T120-480q0-150 105-255t255-105q14 0 27.5 1t26.5 3q-41 29-65.5 75.5T444-660q0 90 63 153t153 63q55 0 101-24.5t75-65.5q2 13 3 26.5t1 27.5q0 150-105 255T480-120Z"/>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          height="24px"
+          viewBox="0 -960 960 960"
+          width="24px"
+          fill="#5f6368"
+        >
+          <path
+            d="M480-120q-150 0-255-105T120-480q0-150 105-255t255-105q14 0 27.5 1t26.5 3q-41 29-65.5 75.5T444-660q0 90 63 153t153 63q55 0 101-24.5t75-65.5q2 13 3 26.5t1 27.5q0 150-105 255T480-120Z"
+          />
         </svg>
       </button>
     </nav>
@@ -53,14 +77,14 @@
 </template>
 
 <script>
-import axios from '@/plugins/axios'; // Import the configured axios instance
-import SearchForm from '@/components/Form/SearchForm.vue'
-import UserProfile from '@/components/Summoner/UserProfile.vue'
+import axios from "@/plugins/axios"; // Import the configured axios instance
+import SearchForm from "@/components/Form/SearchForm.vue";
+import UserProfile from "@/components/Summoner/UserProfile.vue";
 
 export default {
   components: {
     SearchForm,
-    UserProfile
+    UserProfile,
   },
   data() {
     return {
@@ -70,26 +94,26 @@ export default {
       profileIconUrl: "",
       soloRankIconUrl: "",
       flexRankIconUrl: "",
-      summonerName: '',
+      summonerName: "",
       summonerLevel: null,
-      soloRank: '',
+      soloRank: "",
       soloWins: 0,
       soloLosses: 0,
-      flexRank: '',
+      flexRank: "",
       flexWins: 0,
       flexLosses: 0,
       toggle: false,
-      darkmode: localStorage.getItem('darkmode'),
-      themeSwitch: document.getElementById('themeSwitch'),
+      darkmode: localStorage.getItem("darkmode"),
+      themeSwitch: document.getElementById("themeSwitch"),
       matches: [],
-    }
+    };
   },
   mounted() {
     // Set dark mode on load based on localStorage
-    const savedMode = localStorage.getItem('darkmode') === 'true';
+    const savedMode = localStorage.getItem("darkmode") === "true";
     this.toggle = savedMode;
     if (savedMode) {
-      document.body.classList.add('darkmode');
+      document.body.classList.add("darkmode");
     }
 
     // Fetch summoner data based on route parameters
@@ -98,18 +122,18 @@ export default {
   },
   methods: {
     goHome() {
-      this.$router.push('/')
+      this.$router.push("/");
     },
     toggleDarkMode() {
-      this.toggle = !this.toggle
+      this.toggle = !this.toggle;
       if (this.toggle) {
-        console.log("darkmode active")
-        document.body.classList.add('darkmode')
-        localStorage.setItem('darkmode', 'active')
+        console.log("darkmode active");
+        document.body.classList.add("darkmode");
+        localStorage.setItem("darkmode", "active");
       } else {
-        console.log("light mode active")
-        document.body.classList.remove('darkmode')
-        localStorage.setItem('darkmode', null)
+        console.log("light mode active");
+        document.body.classList.remove("darkmode");
+        localStorage.setItem("darkmode", null);
       }
     },
     handleFormSubmit(summoner, region) {
@@ -121,68 +145,89 @@ export default {
     },
     async fetchSummonerData(region, summoner) {
       try {
-          let name, tag;
-    
-          // Check if current summoner name includes a "#" to determine format
-          if (summoner && summoner.includes("#")) {
-            // Parse from stored summoner name
-            [name, tag] = summoner.split("#");
-          } else {
-            name = summoner;
-            tag = region;
-          }
+        let name, tag;
+
+        // Check if current summoner name includes a "#" to determine format
+        if (summoner && summoner.includes("#")) {
+          // Parse from stored summoner name
+          [name, tag] = summoner.split("#");
+        } else {
+          name = summoner;
+          tag = region;
+        }
 
         this.region = region;
         this.tag = tag;
-        console.log("name", name)
-        console.log("region: ", region)
-        console.log("tag", tag)
+        console.log("name", name);
+        console.log("region: ", region);
+        console.log("tag", tag);
 
-
-        const summonerResponse = await axios.get(`/summoners/${region}/${name}-${tag}`);
+        const summonerResponse = await axios.get(
+          `/summoners/${region}/${name}-${tag}`
+        );
         // Handle the response data
         console.log(summonerResponse.data);
         // Update the profile data
-        this.profileIconUrl = "https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/profile-icons/" + summonerResponse.data.summonerProfileIconId + ".jpg";
+        this.profileIconUrl =
+          "https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/profile-icons/" +
+          summonerResponse.data.summonerProfileIconId +
+          ".jpg";
         this.summonerName = summoner;
         this.summonerLevel = summonerResponse.data.summonerLevel;
         this.puuid = summonerResponse.data.puuid;
 
         const rankResponse = await axios.post(`/ranks`, {
-          "puuid": this.puuid
+          puuid: this.puuid,
         });
-      
+
         console.log(rankResponse.data);
-        let soloRankRes = rankResponse.data[0]
-        let flexRankRes = rankResponse.data[1]
+        let soloRankRes = rankResponse.data[0];
+        let flexRankRes = rankResponse.data[1];
         if (soloRankRes.queueType == "RANKED_FLEX_SR") {
-          soloRankRes = rankResponse.data[1]
-          flexRankRes = rankResponse.data[0]
+          soloRankRes = rankResponse.data[1];
+          flexRankRes = rankResponse.data[0];
         }
 
-        this.soloRank = soloRankRes.tier + " " + soloRankRes.rank + " " + soloRankRes.leaguePoints + " LP";
-        this.soloRankIconUrl = "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-" + soloRankRes.tier.toLowerCase() + ".png"
-        this.soloWins = soloRankRes.wins
-        this.soloLosses = soloRankRes.losses
+        this.soloRank =
+          soloRankRes.tier +
+          " " +
+          soloRankRes.rank +
+          " " +
+          soloRankRes.leaguePoints +
+          " LP";
+        this.soloRankIconUrl =
+          "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-" +
+          soloRankRes.tier.toLowerCase() +
+          ".png";
+        this.soloWins = soloRankRes.wins;
+        this.soloLosses = soloRankRes.losses;
 
-        this.flexRank = flexRankRes.tier + " " + flexRankRes.rank + " " + flexRankRes.leaguePoints + " LP";
-        this.flexRankIconUrl = "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-" + flexRankRes.tier.toLowerCase() + ".png"
-        this.flexWins = flexRankRes.wins
-        this.flexLosses = flexRankRes.losses
+        this.flexRank =
+          flexRankRes.tier +
+          " " +
+          flexRankRes.rank +
+          " " +
+          flexRankRes.leaguePoints +
+          " LP";
+        this.flexRankIconUrl =
+          "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-" +
+          flexRankRes.tier.toLowerCase() +
+          ".png";
+        this.flexWins = flexRankRes.wins;
+        this.flexLosses = flexRankRes.losses;
 
-        const matchResponse = await axios.post('/matches', {
-            "puuid": this.puuid
-          });
+        const matchResponse = await axios.post("/matches", {
+          puuid: this.puuid,
+        });
 
         console.log(matchResponse.data);
         this.matches = matchResponse.data;
-
       } catch (error) {
-        console.error('Error fetching summoner data:', error);
+        console.error("Error fetching summoner data:", error);
       }
-    }
-  }
-}
+    },
+  },
+};
 </script>
 
 <style>
@@ -203,8 +248,8 @@ body {
   --text-color: #9fabb9;
   --button-color: #1c1c1e;
   --primary-color: #3a435d;
-  --nav-bar: #5f7fd2;
-  --grey-background: #edeef2;  /* Fixed syntax error */
+  --nav-bar: #5383e9;
+  --grey-background: #edeef2; /* Fixed syntax error */
 }
 
 /* Dark Mode Toggle Button */
@@ -214,7 +259,7 @@ body {
   --text-color: #9fabb9;
   --button-color: #1c1c1e;
   --primary-color: #3a435d;
-  --nav-bar: #5f7fd2;
+  --nav-bar: #5383e9;
   --grey-background: #1a1c23; /* Add dark mode grey */
 }
 

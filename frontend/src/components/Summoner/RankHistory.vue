@@ -72,18 +72,19 @@
               <tr v-for="(row, i) in displayedRows" :key="i">
                 <td class="season-row">{{ row.season }}</td>
                 <!-- Combined tier cell with both icon and text -->
+
                 <td class="tier-row">
                   <div class="tier-content">
                     <div class="mini-icon-container">
                       <img
-                        :src="`https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/ranked-emblems/emblems/ranked-${row.tier.toLowerCase()}.png`"
+                        :src="`https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/ux/fonts/texticons/lol/ranks/rank${getRankName(
+                          row.tier
+                        )}.png`"
                         :alt="row.tier"
                         class="mini-rank-icon"
                       />
                     </div>
-                    <span class="tier-text">{{
-                      formatTierName(row.tier)
-                    }}</span>
+                    <span class="tier-text">{{ formatRank(row.tier) }}</span>
                   </div>
                 </td>
                 <td class="lp-row">{{ row.leaguePoints }}</td>
@@ -195,45 +196,56 @@ export default {
             {
               season: "S2024 S3",
               rankIconId: 13,
-              tier: "CHALLENGER",
-              leaguePoints: "756",
+              tier: "Platinum II",
+              leaguePoints: "78",
+            },
+            {
+              season: "S2024 S2",
+              rankIconId: 12,
+              tier: "Diamond II",
+              leaguePoints: "3",
+            },
+            {
+              season: "S2024 S1",
+              rankIconId: 11,
+              tier: "Emerald III",
+              leaguePoints: "50",
             },
             {
               season: "S2023 S2",
-              rankIconId: 12,
-              tier: "GRANDMASTER",
-              leaguePoints: "521",
-            },
-            {
-              season: "S13",
-              rankIconId: 11,
-              tier: "MASTER",
-              leaguePoints: "312",
-            },
-            {
-              season: "S12",
               rankIconId: 10,
-              tier: "DIAMOND",
-              leaguePoints: "75",
+              tier: "Diamond IV",
+              leaguePoints: "0",
             },
             {
-              season: "S12",
+              season: "S2023 S1",
               rankIconId: 9,
-              tier: "PLATINUM",
-              leaguePoints: "89",
+              tier: "Gold I",
+              leaguePoints: "37",
             },
-            { season: "S11", rankIconId: 8, tier: "GOLD", leaguePoints: "45" },
             {
-              season: "S11",
+              season: "S2022",
+              rankIconId: 8,
+              tier: "Platinum IV",
+              leaguePoints: "0",
+            },
+            {
+              season: "S2021",
               rankIconId: 7,
-              tier: "SILVER",
-              leaguePoints: "67",
+              tier: "Gold II",
+              leaguePoints: "34",
             },
             {
-              season: "S10",
+              season: "S2020",
               rankIconId: 6,
-              tier: "BRONZE",
-              leaguePoints: "28",
+              tier: "Gold II",
+              leaguePoints: "17",
+            },
+            {
+              season: "S9",
+              rankIconId: 6,
+              tier: "Gold II",
+              leaguePoints: "53",
             },
           ],
         };
@@ -263,10 +275,11 @@ export default {
       }
       return rank + " " + tier; // Return the formatted value
     },
-    formatTierName(tier) {
-      if (!tier) return "";
-      const lowerCaseTier = tier.toLowerCase();
-      return lowerCaseTier.charAt(0).toUpperCase() + lowerCaseTier.slice(1);
+    getRankName(rank) {
+      if (!rank) return "";
+      let [rankName, tier] = rank.split(" ");
+      rankName = rankName.toLowerCase();
+      return rankName;
     },
   },
 };

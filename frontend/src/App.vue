@@ -1,14 +1,11 @@
 <template>
-  <div id="app" class="min-h-screen bg-blue-900 font-sans antialiased">
-      <router-view />
+  <div id="app" class="min-h-screen font-sans antialiased">
+    <router-view />
   </div>
 </template>
 
 <script>
-
 export default {
-  components: {
-
-  },
-}
+  components: {},
+};
 </script>
