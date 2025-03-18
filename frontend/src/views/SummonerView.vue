@@ -31,6 +31,8 @@
         <div class="user-profile">
           <UserProfile
             :puuid="puuid"
+            :region="region"
+            :tag="tag"
             :profileIconUrl="profileIconUrl"
             :summonerName="summonerName"
             :summonerLevel="summonerLevel"
@@ -63,6 +65,8 @@ export default {
   data() {
     return {
       puuid: null,
+      region: "",
+      tag: "",
       profileIconUrl: "",
       soloRankIconUrl: "",
       flexRankIconUrl: "",
@@ -117,13 +121,30 @@ export default {
     },
     async fetchSummonerData(region, summoner) {
       try {
-        //console.log("hello")
-        const summonerResponse = await axios.get(`/summoners/${region}/${summoner}-${region}`);
+          let name, tag;
+    
+          // Check if current summoner name includes a "#" to determine format
+          if (summoner && summoner.includes("#")) {
+            // Parse from stored summoner name
+            [name, tag] = summoner.split("#");
+          } else {
+            name = summoner;
+            tag = region;
+          }
+
+        this.region = region;
+        this.tag = tag;
+        console.log("name", name)
+        console.log("region: ", region)
+        console.log("tag", tag)
+
+
+        const summonerResponse = await axios.get(`/summoners/${region}/${name}-${tag}`);
         // Handle the response data
         console.log(summonerResponse.data);
         // Update the profile data
         this.profileIconUrl = "https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/profile-icons/" + summonerResponse.data.summonerProfileIconId + ".jpg";
-        this.summonerName = summonerResponse.data.summonerName + "#" + region;
+        this.summonerName = summoner;
         this.summonerLevel = summonerResponse.data.summonerLevel;
         this.puuid = summonerResponse.data.puuid;
 

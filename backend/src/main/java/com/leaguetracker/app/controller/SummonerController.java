@@ -46,8 +46,7 @@ public class SummonerController {
                 // Fetching Account Data
                 JsonNode accountData = riotService.fetchAccountData(region, summonerName, tag);
                 // Fetching Summoner Data
-                JsonNode summonerData = riotService.fetchSummonerData(tag + "1",
-                        accountData.path("puuid").asText());
+                JsonNode summonerData = riotService.fetchSummonerData(region + "1", accountData.path("puuid").asText());
 
                 Summoner summoner = new Summoner(accountData.path("puuid").asText(), summonerName, region,
                 summonerData.path("profileIconId").asInt(), summonerData.path("summonerLevel").asInt());

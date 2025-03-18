@@ -93,6 +93,8 @@
     },
     props: {
       puuid: String,
+      region: String,
+      tag: String,
       profileIconUrl: String,
       summonerName: String,
       summonerLevel: Number,
@@ -109,6 +111,8 @@
     data() {
       return {
         localPuuid: this.puuid,
+        localRegion: this.region,
+        localTag: this.tag,
         localProfileIconUrl: this.profileIconUrl,
         localSummonerName: this.summonerName,
         localSummonerLevel: this.summonerLevel,
@@ -137,6 +141,8 @@
     },
     watch: {
       puuid(newVal) { this.localPuuid = newVal; },
+      region(newVal) { this.localRegion = newVal; },
+      tag(newVal) { this.localTag = newVal},
       profileIconUrl(newVal) { this.localProfileIconUrl = newVal; },
       rankSoloIconUrl(newVal) { this.localRankSoloIconUrl = newVal; },
       rankFlexIconUrl(newVal) { this.localRankFlexIconUrl = newVal; },
@@ -188,14 +194,12 @@
       async updateSummoner() {
         // Existing update code...
         try {
-          this.isUpdating = true;
-          const [name, tag] = (this.summonerName || '').split('#');
-          const summonerResponse = await axios.get(`/summoners/${tag}/${name}-${tag}`);
+          const summonerResponse = await axios.get(`/summoners/${this.localRegion}/${this.localSummonerName}-${this.localTag}`);
 
           console.log(summonerResponse.data);
           // Update the profile data
           this.localProfileIconUrl = "https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/profile-icons/" + summonerResponse.data.summonerProfileIconId + ".jpg"; // Adjust based on actual response structure
-          this.localSummonerName = summonerResponse.data.summonerName + "#" + tag;
+          this.localSummonerName = summonerResponse.data.summonerName;
           this.localSummonerLevel = summonerResponse.data.summonerLevel;
           this.localPuuid = summonerResponse.data.puuid;
 
