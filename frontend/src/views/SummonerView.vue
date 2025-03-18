@@ -266,15 +266,6 @@ body {
   --grey-background: #1a1c23; /* Add dark mode grey */
 }
 
-.page-container {
-  position: relative;
-  width: 100%;
-  padding-top: 60px; /* Equal to navbar height */
-  min-height: 100vh; /* Full viewport height */
-  box-sizing: border-box;
-  background-color: #edeef2; /* Add this line */
-}
-
 #theme-switch {
   height: 50px;
   width: 50px;
@@ -308,21 +299,19 @@ body {
 }
 
 nav {
+  position: relative !important; /* Force fixed positioning */
   width: 100%;
   height: 60px;
   background-color: var(--nav-bar);
-  color: var(--base-color);
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 0px 30px;
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 1;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 /* Home Button */
+
 .home-button svg {
   background: none;
   border: none;
@@ -337,12 +326,5 @@ nav {
 
 .home-button {
   border: none;
-}
-
-/* Search Form Centering */
-.searchForm {
-  flex: 1;
-  display: flex;
-  justify-content: center;
 }
 </style>

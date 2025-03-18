@@ -260,40 +260,58 @@ export default {
         });
 
         console.log(rankResponse.data);
-        let soloRank = rankResponse.data[0];
-        let flexRank = rankResponse.data[1];
-        if (soloRank.queueType == "RANKED_FLEX_SR") {
-          soloRank = rankResponse.data[1];
-          flexRank = rankResponse.data[0];
+        console.log(rankResponse.data);
+        if (!rankResponse.data || rankResponse.data.length === 0) {
+          // Set defaults for unranked players
+          this.localSummonerRank = "Unranked";
+          this.localRankSoloIconUrl =
+            "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-iron.png";
+          this.localWins = 0;
+          this.localLosses = 0;
+
+          this.localSummonerRankFlex = "Unranked";
+          this.localRankFlexIconUrl =
+            "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-iron.png";
+          this.localWinsFlex = 0;
+          this.localLossesFlex = 0;
+        } else {
+          // Process ranks with safety checks
+          let soloRankRes = rankResponse.data[0] || {};
+          let flexRankRes = rankResponse.data[1] || {};
+
+          if (soloRankRes.queueType === "RANKED_FLEX_SR") {
+            soloRankRes = rankResponse.data[1] || {};
+            flexRankRes = rankResponse.data[0] || {};
+          }
+
+          // Solo queue rank
+          if (soloRankRes && soloRankRes.tier) {
+            this.localSummonerRank = `${soloRankRes.tier} ${soloRankRes.rank} ${soloRankRes.leaguePoints} LP`;
+            this.localRankSoloIconUrl = `https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-${soloRankRes.tier.toLowerCase()}.png`;
+            this.localWins = soloRankRes.wins || 0;
+            this.localLosses = soloRankRes.losses || 0;
+          } else {
+            this.localSummonerRank = "Unranked";
+            this.localRankSoloIconUrl =
+              "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-iron.png";
+            this.localWins = 0;
+            this.localLosses = 0;
+          }
+
+          // Flex queue rank
+          if (flexRankRes && flexRankRes.tier) {
+            this.localSummonerRankFlex = `${flexRankRes.tier} ${flexRankRes.rank} ${flexRankRes.leaguePoints} LP`;
+            this.localRankFlexIconUrl = `https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-${flexRankRes.tier.toLowerCase()}.png`;
+            this.localWinsFlex = flexRankRes.wins || 0;
+            this.localLossesFlex = flexRankRes.losses || 0;
+          } else {
+            this.localSummonerRankFlex = "Unranked";
+            this.localRankFlexIconUrl =
+              "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-iron.png";
+            this.localWinsFlex = 0;
+            this.localLossesFlex = 0;
+          }
         }
-
-        this.localSummonerRank =
-          soloRank.tier +
-          " " +
-          soloRank.rank +
-          " " +
-          soloRank.leaguePoints +
-          " LP";
-        this.localRankSoloIconUrl =
-          "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-" +
-          soloRank.tier.toLowerCase() +
-          ".png";
-        this.localWins = soloRank.wins;
-        this.localLosses = soloRank.losses;
-
-        this.localSummonerRankFlex =
-          flexRank.tier +
-          " " +
-          flexRank.rank +
-          " " +
-          flexRank.leaguePoints +
-          " LP";
-        this.localRankFlexIconUrl =
-          "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-" +
-          flexRank.tier.toLowerCase() +
-          ".png";
-        this.localWinsFlex = flexRank.wins;
-        this.localLossesFlex = flexRank.losses;
 
         const matchResponse = await axios.post("/matches", {
           puuid: this.localPuuid,

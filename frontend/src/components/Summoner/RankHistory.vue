@@ -426,7 +426,7 @@ export default {
 
 .rank-row.ranks-container {
   padding: 16px; /* Remove padding that's causing extra height */
-  margin-bottom: 5px; /* Remove bottom margin */
+  margin-bottom: -10px; /* Remove bottom margin */
   border-radius: 0 0 0 0; /* Remove any border radius from container */
   box-shadow: none; /* Remove shadow which might be visible */
   background-color: transparent;
@@ -570,13 +570,16 @@ export default {
   border-radius: 10px; /* Rounded corners */
   display: inline-block; /* Proper block formatting */
   letter-spacing: 0.5px; /* Optional: slight letter spacing for better readability */
+  text-align: right;
+  align-items: right;
+  margin-left: 5px;
 }
 .peak-rank .rank-icon-container {
   width: 36px; /* Smaller than the 72px for main rank */
   height: 36px;
-  margin-right: 20px; /* Same as the main icon container */
+  margin-right: 5px; /* Same as the main icon container */
   margin-left: 18px; /* Add this to center the smaller icon (72-36)/2 = 18px */
-  position: relative; /* Use relative instead of invalid 'left' */
+  position: right; /* Use relative instead of invalid 'left' */
   overflow: hidden;
 }
 
