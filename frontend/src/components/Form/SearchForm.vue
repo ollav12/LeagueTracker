@@ -85,7 +85,7 @@ export default {
 
 select {
   width: fit-content;
-  padding: 0px 5px;
+  padding: 5px 5px;
   margin-right: 5px;
   color: #4f75da;
   font-size: 14px;
@@ -111,6 +111,9 @@ input {
   font-weight: 400;
   outline: none;
   background: transparent;
+  position: center;
+  text-align: left;
+  padding-top: 8px;
 }
 
 .custom-placeholder {

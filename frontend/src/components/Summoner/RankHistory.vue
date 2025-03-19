@@ -106,19 +106,79 @@
         </div>
       </div>
 
-      <h3 class="rank-title">Ranked Flex</h3>
-      <div class="rank-row">
-        <div class="rank-icon-container">
-          <img :src="flexRankIconUrl" alt="Flex Rank" class="rank-icon" />
-        </div>
-        <div class="rank-info">
-          <div class="rank-status">
-            <span class="rankText">{{ formatRank(flexRank) }}</span>
-            <span class="win-loss-text">{{ flexWins }}W {{ flexLosses }}L</span>
+      <h3 class="rank-title rank-flex-title">
+        Ranked Flex
+        <span v-if="flexRank === 'Unranked'" class="unranked-badge"
+          >Unranked</span
+        >
+      </h3>
+
+      <div v-if="flexRank === 'Unranked'" class="unranked-spacer"></div>
+
+      <div v-if="flexRank !== 'Unranked'" class="rank-row">
+        <div class="rank-entry">
+          <div class="rank-icon-container">
+            <img :src="flexRankIconUrl" alt="Flex Rank" class="rank-icon" />
           </div>
-          <div class="stats-row">
-            <span class="lp-text">{{ flexLp }}</span>
-            <span class="win-percent">Win rate {{ winPercentageFlex }}%</span>
+          <div class="rank-info">
+            <div class="rank-status">
+              <span class="rankText">{{ formatRank(flexRank) }}</span>
+              <span class="win-loss-text"
+                >{{ flexWins }}W {{ flexLosses }}L</span
+              >
+            </div>
+            <div class="stats-row">
+              <span class="lp-text">{{ flexLp }}</span>
+              <span class="win-percent">Win rate {{ winPercentageFlex }}%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        class="ranks-section"
+        v-if="flexRank === 'Unranked' || flexRank !== 'Unranked'"
+      >
+        <div class="rank-row ranks-container">
+          <table class="ranks-table">
+            <thead>
+              <tr>
+                <th class="title-season">Season</th>
+                <th class="title-tier">Tier</th>
+                <th class="title-lp">LP</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(row, i) in displayedFlexRows" :key="i">
+                <td class="season-row">{{ row.season }}</td>
+                <td class="tier-row">
+                  <div class="tier-content">
+                    <div class="mini-icon-container">
+                      <img
+                        :src="`https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/ux/fonts/texticons/lol/ranks/rank${getRankName(
+                          row.tier
+                        )}.png`"
+                        :alt="row.tier"
+                        class="mini-rank-icon"
+                      />
+                    </div>
+                    <span class="tier-text">{{ formatRank(row.tier) }}</span>
+                  </div>
+                </td>
+                <td class="lp-row">{{ row.leaguePoints }}</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="view-all-container" v-if="flexData.rows.length > 5">
+            <button @click="toggleFlexSeasonDisplay" class="view-all-button">
+              {{ showAllFlexSeasons ? "Close" : "View all season tiers" }}
+              <span
+                class="toggle-arrow"
+                :class="{ 'arrow-up': showAllFlexSeasons }"
+              >
+                ▼
+              </span>
+            </button>
           </div>
         </div>
       </div>
@@ -142,13 +202,18 @@ export default {
       soloLp: "",
       flexLp: "",
       showAllSeasons: false,
+      showAllFlexSeasons: false,
       data: {
+        rows: [],
+      },
+      flexData: {
         rows: [],
       },
     };
   },
   mounted() {
     this.fetchSoloranks();
+    this.fetchFlexranks();
   },
   watch: {
     soloRank(newVal) {
@@ -161,6 +226,13 @@ export default {
     },
   },
   computed: {
+    displayedFlexRows() {
+      if (this.showAllFlexSeasons) {
+        return this.flexData.rows;
+      } else {
+        return this.flexData.rows.slice(0, 5);
+      }
+    },
     displayedRows() {
       if (this.showAllSeasons) {
         return this.data.rows;
@@ -185,6 +257,57 @@ export default {
     },
   },
   methods: {
+    toggleFlexSeasonDisplay() {
+      this.showAllFlexSeasons = !this.showAllFlexSeasons;
+    },
+    async fetchFlexranks() {
+      try {
+        // Mock data for flex ranks
+        const mockData = {
+          rows: [
+            {
+              season: "S2024 S3",
+              rankIconId: 9,
+              tier: "Challenger",
+              leaguePoints: "2232",
+            },
+            {
+              season: "S2024 S2",
+              rankIconId: 8,
+              tier: "Grandmaster",
+              leaguePoints: "1200",
+            },
+            {
+              season: "S2024 S1",
+              rankIconId: 7,
+              tier: "Master",
+              leaguePoints: "460",
+            },
+            {
+              season: "S2023 S2",
+              rankIconId: 6,
+              tier: "Diamond I",
+              leaguePoints: "99",
+            },
+            {
+              season: "S2023 S1",
+              rankIconId: 5,
+              tier: "Emerald II",
+              leaguePoints: "15",
+            },
+            {
+              season: "S2022",
+              rankIconId: 4,
+              tier: "Platinum IV",
+              leaguePoints: "0",
+            },
+          ],
+        };
+        this.flexData = mockData;
+      } catch (error) {
+        console.error(error);
+      }
+    },
     toggleSeasonDisplay() {
       this.showAllSeasons = !this.showAllSeasons;
     },
@@ -196,20 +319,20 @@ export default {
             {
               season: "S2024 S3",
               rankIconId: 13,
-              tier: "Platinum II",
-              leaguePoints: "78",
+              tier: "Challenger",
+              leaguePoints: "1752",
             },
             {
               season: "S2024 S2",
               rankIconId: 12,
-              tier: "Diamond II",
-              leaguePoints: "3",
+              tier: "Grandmaster",
+              leaguePoints: "950",
             },
             {
               season: "S2024 S1",
               rankIconId: 11,
-              tier: "Emerald III",
-              leaguePoints: "50",
+              tier: "Master",
+              leaguePoints: "500",
             },
             {
               season: "S2023 S2",
@@ -220,31 +343,31 @@ export default {
             {
               season: "S2023 S1",
               rankIconId: 9,
-              tier: "Gold I",
+              tier: "Platinum IV",
               leaguePoints: "37",
             },
             {
               season: "S2022",
               rankIconId: 8,
-              tier: "Platinum IV",
+              tier: "Gold III",
               leaguePoints: "0",
             },
             {
               season: "S2021",
               rankIconId: 7,
-              tier: "Gold II",
+              tier: "Silver I",
               leaguePoints: "34",
             },
             {
               season: "S2020",
               rankIconId: 6,
-              tier: "Gold II",
+              tier: "Bronze IV",
               leaguePoints: "17",
             },
             {
               season: "S9",
               rankIconId: 6,
-              tier: "Gold II",
+              tier: "Iron IV",
               leaguePoints: "53",
             },
           ],
@@ -285,6 +408,31 @@ export default {
 };
 </script>
 <style scoped>
+.unranked-spacer {
+  height: 19px;
+  width: 100%;
+}
+
+/* Remove negative margin for unranked tables */
+.unranked-flex-table {
+  margin-top: 0px !important;
+}
+
+/* Fix title padding */
+.rank-flex-title {
+  padding-bottom: 8px;
+}
+
+.unranked-badge {
+  font-family: "Roboto";
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 20px;
+  color: rgb(195, 203, 209);
+  text-align: right;
+  padding-left: 173px;
+}
+
 /* Add styles for the arrow */
 .toggle-arrow {
   display: inline-block;
@@ -380,11 +528,11 @@ export default {
   font-family: "Roboto";
   font-weight: 700;
   font-size: 11px;
-  line-height: 18px;
+  line-height: 14px;
   color: rgb(154, 164, 175); /* Slightly darker for better contrast on grey */
-  padding: 0px 3px; /* Padding inside the box */
+  padding: 0px 4px; /* Padding inside the box */
   background-color: #eceff4; /* Light grey background */
-  border-radius: 4px; /* Rounded corners */
+  border-radius: 2px; /* Rounded corners */
   display: inline-block; /* Ensure the background only wraps the text */
   margin-left: 8px; /* Space from the left edge */
 }
@@ -453,8 +601,8 @@ export default {
 }
 
 .mini-icon-container {
-  width: 14px;
-  height: 14px;
+  width: 20px;
+  height: 20px;
   display: inline-block;
   overflow: hidden;
 }
@@ -661,18 +809,21 @@ export default {
 }
 
 .rank-title {
-  margin-top: 0;
+  margin-top: 0px;
   margin-bottom: 1px;
   font-size: 14px;
   font-weight: 400;
-  color: #202a38;
+  color: rgb(32, 45, 55);
   background-color: white;
   width: 332px;
   height: 30px;
   border-radius: 4px 4px 0 0;
   padding: 10px;
   font-family: "roboto";
-  line-height: 14px;
+  align-items: center;
+  display: flex;
+  padding-left: 10px;
+  line-height: 20px;
 }
 
 /* Add white background boxes around each rank row */
