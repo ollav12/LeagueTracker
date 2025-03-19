@@ -1,96 +1,104 @@
 <template>
   <div class="user-profile">
-    <div class="profile-header">
-      <div class="icon-container">
-        <img
-          :src="localProfileIconUrl"
-          alt="Profile Icon"
-          class="profile-icon"
-        />
-        <span class="level">{{ localSummonerLevel }}</span>
+    <div class="background-all">
+      <div class="profile-header">
+        <div class="icon-container">
+          <img
+            :src="localProfileIconUrl"
+            alt="Profile Icon"
+            class="profile-icon"
+          />
+          <span class="level">{{ localSummonerLevel }}</span>
+        </div>
+        <div class="name-container">
+          <h2 class="summoner-name">
+            {{ this.localSummonerName }}
+            <span class="tag"> #{{ formatTag(localTag) }}</span>
+          </h2>
+          <p class="ladder-rank">EUW | Ladder Rank 77,321 (3.71% of top)</p>
+          <button
+            class="update-button"
+            @click="updateSummoner"
+            :disabled="isUpdating || cooldownActive"
+          >
+            {{ buttonText }}
+          </button>
+          <p v-if="cooldownActive" class="cooldown-text">
+            Refresh available in: {{ cooldownSeconds }} seconds
+          </p>
+          <p v-else-if="hasBeenUpdated" class="cooldown-text">
+            Last updated: {{ lastUpdatedText }}
+          </p>
+        </div>
       </div>
-      <div class="name-container">
-        <h2 class="summoner-name">
-          {{ this.localSummonerName }}
-          <span class="tag"> #{{ formatTag(localTag) }}</span>
-        </h2>
-        <p class="ladder-rank">EUW | Ladder Rank 77,321 (3.71% of top)</p>
+
+      <!-- Add the nav bar here -->
+      <div class="profile-nav">
         <button
-          class="update-button"
-          @click="updateSummoner"
-          :disabled="isUpdating || cooldownActive"
+          class="nav-item"
+          :class="{ active: activeTab === 'summary' }"
+          @click="activeTab = 'summary'"
         >
-          {{ buttonText }}
+          Summary
         </button>
-        <p v-if="cooldownActive" class="cooldown-text">
-          Refresh available in: {{ cooldownSeconds }} seconds
-        </p>
-        <p v-else-if="hasBeenUpdated" class="cooldown-text">
-          Last updated: {{ lastUpdatedText }}
-        </p>
-      </div>
-    </div>
-
-    <!-- Add the nav bar here -->
-    <div class="profile-nav">
-      <button
-        class="nav-item"
-        :class="{ active: activeTab === 'summary' }"
-        @click="activeTab = 'summary'"
-      >
-        Summary
-      </button>
-      <button
-        class="nav-item"
-        :class="{ active: activeTab === 'champions' }"
-        @click="activeTab = 'champions'"
-      >
-        Champions <span class="update-badge">U</span>
-      </button>
-      <button
-        class="nav-item"
-        :class="{ active: activeTab === 'mastery' }"
-        @click="activeTab = 'mastery'"
-      >
-        Mastery
-      </button>
-      <button
-        class="nav-item"
-        :class="{ active: activeTab === 'live' }"
-        @click="activeTab = 'live'"
-      >
-        Live Game
-      </button>
-    </div>
-
-    <!-- Tab content -->
-    <div class="tab-content">
-      <!-- Summary tab (current content) -->
-      <div v-if="activeTab === 'summary'">
-        <RankHistory
-          :soloRank="soloRank"
-          :soloWins="soloWins"
-          :soloLosses="soloLosses"
-          :soloRankIconUrl="soloRankIconUrl"
-          :flexRank="flexRank"
-          :flexWins="flexWins"
-          :flexLosses="flexLosses"
-          :flexRankIconUrl="flexRankIconUrl"
-        />
-        <MatchHistory :matches="localMatches" />
+        <button
+          class="nav-item"
+          :class="{ active: activeTab === 'champions' }"
+          @click="activeTab = 'champions'"
+        >
+          Champions <span class="update-badge">U</span>
+        </button>
+        <button
+          class="nav-item"
+          :class="{ active: activeTab === 'mastery' }"
+          @click="activeTab = 'mastery'"
+        >
+          Mastery
+        </button>
+        <button
+          class="nav-item"
+          :class="{ active: activeTab === 'live' }"
+          @click="activeTab = 'live'"
+        >
+          Live Game
+        </button>
       </div>
 
-      <!-- Placeholder for other tabs -->
-      <div v-else-if="activeTab === 'champions'" class="placeholder-content">
-        Champions stats will be shown here
-      </div>
+      <!-- Tab content -->
+      <div class="tab-content">
+        <!-- Summary tab (current content) -->
+        <div v-if="activeTab === 'summary'" class="summary-container">
+          <div class="rank-container">
+            <RankHistory
+              :soloRank="soloRank"
+              :soloWins="soloWins"
+              :soloLosses="soloLosses"
+              :soloRankIconUrl="soloRankIconUrl"
+              :flexRank="flexRank"
+              :flexWins="flexWins"
+              :flexLosses="flexLosses"
+              :flexRankIconUrl="flexRankIconUrl"
+            />
+          </div>
+          <div class="match-table">
+            <div class="match-container">
+              <MatchHistory :matches="localMatches" />
+            </div>
+          </div>
+        </div>
 
-      <div v-else-if="activeTab === 'mastery'" class="placeholder-content">
-        Mastery information will be shown here
-      </div>
+        <!-- Placeholder for other tabs -->
+        <div v-else-if="activeTab === 'champions'" class="placeholder-content">
+          Champions stats will be shown here
+        </div>
 
-      <div v-else-if="activeTab === 'live'" class="placeholder-content">
-        Live game data will be shown here
+        <div v-else-if="activeTab === 'mastery'" class="placeholder-content">
+          Mastery information will be shown here
+        </div>
+
+        <div v-else-if="activeTab === 'live'" class="placeholder-content">
+          Live game data will be shown here
+        </div>
       </div>
     </div>
   </div>
@@ -280,6 +288,7 @@ export default {
     async updateSummoner() {
       // Existing update code...
       try {
+        console.log("Update: fetching new data");
         const summonerResponse = await axios.get(
           `/summoners/${this.localRegion}/${this.localSummonerName}-${this.localTag}`
         );
@@ -428,6 +437,27 @@ export default {
 };
 </script>
 <style scoped>
+.match-table {
+  margin-top: 59px;
+  margin-left: -765px;
+}
+
+.summary-container {
+  display: flex;
+  width: 100%;
+  justify-content: flex-start; /* Keep elements spread apart */
+}
+
+.rank-container {
+  flex: 0 0 332px; /* Fixed width for rank container */
+  max-width: 100%; /* But don't overflow on small screens */
+}
+
+.match-container {
+  flex: 1; /* Take remaining space */
+  width: 740;
+}
+
 .tag {
   font-size: 24px;
   line-height: 28px;
@@ -528,7 +558,7 @@ export default {
 .profile-header {
   display: flex;
   align-items: top;
-  margin-bottom: 60px;
+  margin-bottom: 50px;
   padding: 20px;
   position: relative; /* Keep content above the white background */
   padding-top: 40px;
@@ -646,5 +676,17 @@ export default {
     font-size: 14px;
     font-weight: 550;
   }
+}
+.background-all {
+  background-color: white;
+  width: 100%;
+  height: 100%;
+}
+
+.tab-content {
+  background-color: #edeef2; /* Move the grey background here */
+  padding-top: 0px; /* Add some spacing after the nav bar */
+  width: 100%;
+  height: 100%;
 }
 </style>

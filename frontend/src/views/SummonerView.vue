@@ -326,7 +326,7 @@ body {
 }
 
 :root {
-  --background: white;
+  --background: #edeef2;
   --base-variant: #e8e9ed;
   --text-color: #9fabb9;
   --button-color: #1c1c1e;
