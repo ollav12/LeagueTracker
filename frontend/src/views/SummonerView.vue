@@ -118,7 +118,29 @@ export default {
 
     // Fetch summoner data based on route parameters
     const { region, summoner, tag } = this.$route.params;
+    console.log(`Mounted: /${region}/${summoner}-${tag}`);
     this.fetchSummonerData(region, summoner, tag);
+  },
+  watch: {
+    // Watch for route parameter changes
+    "$route.params": {
+      handler(newParams) {
+        const { region, summoner, tag } = newParams;
+        console.log(`Refresh: /${region}/${summoner}-${tag}`);
+        // Only fetch if there's actually new parameters
+        if (region && summoner) {
+          // Parse the summoner-tag format
+          const parts = summoner.split("-");
+          const summonerName = parts[0];
+          const tagValue = parts.length > 1 ? parts[1] : tag;
+
+          // Fetch the new data
+          this.fetchSummonerData(region, summonerName, tagValue);
+        }
+      },
+      immediate: false, // Don't trigger on component mount
+      deep: true, // Watch nested properties
+    },
   },
   methods: {
     goHome() {
@@ -129,24 +151,60 @@ export default {
       if (this.toggle) {
         console.log("darkmode active");
         document.body.classList.add("darkmode");
-        localStorage.setItem("darkmode", "active");
+        localStorage.setItem("darkmode", "true"); // Use "true" instead of "active"
       } else {
         console.log("light mode active");
         document.body.classList.remove("darkmode");
-        localStorage.setItem("darkmode", null);
+        localStorage.setItem("darkmode", "false"); // Use "false" instead of null
       }
     },
     handleFormSubmit(region, summoner, tag) {
-      console.log(`Region: ${region}, Summoner: ${summoner}, Tag: ${tag}`);
-      this.fetchSummonerData(region, summoner, tag);
+      // Validate that summoner name is not empty before navigating
+      if (summoner && summoner.trim() !== "") {
+        console.log(`Region: ${region}, Summoner: ${summoner}, Tag: ${tag}`);
+        this.$router.push(`/summoner/${region}/${summoner}-${tag}`);
+      } else {
+        console.log("Search field was empty");
+        // Optional: Show a validation message to the user
+      }
     },
     async fetchSummonerData(region, summoner, tag) {
       try {
+        const cacheKey = `summoner_${region}_${summoner}_${tag}`;
+        const cachedData = localStorage.getItem(cacheKey);
+
+        // Check if we have recent cached data (less than 5 minutes old)
+        if (cachedData) {
+          const data = JSON.parse(cachedData);
+          const cacheTime = data.timestamp;
+          const now = Date.now();
+          const fiveMinutes = 5 * 60 * 1000;
+
+          // If cache is fresh (less than 5 minutes old), use it
+          if (now - cacheTime < fiveMinutes) {
+            console.log("Fetching: Cached data");
+            this.puuid = data.puuid;
+            this.profileIconUrl = data.profileIconUrl;
+            this.summonerName = data.summonerName;
+            this.summonerLevel = data.summonerLevel;
+            this.soloRank = data.soloRank;
+            this.soloWins = data.soloWins;
+            this.soloLosses = data.soloLosses;
+            this.flexRank = data.flexRank;
+            this.flexWins = data.flexWins;
+            this.flexLosses = data.flexLosses;
+            this.soloRankIconUrl = data.soloRankIconUrl;
+            this.flexRankIconUrl = data.flexRankIconUrl;
+            this.matches = data.matches;
+            this.tag = data.tag;
+            this.region = data.region;
+            return; // Skip API calls
+          }
+        }
+
         this.region = region;
         this.tag = tag;
-        console.log("summoner", summoner);
-        console.log("region: ", region);
-        console.log("tag", tag);
+        console.log(`Fetching: New Data`);
 
         const summonerResponse = await axios.get(
           `/summoners/${region}/${summoner}-${tag}`
@@ -225,6 +283,28 @@ export default {
 
         console.log(matchResponse.data);
         this.matches = matchResponse.data;
+
+        // Store data in cache
+        const cacheData = {
+          timestamp: Date.now(),
+          puuid: this.puuid,
+          profileIconUrl: this.profileIconUrl,
+          summonerName: this.summonerName,
+          summonerLevel: this.summonerLevel,
+          soloRank: this.soloRank,
+          soloWins: this.soloWins,
+          soloLosses: this.soloLosses,
+          flexRank: this.flexRank,
+          flexWins: this.flexWins,
+          flexLosses: this.flexLosses,
+          soloRankIconUrl: this.soloRankIconUrl,
+          flexRankIconUrl: this.flexRankIconUrl,
+          matches: this.matches,
+          tag: this.tag,
+          region: this.region,
+        };
+
+        localStorage.setItem(cacheKey, JSON.stringify(cacheData));
       } catch (error) {
         console.error("Error fetching summoner data:", error);
       }

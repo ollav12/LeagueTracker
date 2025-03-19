@@ -54,8 +54,7 @@ export default {
       if (tag == null) {
         tag = this.region;
       }
-      console.log(name);
-      console.log(tag);
+      console.log("Form submitted");
       this.$emit("formSubmit", this.region, name, tag);
       this.summoner = "";
       this.$refs.input.blur();

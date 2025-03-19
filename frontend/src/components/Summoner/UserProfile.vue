@@ -222,17 +222,57 @@ export default {
     },
   },
   mounted() {
-    // On mount, restore last updated timestamp if available
-    const lastUpdateKey = `lastUpdated_${this.summonerName}`;
-    const savedTimestamp = localStorage.getItem(lastUpdateKey);
-
-    if (savedTimestamp) {
-      this.lastUpdatedAt = parseInt(savedTimestamp);
-      this.hasBeenUpdated = true;
-      this.startUpdateTimeTracking();
-    }
+    this.$nextTick(() => {
+      // Wait for props to be fully available
+      this.checkCooldownStatus();
+    });
   },
   methods: {
+    checkCooldownStatus() {
+      // Try multiple possible cooldown keys to handle prop/local value differences
+      const possibleKeys = [
+        `cooldown_${this.localSummonerName}_${this.localRegion}`,
+        `cooldown_${this.summonerName}_${this.region}`,
+        `cooldown_${this.$route.params.summoner.split("-")[0]}_${
+          this.$route.params.region
+        }`,
+      ];
+
+      let cooldownExpiration = null;
+      // Check all possible keys for an active cooldown
+      for (const key of possibleKeys) {
+        const value = localStorage.getItem(key);
+        if (value) {
+          cooldownExpiration = value;
+          this.activeCooldownKey = key; // Store the key that worked
+          break;
+        }
+      }
+
+      if (cooldownExpiration) {
+        const remainingTime = parseInt(cooldownExpiration) - Date.now();
+
+        // If cooldown is still active
+        if (remainingTime > 0) {
+          this.cooldownActive = true;
+          this.cooldownSeconds = Math.ceil(remainingTime / 1000);
+
+          // Start the cooldown timer
+          this.cooldownTimer = setInterval(() => {
+            this.cooldownSeconds--;
+
+            if (this.cooldownSeconds <= 0) {
+              clearInterval(this.cooldownTimer);
+              this.cooldownActive = false;
+              localStorage.removeItem(this.activeCooldownKey);
+            }
+          }, 1000);
+        } else {
+          // Cleanup expired cooldowns
+          localStorage.removeItem(this.activeCooldownKey);
+        }
+      }
+    },
     formatTag(tag) {
       let [newTag, test] = tag.split("#");
       return newTag;
@@ -254,7 +294,6 @@ export default {
         this.localSummonerLevel = summonerResponse.data.summonerLevel;
         this.localPuuid = summonerResponse.data.puuid;
 
-        console.log("Name ", this.localSummonerName);
         const rankResponse = await axios.post(`/ranks`, {
           puuid: this.localPuuid,
         });
@@ -328,7 +367,7 @@ export default {
         this.hasBeenUpdated = true;
 
         // Store in localStorage for persistence
-        const lastUpdateKey = `lastUpdated_${this.summonerName}`;
+        const lastUpdateKey = `lastUpdated_${this.localSummonerName}`;
         localStorage.setItem(lastUpdateKey, currentTime.toString());
 
         this.startUpdateTimeTracking();
@@ -343,6 +382,11 @@ export default {
       this.cooldownActive = true;
       this.cooldownSeconds = 60; // 1 minute cooldown
 
+      // IMPORTANT: Use the localSummonerName and localRegion for consistency
+      const cooldownExpirationTime = Date.now() + this.cooldownSeconds * 1000;
+      const cooldownKey = `cooldown_${this.localSummonerName}_${this.localRegion}`;
+      localStorage.setItem(cooldownKey, cooldownExpirationTime.toString());
+
       // Clear any existing timer
       if (this.cooldownTimer) {
         clearInterval(this.cooldownTimer);
@@ -355,6 +399,8 @@ export default {
         if (this.cooldownSeconds <= 0) {
           clearInterval(this.cooldownTimer);
           this.cooldownActive = false;
+          // Remove cooldown from localStorage when it expires
+          localStorage.removeItem(cooldownKey);
         }
       }, 1000);
     },
