@@ -184,6 +184,7 @@ export default {
           if (now - cacheTime < fiveMinutes) {
             console.log("Fetching: Cached data");
             this.puuid = data.puuid;
+            localStorage.setItem("puuid", this.puuid);
             this.profileIconUrl = data.profileIconUrl;
             this.summonerName = data.summonerName;
             this.summonerLevel = data.summonerLevel;
@@ -219,6 +220,7 @@ export default {
         this.summonerName = summoner;
         this.summonerLevel = summonerResponse.data.summonerLevel;
         this.puuid = summonerResponse.data.puuid;
+        localStorage.setItem("puuid", this.puuid);
 
         const rankResponse = await axios.post(`/ranks`, {
           puuid: this.puuid,

@@ -82,7 +82,7 @@
           </div>
           <div class="match-table">
             <div class="match-container">
-              <MatchHistory :matches="localMatches" />
+              <MatchHistory />
             </div>
           </div>
         </div>
@@ -360,13 +360,6 @@ export default {
             this.localLossesFlex = 0;
           }
         }
-
-        const matchResponse = await axios.post("/matches", {
-          puuid: this.localPuuid,
-        });
-
-        console.log(matchResponse.data);
-        this.localMatches = matchResponse.data;
 
         this.isUpdating = false;
         this.startCooldown();
@@ -681,6 +674,8 @@ export default {
   background-color: white;
   width: 100%;
   height: 100%;
+  margin: 0 auto;
+  position: relative;
 }
 
 .tab-content {
