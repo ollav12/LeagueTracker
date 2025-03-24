@@ -1,6 +1,6 @@
 <template>
   <div class="homeview">
-    <h1>LeagueTracker</h1>
+    <h1 class="title">LeagueTracker</h1>
     <div class="">
       <SearchForm @formSubmit="redirect" />
     </div>
@@ -33,14 +33,21 @@ export default {
 </script>
 
 <style scoped>
+.title {
+  color: white;
+  margin-top: 250px;
+}
+
 .homeview {
   display: flex;
-  flex-direction: column; /* Stack elements vertically */
-  justify-content: center; /* Center horizontally */
-  align-items: center; /* Center vertically */
-  text-align: center; /* Center text if necessary */
-  position: static;
-  padding-top: 30vh;
+  flex-direction: column;
+  justify-content: space-between; /* Changed from center to space-between */
+  align-items: center;
+  text-align: center;
+  background-color: #5383e9;
+  width: 100%;
+  min-height: 100vh; /* Use viewport height instead of % */
+  padding: 20px 0; /* Add padding top and bottom */
 }
 
 .policy-text {
@@ -48,5 +55,6 @@ export default {
   padding-top: 485px;
   display: flex;
   font-size: small;
+  color: white;
 }
 </style>

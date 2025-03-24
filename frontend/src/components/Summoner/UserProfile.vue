@@ -527,7 +527,7 @@ export default {
   text-align: left;
   position: relative; /* Add this to contain the nav bar */
   overflow-x: hidden; /* Prevent horizontal scrollbar */
-  background-color: white;
+  background-color: #edeef2;
   padding-bottom: 20px;
   size: 100%;
 }
@@ -682,6 +682,5 @@ export default {
   background-color: #edeef2; /* Move the grey background here */
   padding-top: 0px; /* Add some spacing after the nav bar */
   width: 100%;
-  height: 100%;
 }
 </style>
