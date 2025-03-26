@@ -303,11 +303,8 @@ export default {
         this.localSummonerLevel = summonerResponse.data.summonerLevel;
         this.localPuuid = summonerResponse.data.puuid;
 
-        const rankResponse = await axios.post(`/ranks`, {
-          puuid: this.localPuuid,
-        });
+        const rankResponse = await axios.get(`/ranks/${this.localPuuid}`);
 
-        console.log(rankResponse.data);
         console.log(rankResponse.data);
         if (!rankResponse.data || rankResponse.data.length === 0) {
           // Set defaults for unranked players
@@ -324,12 +321,12 @@ export default {
           this.localLossesFlex = 0;
         } else {
           // Process ranks with safety checks
-          let soloRankRes = rankResponse.data[0] || {};
-          let flexRankRes = rankResponse.data[1] || {};
+          let soloRankRes = rankResponse.data.ranks[0] || {};
+          let flexRankRes = rankResponse.data.ranks[1] || {};
 
           if (soloRankRes.queueType === "RANKED_FLEX_SR") {
-            soloRankRes = rankResponse.data[1] || {};
-            flexRankRes = rankResponse.data[0] || {};
+            soloRankRes = rankResponse.data.ranks[1] || {};
+            flexRankRes = rankResponse.data.ranks[0] || {};
           }
 
           // Solo queue rank

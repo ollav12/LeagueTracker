@@ -1,5 +1,7 @@
 package com.leaguetracker.app.controller;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,16 +15,20 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.leaguetracker.app.model.Summoner;
+import com.leaguetracker.app.model.SummonerUpdate;
 import com.leaguetracker.app.service.RiotApiService;
 import com.leaguetracker.app.service.SummonerService;
-
+import com.leaguetracker.app.service.UpdateService;
+import com.leaguetracker.app.service.UpdateService.UpdateType;
 
 @RestController
 @RequestMapping("/summoners")
 public class SummonerController {
-    
+
     @Autowired
     private SummonerService summonerService;
+    @Autowired
+    private UpdateService updateService;
 
     @Autowired
     private RiotApiService riotService;
@@ -31,40 +37,65 @@ public class SummonerController {
     public ResponseEntity<List<Summoner>> getAllSummoners() {
         return ResponseEntity.ok(summonerService.getAllSummoners());
     }
-    
-
 
     @GetMapping("/{region}/{summonerName}-{tag}")
-    public ResponseEntity<Summoner> getSummonerInfo(@PathVariable String region,
+    public ResponseEntity<?> getSummonerInfo(@PathVariable String region,
             @PathVariable String summonerName,
             @PathVariable String tag) {
         try {
-            
-            Summoner sum = summonerService.getSummoner(summonerName);
+            // First check if we have this summoner in database
+            Summoner existingSummoner = summonerService.getSummoner(summonerName);
 
-            if (sum == null || (System.currentTimeMillis() - sum.getLastUpdated().getTime() < 60000)) {
-                // Fetching Account Data
-                JsonNode accountData = riotService.fetchAccountData(region, summonerName, tag);
-                // Fetching Summoner Data
-                JsonNode summonerData = riotService.fetchSummonerData(region + "1", accountData.path("puuid").asText());
+            if (existingSummoner != null) {
+                String puuid = existingSummoner.getPuuid();
 
-                Summoner summoner = new Summoner(accountData.path("puuid").asText(), summonerName, region,
-                summonerData.path("profileIconId").asInt(), summonerData.path("summonerLevel").asInt());
+                // Check rate limiting using the updateService
+                LocalDateTime lastUpdate = updateService.getLastUpdatedTime(puuid, UpdateType.SUMMONER);
+                LocalDateTime now = LocalDateTime.now();
 
-                // Save the summoner to the database
-                summonerService.saveSummoner(summoner);
-                return ResponseEntity.ok(summoner);
-                      
+                // If last update was less than 5 minutes ago
+                if (lastUpdate != null && ChronoUnit.SECONDS.between(lastUpdate, now) < 300) {
+                    // Calculate remaining cooldown
+                    long remainingSeconds = 300 - ChronoUnit.SECONDS.between(lastUpdate, now);
+
+                    // Return the existing data with rate limit info
+                    Map<String, Object> response = new HashMap<>();
+                    response.put("summoner", existingSummoner);
+                    response.put("cooldownSeconds", remainingSeconds);
+                    response.put("isRateLimited", true);
+
+                    return ResponseEntity.ok(response);
+                }
+
+                // If we're here, we can fetch fresh data
             }
-            else {
-                return ResponseEntity.ok(sum);
-            }
 
+            // Fetching fresh data from Riot API
+            JsonNode accountData = riotService.fetchAccountData(region, summonerName, tag);
+            String puuid = accountData.path("puuid").asText();
+
+            // Fetching Summoner Data
+            JsonNode summonerData = riotService.fetchSummonerData(region + "1", puuid);
+
+            // Create and save summoner
+            Summoner summoner = new Summoner(
+                    puuid,
+                    summonerName,
+                    region,
+                    summonerData.path("profileIconId").asInt(),
+                    summonerData.path("summonerLevel").asInt());
+
+            // Save to database
+            summonerService.saveSummoner(summoner);
+
+            // Update the last updated time
+            updateService.updateLastUpdatedTime(puuid, UpdateType.SUMMONER);
+
+            return ResponseEntity.ok(summoner);
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(500).body(null);
         }
     }
-
 
 }
