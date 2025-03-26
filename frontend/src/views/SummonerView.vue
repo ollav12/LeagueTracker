@@ -222,9 +222,7 @@ export default {
         this.puuid = summonerResponse.data.puuid;
         localStorage.setItem("puuid", this.puuid);
 
-        const rankResponse = await axios.post(`/ranks`, {
-          puuid: this.puuid,
-        });
+        const rankResponse = await axios.get(`/ranks/${this.puuid}`);
 
         console.log(rankResponse.data);
         if (!rankResponse.data || rankResponse.data.length === 0) {
