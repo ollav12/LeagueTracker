@@ -30,7 +30,7 @@ public class AccountEndpoint {
         String endpoint = "riot/account/v1/accounts/by-riot-id/" + summonerName + "/" + tag.toUpperCase();
         RiotRequest<AccountDto> request = new RiotRequest<>(Helper.getRiotApiRegion(region), endpoint, apiKey,
                 new AccountMapper());
-        return request.executeAsync();
+        return request.execute();
     }
 
     /**
@@ -43,7 +43,7 @@ public class AccountEndpoint {
         String endpoint = "lol/summoner/v4/summoners/by-puuid/" + puuid;
         RiotRequest<AccountDto> request = new RiotRequest<>(Helper.getRiotApiRegion(region), endpoint, apiKey,
                 new AccountMapper());
-        return request.executeAsync();
+        return request.execute();
     }
 
     /**

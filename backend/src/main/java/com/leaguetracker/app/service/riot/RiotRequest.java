@@ -16,7 +16,7 @@ public class RiotRequest<T> {
         this.responseMapper = responseMapper;
     }
 
-    public T executeAsync() {
+    public T execute() {
         String response = webClient.get()
                 .uri(url)
                 .retrieve()

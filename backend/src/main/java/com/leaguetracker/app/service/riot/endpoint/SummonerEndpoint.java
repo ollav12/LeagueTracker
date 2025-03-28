@@ -25,6 +25,6 @@ public class SummonerEndpoint {
         String endpoint = "lol/summoner/v4/summoners/by-puuid/" + puuid;
         RiotRequest<SummonerDto> request = new RiotRequest<>(region, endpoint, apiKey,
                 new SummonerMapper());
-        return request.executeAsync();
+        return request.execute();
     }
 }

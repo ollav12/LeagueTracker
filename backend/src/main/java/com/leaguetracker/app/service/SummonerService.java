@@ -28,14 +28,30 @@ public class SummonerService {
      * Get a summoner
      * 
      * @param puuid
-     * @return
+     * @return summoner response
      */
     public SummonerResponse getSummoner(String summonerName, String region, String tag) {
         AccountDto account = riotService.Account.findByRiotId(region, summonerName, tag);
+        System.out.println("Fetched account form riot api: " + account);
         if (account != null) {
-            SummonerDto summoner = riotService.Summoner.findByPuuid(account.puuid(), region);
-            System.out.println("Sumoner: " + summoner);
-            return SummonerMapper.toResponse(summonerName, tag, summoner);
+            Summoner summoner = summonerRepository.findById(account.puuid()).orElse(null);
+            if (summoner != null) {
+                System.out.println("Retrieved summoner from database: " + summoner);
+                return SummonerMapper.toResponse(summonerName, tag, new SummonerDto(
+                        summoner.getId(),
+                        summoner.getAccountId(),
+                        summoner.getPuuid(),
+                        summoner.getProfileIconId(),
+                        summoner.getRevisionDate(),
+                        summoner.getSummonerLevel()));
+            }
+            SummonerDto summonerDto = riotService.Summoner.findByPuuid(account.puuid(), region);
+            System.out.println("Fetched summoner from riot api: " + summonerDto);
+            SummonerResponse response = SummonerMapper.toResponse(summonerName, tag, summonerDto);
+            Summoner newSummoner = SummonerMapper.toEntity(region, response);
+            summonerRepository.save(newSummoner);
+            System.out.println("Saved new summoner " + newSummoner);
+            return response;
         }
 
         return null;

@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.leaguetracker.app.dto.SummonerDto;
 import com.leaguetracker.app.dto.response.SummonerResponse;
+import com.leaguetracker.app.model.Summoner;
 
 public class SummonerMapper implements Function<String, SummonerDto> {
 
@@ -34,8 +35,26 @@ public class SummonerMapper implements Function<String, SummonerDto> {
 
     public static SummonerResponse toResponse(String name, String tagLine, SummonerDto dto) {
         return new SummonerResponse(
-                name, tagLine,
-                dto.id(), dto.accountId(), dto.puuid(),
-                dto.profieIconId(), dto.revisionDate(), dto.summonerLevel());
+                name,
+                tagLine,
+                dto.id(),
+                dto.accountId(),
+                dto.puuid(),
+                dto.profieIconId(),
+                dto.revisionDate(),
+                dto.summonerLevel());
+    }
+
+    public static Summoner toEntity(String region, SummonerResponse summoner) {
+        return new Summoner(
+                summoner.puuid(),
+                summoner.summonerName(),
+                region,
+                summoner.profileIconId(),
+                summoner.summonerLevel(),
+                summoner.revisionDate(),
+                summoner.accountId(),
+                summoner.id(),
+                summoner.tagLine());
     }
 }

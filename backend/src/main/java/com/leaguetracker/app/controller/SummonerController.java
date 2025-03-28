@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.leaguetracker.app.dto.response.SummonerResponse;
 import com.leaguetracker.app.model.Summoner;
 import com.leaguetracker.app.service.SummonerService;
 
@@ -35,17 +36,13 @@ public class SummonerController {
      * @return
      */
     @GetMapping("/{region}/{summonerName}-{tag}")
-    public ResponseEntity<?> getSummoner(@PathVariable String region,
+    public ResponseEntity<SummonerResponse> getSummoner(@PathVariable String region,
             @PathVariable String summonerName,
             @PathVariable String tag) {
 
         try {
-            Object account = summonerService.getSummoner(summonerName, region, tag);
-            if (account == null) {
-                return null;
-            } else {
-                return ResponseEntity.ok(account);
-            }
+            SummonerResponse summoner = summonerService.getSummoner(summonerName, region, tag);
+            return ResponseEntity.ok(summoner);
         } finally {
         }
     }
