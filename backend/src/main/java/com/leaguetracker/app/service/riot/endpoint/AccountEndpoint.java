@@ -5,11 +5,9 @@ import javax.security.auth.login.AccountExpiredException;
 import org.springframework.stereotype.Service;
 
 import com.leaguetracker.app.dto.AccountDto;
-import com.leaguetracker.app.dto.mapper.AccountMapper;
 import com.leaguetracker.app.helper.Helper;
+import com.leaguetracker.app.mapper.AccountMapper;
 import com.leaguetracker.app.service.riot.RiotRequest;
-
-import reactor.core.publisher.Mono;
 
 @Service
 public class AccountEndpoint {
@@ -30,7 +28,8 @@ public class AccountEndpoint {
      */
     public AccountDto findByRiotId(String region, String summonerName, String tag) {
         String endpoint = "riot/account/v1/accounts/by-riot-id/" + summonerName + "/" + tag.toUpperCase();
-        RiotRequest<AccountDto> request = new RiotRequest<>(region, endpoint, apiKey, new AccountMapper());
+        RiotRequest<AccountDto> request = new RiotRequest<>(Helper.getRiotApiRegion(region), endpoint, apiKey,
+                new AccountMapper());
         return request.executeAsync();
     }
 

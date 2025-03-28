@@ -32,6 +32,16 @@ public class Helper {
         public String getRegionCode() {
             return regionCode;
         }
+
+        // Helper method to find a LeagueRegion by its region code
+        public static LeagueRegion fromRegionCode(String regionCode) {
+            for (LeagueRegion region : LeagueRegion.values()) {
+                if (region.getRegionCode().equalsIgnoreCase(regionCode)) {
+                    return region;
+                }
+            }
+            throw new IllegalArgumentException("Unknown region code: " + regionCode);
+        }
     }
 
     public enum RiotRegion {
@@ -52,14 +62,17 @@ public class Helper {
     }
 
     /**
-     * Get riot api region from a region
+     * Get Riot API region from a League region code (e.g., "euw1" -> "europe")
      * 
-     * @param region
-     * @return
+     * @param regionCode The League region code (e.g., "euw1", "na1")
+     * @return The corresponding Riot API region (e.g., "europe", "americas")
      */
-    public static String getRiotApiRegion(String region) {
-        LeagueRegion newRegion = LeagueRegion.valueOf(region.toLowerCase());
-        switch (newRegion) {
+    public static String getRiotApiRegion(String regionCode) {
+        // Convert region code to LeagueRegion enum
+        LeagueRegion leagueRegion = LeagueRegion.fromRegionCode(regionCode);
+
+        // Map LeagueRegion to RiotRegion
+        switch (leagueRegion) {
             case NORTH_AMERICA:
             case BRAZIL:
             case LATIN_AMERICA_NORTH:
@@ -76,15 +89,12 @@ public class Helper {
             case JAPAN:
                 return RiotRegion.ASIA.getRegionName();
             case EUROPE_NORTHEAST:
-                return RiotRegion.EUROPE.getRegionName();
             case EUROPE_WEST:
-                return RiotRegion.EUROPE.getRegionName();
             case TURKEY:
-                return RiotRegion.EUROPE.getRegionName();
             case RUSSIA:
                 return RiotRegion.EUROPE.getRegionName();
             default:
-                throw new IllegalArgumentException("Unknown LeagueRegion: " + region);
+                throw new IllegalArgumentException("Unknown LeagueRegion: " + leagueRegion);
         }
     }
 }

@@ -1,4 +1,4 @@
-package com.leaguetracker.app.dto.mapper;
+package com.leaguetracker.app.mapper;
 
 import java.util.function.Function;
 

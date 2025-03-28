@@ -2,7 +2,6 @@ package com.leaguetracker.app.controller;
 
 import java.util.List;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,7 +27,7 @@ public class SummonerController {
     }
 
     /**
-     * Get summoner info
+     * Get a summoner
      * 
      * @param region
      * @param summonerName
@@ -36,7 +35,7 @@ public class SummonerController {
      * @return
      */
     @GetMapping("/{region}/{summonerName}-{tag}")
-    public ResponseEntity<?> getSummonerInfo(@PathVariable String region,
+    public ResponseEntity<?> getSummoner(@PathVariable String region,
             @PathVariable String summonerName,
             @PathVariable String tag) {
 
