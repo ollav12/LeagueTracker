@@ -15,11 +15,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.leaguetracker.app.model.Summoner;
-import com.leaguetracker.app.model.SummonerUpdate;
-import com.leaguetracker.app.service.RiotApiService;
 import com.leaguetracker.app.service.SummonerService;
 import com.leaguetracker.app.service.UpdateService;
 import com.leaguetracker.app.service.UpdateService.UpdateType;
+import com.leaguetracker.app.service.riot.RiotService;
 
 @RestController
 @RequestMapping("/summoners")
@@ -31,20 +30,37 @@ public class SummonerController {
     private UpdateService updateService;
 
     @Autowired
-    private RiotApiService riotService;
+    private RiotService riotService;
 
     @GetMapping()
     public ResponseEntity<List<Summoner>> getAllSummoners() {
         return ResponseEntity.ok(summonerService.getAllSummoners());
     }
 
+    /**
+     * Get summoner info
+     * 
+     * @param region
+     * @param summonerName
+     * @param tag
+     * @return
+     */
     @GetMapping("/{region}/{summonerName}-{tag}")
     public ResponseEntity<?> getSummonerInfo(@PathVariable String region,
             @PathVariable String summonerName,
             @PathVariable String tag) {
+
+        try {
+            Object account = summonerService.getSummoner(summonerName, region, tag);
+            if (account == null) {
+                return null;
+            }
+        } finally {
+        }
+
         try {
             // First check if we have this summoner in database
-            Summoner existingSummoner = summonerService.getSummoner(summonerName);
+            Summoner existingSummoner = summonerService.getSummoner(summonerName, region, tag);
 
             if (existingSummoner != null) {
                 String puuid = existingSummoner.getPuuid();
@@ -71,7 +87,7 @@ public class SummonerController {
             }
 
             // Fetching fresh data from Riot API
-            JsonNode accountData = riotService.fetchAccountData(region, summonerName, tag);
+            JsonNode accountData = riotService.Account.fetchAccountData(region, summonerName, tag);
             String puuid = accountData.path("puuid").asText();
 
             // Fetching Summoner Data

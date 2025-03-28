@@ -1,8 +1,8 @@
 package com.leaguetracker.app.service;
+
 import com.leaguetracker.app.repository.RankRepository;
 
 import java.util.ArrayList;
-import java.util.Dictionary;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +24,7 @@ public class RankService {
     private RankRepository rankRepository;
     private final RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper objectMapper = new ObjectMapper();
-    
+
     private final String apiKey;
 
     public RankService(EnvConfig envConfig) {
@@ -41,21 +41,24 @@ public class RankService {
     }
 
     public List<SummonerRank> getRankByPuuid(String puuid) {
-       return rankRepository.findByPuuid(puuid);
+        return rankRepository.findByPuuid(puuid);
     }
 
     // Riot api calls
     public List<SummonerRank> fetchRanks(String puuid) {
         try {
             String region = "euw1";
-            String rankUrl = "https://" + region + ".api.riotgames.com/lol/league/v4/entries/by-puuid/" + puuid + "?api_key=" + apiKey;
+            String rankUrl = "https://" + region + ".api.riotgames.com/lol/league/v4/entries/by-puuid/" + puuid
+                    + "?api_key=" + apiKey;
             ResponseEntity<String> response = restTemplate.getForEntity(rankUrl, String.class);
 
             if (response.getStatusCode().is2xxSuccessful()) {
                 List<SummonerRank> list = new ArrayList<>();
                 String responseBody = response.getBody();
                 if (responseBody != null) {
-                    List<SummonerRank> ranks = objectMapper.readValue(responseBody, new TypeReference<List<SummonerRank>>() {});
+                    List<SummonerRank> ranks = objectMapper.readValue(responseBody,
+                            new TypeReference<List<SummonerRank>>() {
+                            });
                     for (SummonerRank rank : ranks) {
                         rankRepository.save(rank);
                         list.add(rank);

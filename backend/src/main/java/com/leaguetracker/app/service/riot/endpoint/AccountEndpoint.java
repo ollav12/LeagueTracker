@@ -1,25 +1,37 @@
-package com.leaguetracker.app.service;
-import com.leaguetracker.app.config.EnvConfig;
+package com.leaguetracker.app.service.riot.endpoint;
 
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.leaguetracker.app.service.riot.RiotRequest;
+
+import reactor.core.publisher.Mono;
 
 @Service
-public class RiotApiService {
- 
-    private final RestTemplate restTemplate = new RestTemplate();
-    private final ObjectMapper objectMapper = new ObjectMapper();
+public class AccountEndpoint {
 
-    private String apiKey;
+    private final String apiKey;
 
-    public RiotApiService(EnvConfig envConfig) {
-        this.apiKey = envConfig.getApiKey();
+    public AccountEndpoint(String apiKey) {
+        this.apiKey = apiKey;
     }
 
-    public JsonNode fetchAccountData(String region, String summonerName, String tag) {
+    /**
+     * Fetch user by riot ID
+     * 
+     * @param region
+     * @param summonerName
+     * @param tag
+     * @return
+     */
+    public Mono<String> findByRiotID(String region, String summonerName, String tag) {
+        String endpoint = "riot/account/v1/accounts/by-riot-id/" + summonerName + "/" + tag;
+        RiotRequest request = new RiotRequest(region, endpoint, apiKey);
+        return request.executeAsync();
+    }
+
+    public JsonNode getAccountData(String region, String summonerName, String tag) {
         try {
             region = getRegionFromTag(tag);
             String accountUrl = "https://" + region + ".api.riotgames.com/riot/account/v1/accounts/by-riot-id/"
@@ -52,7 +64,6 @@ public class RiotApiService {
         return "https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/profile-icons/"
                 + summonerProfileIconId + ".jpg";
     }
-
 
     public String getRegionFromTag(String tag) {
         switch (tag) {

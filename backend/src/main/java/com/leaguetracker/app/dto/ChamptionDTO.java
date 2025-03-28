@@ -1,5 +1,4 @@
 package com.leaguetracker.app.dto;
 
-public class ChamptionDTO {
-
+public record ChamptionDto() {
 }

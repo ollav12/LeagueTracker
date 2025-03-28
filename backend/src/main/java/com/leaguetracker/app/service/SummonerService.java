@@ -7,19 +7,36 @@ import org.springframework.stereotype.Service;
 
 import com.leaguetracker.app.model.Summoner;
 import com.leaguetracker.app.repository.SummonerRepository;
+import com.leaguetracker.app.service.riot.RiotService;
 
 @Service
 public class SummonerService {
-    
-    @Autowired
-    private SummonerRepository summonerRepository;
+
+    private final SummonerRepository summonerRepository;
+
+    private final RiotService riotService;
+
+    public SummonerService(SummonerRepository summonerRepository, RiotService riotService) {
+        this.summonerRepository = summonerRepository;
+        this.riotService = riotService;
+    }
+
+    /**
+     * Get a summoner
+     * 
+     * @param puuid
+     * @return
+     */
+    public Summoner getSummoner(String summonerName, String region, String tag) {
+        Object account = riotService.Account.getAccountData(region, summonerName, tag);
+        System.out.println("Account: ");
+        System.out.println(account);
+
+        return summonerRepository.findById("te").orElse(null);
+    }
 
     public Summoner saveSummoner(Summoner summoner) {
         return summonerRepository.save(summoner);
-    }
-
-    public Summoner getSummoner(String puuid) {
-        return summonerRepository.findById(puuid).orElse(null);
     }
 
     public List<Summoner> getAllSummoners() {
