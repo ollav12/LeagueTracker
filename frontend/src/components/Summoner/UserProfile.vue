@@ -306,7 +306,7 @@ export default {
 
         console.log(summonerResponse.data);
         // Update the profile data
-        this.localProfileIconUrl =
+        this.profileIconUrl =
           "https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/profile-icons/" +
           summonerResponse.data.summonerProfileIconId +
           ".jpg"; // Adjust based on actual response structure

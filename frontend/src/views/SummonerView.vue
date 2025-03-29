@@ -214,10 +214,8 @@ export default {
         this.region = region;
         this.tag = tag;
         console.log(`Fetching: New Data`);
-        console.log(region.toLowerCase())
-        let newRegion = this.globalStore.regionsList[this.region.toLowerCase()]
-        console.log(newRegion)
-        console.log(region)
+        let newRegion = this.globalStore.regionsList[this.region.toLowerCase()];
+
         const summonerResponse = await axios.get(
           `/summoners/${newRegion}/${summoner}-${tag}`
         );
@@ -226,8 +224,7 @@ export default {
         // Update the profile data
         this.profileIconUrl =
           "https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/profile-icons/" +
-          summonerResponse.data.summonerProfileIconId +
-          ".jpg";
+          summonerResponse.data.profileIconId + ".jpg";
         this.summonerName = summoner;
         this.summonerLevel = summonerResponse.data.summonerLevel;
         this.puuid = summonerResponse.data.puuid;
