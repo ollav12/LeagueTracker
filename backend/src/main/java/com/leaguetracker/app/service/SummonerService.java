@@ -57,6 +57,15 @@ public class SummonerService {
         return null;
     }
 
+    /**
+     * Get account by puuid
+     * 
+     * @return AccountDto
+     */
+    public AccountDto getAccount(String puuid, String region) {
+        return riotService.Account.findByPuuid(puuid, region);
+    }
+
     public Summoner saveSummoner(Summoner summoner) {
         return summonerRepository.save(summoner);
     }
