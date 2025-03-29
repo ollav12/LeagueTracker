@@ -5,13 +5,13 @@ import java.util.List;
 import com.leaguetracker.app.dto.LeagueDto;
 
 public record SummonerResponse(
-        String summonerName,
-        String tagLine,
-        String id,
-        String accountId,
-        String puuid,
-        int profileIconId,
-        long revisionDate,
-        int summonerLevel,
-        List<LeagueDto> raked) {
+                String summonerName,
+                String tagLine,
+                String id,
+                String accountId,
+                String puuid,
+                int profileIconId,
+                long revisionDate,
+                int summonerLevel,
+                List<LeagueDto> ranked) {
 }

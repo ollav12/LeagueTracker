@@ -478,7 +478,7 @@ export default {
   margin-left: 3px;
   position: relative;
   top: -1px;
-  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  font-family: 'Roboto'; 
 }
 
 /* Adjust padding on the Champions button to accommodate badge */

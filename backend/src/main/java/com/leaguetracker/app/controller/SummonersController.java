@@ -14,11 +14,11 @@ import com.leaguetracker.app.service.SummonerService;
 
 @RestController
 @RequestMapping("/summoners")
-public class SummonerController {
+public class SummonersController {
 
     private final SummonerService summonerService;
 
-    public SummonerController(SummonerService summonerService) {
+    public SummonersController(SummonerService summonerService) {
         this.summonerService = summonerService;
     }
 
@@ -33,7 +33,7 @@ public class SummonerController {
      * @param region
      * @param summonerName
      * @param tag
-     * @return
+     * @return Summoner response
      */
     @GetMapping("/{region}/{summonerName}-{tag}")
     public ResponseEntity<SummonerResponse> getSummoner(@PathVariable String region,

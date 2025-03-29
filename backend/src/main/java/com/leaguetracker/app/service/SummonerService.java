@@ -73,7 +73,7 @@ public class SummonerService {
      * 
      * @param puuid
      * @param region
-     * @return
+     * @return SummonerDto
      */
     public SummonerDto getSummoner(String puuid) {
         Summoner summoner = summonerRepository.findById(puuid).orElse(null);

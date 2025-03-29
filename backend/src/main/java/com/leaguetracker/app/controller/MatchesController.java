@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
 @RequestMapping("/matches")
-public class MatchController /* ~~(Could not parse as Java)~~> */ {
+public class MatchesController /* ~~(Could not parse as Java)~~> */ {
 
     @Autowired
     private MatchService matchService;
