@@ -1,0 +1,79 @@
+name: Java CI with Gradle
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_USER: user
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: dev_database
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U user -d dev_database"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set environment variables
+        run: |
+          echo "RIOT_KEY=${{ secrets.RIOT_KEY }}" > backend/.env
+          echo "SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/dev_database" >> $GITHUB_ENV
+          echo "SPRING_DATASOURCE_USERNAME=user" >> $GITHUB_ENV
+          echo "SPRING_DATASOURCE_PASSWORD=password" >> $GITHUB_ENV
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: "21"
+          distribution: "temurin"
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Build without tests
+        run: |
+          cd backend
+          chmod +x ./gradlew
+          ./gradlew build -x test --info
+
+      - name: Run tests separately
+        run: |
+          cd backend
+          ./gradlew test --info
+
+  dependency-submission:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: "21"
+          distribution: "temurin"
+
+      - name: Generate and submit dependency graph
+        uses: gradle/actions/dependency-submission@v4
+        with:
+          build-root-directory: backend
