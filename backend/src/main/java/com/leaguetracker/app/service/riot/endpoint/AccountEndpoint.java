@@ -1,7 +1,5 @@
 package com.leaguetracker.app.service.riot.endpoint;
 
-import javax.security.auth.login.AccountExpiredException;
-
 import org.springframework.stereotype.Service;
 
 import com.leaguetracker.app.dto.AccountDto;

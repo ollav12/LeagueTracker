@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.leaguetracker.app.dto.AccountDto;
+import com.leaguetracker.app.dto.LeagueDto;
 import com.leaguetracker.app.dto.SummonerDto;
 import com.leaguetracker.app.dto.response.SummonerResponse;
 import com.leaguetracker.app.mapper.SummonerMapper;
@@ -30,30 +31,56 @@ public class SummonerService {
      * @param puuid
      * @return summoner response
      */
-    public SummonerResponse getSummoner(String summonerName, String region, String tag) {
-        AccountDto account = riotService.Account.findByRiotId(region, summonerName, tag);
+    public SummonerResponse getSummonerDetails(String summonerName, String region, String tag) {
+        AccountDto account = this.getAccount(region, summonerName, tag);
         System.out.println("Fetched account form riot api: " + account);
+
         if (account != null) {
-            Summoner summoner = summonerRepository.findById(account.puuid()).orElse(null);
+            SummonerDto summoner = this.getSummoner(account.puuid());
             if (summoner != null) {
                 System.out.println("Retrieved summoner from database: " + summoner);
-                return SummonerMapper.toResponse(summonerName, tag, new SummonerDto(
-                        summoner.getId(),
-                        summoner.getAccountId(),
-                        summoner.getPuuid(),
-                        summoner.getProfileIconId(),
-                        summoner.getRevisionDate(),
-                        summoner.getSummonerLevel()));
+
+                List<LeagueDto> ranked = this.getRanked(summoner.id(), region);
+                System.out.println("Ranked: " + ranked);
+
+                return SummonerMapper.toResponse(summonerName, tag, summoner, ranked);
             }
             SummonerDto summonerDto = riotService.Summoner.findByPuuid(account.puuid(), region);
             System.out.println("Fetched summoner from riot api: " + summonerDto);
-            SummonerResponse response = SummonerMapper.toResponse(summonerName, tag, summonerDto);
+
+            List<LeagueDto> ranked = this.getRanked(summonerDto.id(), region);
+            System.out.println("Ranked: " + ranked);
+
+            SummonerResponse response = SummonerMapper.toResponse(summonerName, tag, summonerDto, ranked);
             Summoner newSummoner = SummonerMapper.toEntity(region, response);
             summonerRepository.save(newSummoner);
             System.out.println("Saved new summoner " + newSummoner);
+
             return response;
         }
 
+        return null;
+    }
+
+    /**
+     * Get summoner from database by puuid
+     * 
+     * @param puuid
+     * @param region
+     * @return
+     */
+    public SummonerDto getSummoner(String puuid) {
+        Summoner summoner = summonerRepository.findById(puuid).orElse(null);
+        if (summoner != null) {
+            System.out.println("Retrieved summoner from database: " + summoner);
+            return new SummonerDto(
+                    summoner.getId(),
+                    summoner.getAccountId(),
+                    summoner.getPuuid(),
+                    summoner.getProfileIconId(),
+                    summoner.getRevisionDate(),
+                    summoner.getSummonerLevel());
+        }
         return null;
     }
 
@@ -62,8 +89,28 @@ public class SummonerService {
      * 
      * @return AccountDto
      */
-    public AccountDto getAccount(String puuid, String region) {
+    public AccountDto getAccountByPuuid(String puuid, String region) {
         return riotService.Account.findByPuuid(puuid, region);
+    }
+
+    /**
+     * Get account by region, summonerName, tag
+     * 
+     * @return AccountDto
+     */
+    public AccountDto getAccount(String region, String summonerName, String tag) {
+        return riotService.Account.findByRiotId(region, summonerName, tag);
+    }
+
+    /**
+     * Get summoner ranked data
+     * 
+     * @param summoner
+     * @return
+     */
+    public List<LeagueDto> getRanked(String id, String region) {
+        List<LeagueDto> ranked = riotService.League.findBySummonerId(id, region);
+        return ranked;
     }
 
     public Summoner saveSummoner(Summoner summoner) {

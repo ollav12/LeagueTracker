@@ -1,9 +1,11 @@
 package com.leaguetracker.app.mapper;
 
+import java.util.List;
 import java.util.function.Function;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.leaguetracker.app.dto.LeagueDto;
 import com.leaguetracker.app.dto.SummonerDto;
 import com.leaguetracker.app.dto.response.SummonerResponse;
 import com.leaguetracker.app.model.Summoner;
@@ -33,7 +35,7 @@ public class SummonerMapper implements Function<String, SummonerDto> {
         }
     }
 
-    public static SummonerResponse toResponse(String name, String tagLine, SummonerDto dto) {
+    public static SummonerResponse toResponse(String name, String tagLine, SummonerDto dto, List<LeagueDto> ranked) {
         return new SummonerResponse(
                 name,
                 tagLine,
@@ -42,7 +44,8 @@ public class SummonerMapper implements Function<String, SummonerDto> {
                 dto.puuid(),
                 dto.profieIconId(),
                 dto.revisionDate(),
-                dto.summonerLevel());
+                dto.summonerLevel(),
+                ranked);
     }
 
     public static Summoner toEntity(String region, SummonerResponse summoner) {
