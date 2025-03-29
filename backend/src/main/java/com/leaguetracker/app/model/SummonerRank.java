@@ -23,7 +23,20 @@ public class SummonerRank {
     private boolean freshBlood;
     private boolean hotStreak;
 
-    public SummonerRank(String leagueId, String summonerId, String puuid, String queueType, String rank, String tier, String leaguePoints, int wins, int losses, boolean veteran, boolean inactive, boolean freshBlood, boolean hotStreak) {
+    public SummonerRank(
+            String leagueId,
+            String summonerId,
+            String puuid,
+            String queueType,
+            String rank,
+            String tier,
+            String leaguePoints,
+            int wins,
+            int losses,
+            boolean veteran,
+            boolean inactive,
+            boolean freshBlood,
+            boolean hotStreak) {
         this.leagueId = leagueId;
         this.summonerId = summonerId;
         this.puuid = puuid;
@@ -45,24 +58,31 @@ public class SummonerRank {
     public String getPuuid() {
         return puuid;
     }
+
     public int getLosses() {
         return losses;
     }
+
     public String getLeaguePoints() {
         return leaguePoints;
     }
+
     public String getQueueType() {
         return queueType;
     }
+
     public String getRank() {
         return rank;
     }
+
     public String getTier() {
         return tier;
     }
+
     public int getWins() {
         return wins;
     }
+
     public boolean getVeteran() {
         return this.veteran;
     }
@@ -126,7 +146,7 @@ public class SummonerRank {
     public void setVeteran(boolean veteran) {
         this.veteran = veteran;
     }
-    
+
     public void setWins(int wins) {
         this.wins = wins;
     }

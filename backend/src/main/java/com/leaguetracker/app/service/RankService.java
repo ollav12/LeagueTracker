@@ -13,6 +13,7 @@ import org.springframework.web.client.RestTemplate;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.leaguetracker.app.config.EnvConfig;
+import com.leaguetracker.app.dto.LeagueDto;
 import com.leaguetracker.app.model.SummonerRank;
 
 @Service
@@ -30,6 +31,26 @@ public class RankService {
     public RankService(EnvConfig envConfig) {
         this.apiKey = envConfig.getApiKey();
         this.envConfig = envConfig;
+    }
+
+    public void saveLeagueDto(List<LeagueDto> ranks) {
+        for (LeagueDto rank : ranks) {
+            SummonerRank sumRank = new SummonerRank(
+                    rank.leagueId(),
+                    rank.summonerId(),
+                    rank.puuid(),
+                    rank.queueType(),
+                    rank.rank(),
+                    rank.tier(),
+                    rank.leaguePoints(),
+                    rank.wins(),
+                    rank.losses(),
+                    rank.veteran(),
+                    rank.inactive(),
+                    rank.freshBlood(),
+                    rank.hotStreak());
+            rankRepository.save(sumRank);
+        }
     }
 
     public SummonerRank saveRank(SummonerRank rank) {
