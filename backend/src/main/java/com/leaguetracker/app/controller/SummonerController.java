@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.leaguetracker.app.dto.LeagueDto;
 import com.leaguetracker.app.dto.response.SummonerResponse;
 import com.leaguetracker.app.model.Summoner;
 import com.leaguetracker.app.service.SummonerService;

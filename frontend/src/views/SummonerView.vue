@@ -80,8 +80,16 @@
 import axios from "@/plugins/axios"; // Import the configured axios instance
 import SearchForm from "@/components/Form/SearchForm.vue";
 import UserProfile from "@/components/Summoner/UserProfile.vue";
+import { useGlobalStore } from '@/stores/global.js'
 
 export default {
+  setup() {
+    const globalStore = useGlobalStore();
+
+    return {
+      globalStore
+    };
+  },
   components: {
     SearchForm,
     UserProfile,
@@ -206,9 +214,12 @@ export default {
         this.region = region;
         this.tag = tag;
         console.log(`Fetching: New Data`);
-
+        console.log(region.toLowerCase())
+        let newRegion = this.globalStore.regionsList[this.region.toLowerCase()]
+        console.log(newRegion)
+        console.log(region)
         const summonerResponse = await axios.get(
-          `/summoners/${region}/${summoner}-${tag}`
+          `/summoners/${newRegion}/${summoner}-${tag}`
         );
         // Handle the response data
         console.log(summonerResponse.data);

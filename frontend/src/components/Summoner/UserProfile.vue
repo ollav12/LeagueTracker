@@ -108,8 +108,16 @@
 import axios from "@/plugins/axios";
 import RankHistory from "@/components/Summoner/RankHistory.vue";
 import MatchHistory from "@/components/Summoner/MatchHistory.vue";
+import { useGlobalStore } from '@/stores/global.js'
 
 export default {
+  setup() {
+    const globalStore = useGlobalStore();
+
+    return {
+      globalStore
+    };
+  },
   components: {
     RankHistory,
     MatchHistory,
@@ -289,8 +297,11 @@ export default {
       // Existing update code...
       try {
         console.log("Update: fetching new data");
+        let newRegion = this.globalStore.regionsList[this.region.toLowerCase()]
+        console.log(newRegion)
+        console.log(region)
         const summonerResponse = await axios.get(
-          `/summoners/${this.localRegion}/${this.localSummonerName}-${this.localTag}`
+          `/summoners/${newRegion}/${this.localSummonerName}-${this.localTag}`
         );
 
         console.log(summonerResponse.data);
