@@ -55,12 +55,10 @@ public class SummonerService {
             System.out.println("Fetched ranked data from riot api: " + ranked);
 
             rankService.saveLeagueDto(ranked);
-            System.out.println("Saved ranked data");
 
             SummonerResponse response = SummonerMapper.toResponse(summonerName, tag, summonerDto, ranked);
             Summoner newSummoner = SummonerMapper.toEntity(region, response);
             summonerRepository.save(newSummoner);
-            System.out.println("Saved new summoner " + newSummoner);
 
             return response;
         }

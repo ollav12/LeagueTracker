@@ -47,13 +47,13 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Build without tests
+      - name: Build without test
         run: |
           cd backend
           chmod +x ./gradlew
           ./gradlew build -x test --info
 
-      - name: Run tests separately
+      - name: Run test
         run: |
           cd backend
           ./gradlew test --info

@@ -108,14 +108,14 @@
 import axios from "@/plugins/axios";
 import RankHistory from "@/components/Summoner/RankHistory.vue";
 import MatchHistory from "@/components/Summoner/MatchHistory.vue";
-import { useGlobalStore } from '@/stores/global.js'
+import { useGlobalStore } from "@/stores/global.js";
 
 export default {
   setup() {
     const globalStore = useGlobalStore();
 
     return {
-      globalStore
+      globalStore,
     };
   },
   components: {
@@ -297,9 +297,7 @@ export default {
       // Existing update code...
       try {
         console.log("Update: fetching new data");
-        let newRegion = this.globalStore.regionsList[this.region.toLowerCase()]
-        console.log(newRegion)
-        console.log(region)
+        let newRegion = this.globalStore.regionsList[this.region.toLowerCase()];
         const summonerResponse = await axios.get(
           `/summoners/${newRegion}/${this.localSummonerName}-${this.localTag}`
         );
@@ -308,7 +306,7 @@ export default {
         // Update the profile data
         this.profileIconUrl =
           "https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/profile-icons/" +
-          summonerResponse.data.summonerProfileIconId +
+          summonerResponse.data.profileIconId +
           ".jpg"; // Adjust based on actual response structure
         this.localSummonerName = summonerResponse.data.summonerName;
         this.localSummonerLevel = summonerResponse.data.summonerLevel;
@@ -478,7 +476,7 @@ export default {
   margin-left: 3px;
   position: relative;
   top: -1px;
-  font-family: 'Roboto'; 
+  font-family: "Roboto";
 }
 
 /* Adjust padding on the Champions button to accommodate badge */

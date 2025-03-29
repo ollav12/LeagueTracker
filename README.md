@@ -12,9 +12,10 @@ LeagueTracker is a website that can be used to gather insightful data & statisti
 
 Before you begin, ensure you have the following installed on your machine:
 
-- [Java Development Kit (JDK)](https://www.oracle.com/java/technologies/javase-jdk11-downloads.html) (version 11 or later)
+- [Java Development Kit (JDK)](https://www.oracle.com/java/technologies/javase-jdk11-downloads.html) (version 16 or later)
 - [Gradle](https://gradle.org/install/)
 - [Node.js and npm](https://nodejs.org/) (version 14 or later)
+- [Docker Desktop]()
 
 You also need a riot games dev api key, read more at https://developer.riotgames.com/ on how to get one.
 Create your `.env` file inside `backend`, the `.env.example` shows how it should be.
@@ -27,13 +28,19 @@ Create your `.env` file inside `backend`, the `.env.example` shows how it should
    cd backend
    ```
 
-2. Clean and build the project:
+2. Compose docker:
 
    ```bash
-   ./gradlew clean build
+   docker compose up -d
    ```
 
-3. Run the backend:
+3. Build the project:
+
+   ```bash
+   ./gradlew build
+   ```
+
+4. Run the backend:
    ```bash
    ./gradlew bootRun
    ```
@@ -56,3 +63,7 @@ Create your `.env` file inside `backend`, the `.env.example` shows how it should
    ```bash
    npm run dev
    ```
+
+## Database access
+
+You can acces postgres using pgAdmin on http://localhost:5050/

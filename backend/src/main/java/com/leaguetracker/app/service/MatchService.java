@@ -13,8 +13,10 @@ import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.leaguetracker.app.config.EnvConfig;
+import com.leaguetracker.app.dto.MatchDto;
 import com.leaguetracker.app.model.SummonerMatch;
 import com.leaguetracker.app.repository.MatchRepository;
+import com.leaguetracker.app.service.riot.RiotService;
 
 @Service
 public class MatchService {
@@ -25,11 +27,42 @@ public class MatchService {
 
     private static final Logger logger = LoggerFactory.getLogger(MatchService.class);
 
-    @Autowired
-    private MatchRepository matchRepository;
+    private final MatchRepository matchRepository;
+    private final RiotService riotService;
 
-    public MatchService(EnvConfig envConfig) {
+    public MatchService(MatchRepository matchRepository, EnvConfig envConfig, RiotService riotService) {
+        this.matchRepository = matchRepository;
+        this.riotService = riotService;
         this.apiKey = envConfig.getApiKey();
+    }
+
+    /**
+     * Get a match by matchId
+     * 
+     * @param matchId
+     * @param region
+     * @return match
+     */
+    public MatchDto getMatch(String matchId, String region) {
+        return riotService.Match.findByMatchId(matchId, region);
+    }
+
+    /**
+     * Get matches from matchId
+     * 
+     * @return list of matches
+     */
+    public List<SummonerMatch> getMatches() {
+        return matchRepository.findAll();
+    }
+
+    /**
+     * Get ranks of players from given match
+     * 
+     * @return list of ranks
+     */
+    public List<SummonerMatch> getSummonersRanks(String matchId) {
+        return null;
     }
 
     public SummonerMatch saveMatch(Map<String, Object> matchData, String puuid) {
@@ -54,21 +87,8 @@ public class MatchService {
         return matchRepository.save(match);
     }
 
-    public List<SummonerMatch> getMatches() {
-        return matchRepository.findAll();
-    }
-
-    public SummonerMatch getMatchMatchId(String matchId) {
-        return matchRepository.findByMatchId(matchId);
-    }
-
     public List<SummonerMatch> getMatchesByPuuid(String puuid) {
         return matchRepository.findByPuuid(puuid);
-    }
-
-    // Riot api calls
-    public SummonerMatch get() {
-        return null;
     }
 
     public List<SummonerMatch> fetchMatches(String puuid) {

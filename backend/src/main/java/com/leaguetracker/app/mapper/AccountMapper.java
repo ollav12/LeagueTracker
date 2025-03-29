@@ -18,7 +18,9 @@ public class AccountMapper implements Function<String, AccountDto> {
     public AccountDto apply(String response) {
         try {
             JsonNode jsonNode = objectMapper.readTree(response);
-            AccountDto accountDto = new AccountDto(jsonNode.get("puuid").asText(), jsonNode.get("gameName").asText(),
+            AccountDto accountDto = new AccountDto(
+                    jsonNode.get("puuid").asText(),
+                    jsonNode.get("gameName").asText(),
                     jsonNode.get("tagLine").asText());
             return accountDto;
         } catch (Exception e) {
