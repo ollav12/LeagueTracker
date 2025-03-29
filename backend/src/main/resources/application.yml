@@ -1,0 +1,62 @@
+spring:
+  application:
+    name: leaguetracker
+  profiles:
+    active: dev # Default profile, can be overridden
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+  datasource:
+    url: jdbc:postgresql://prod-db:5432/prod_database
+    username: user
+    password: password
+    driver-class-name: org.postgresql.Driver # Correct driver class
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect # Correct dialect for PostgreSQL
+        format_sql: true
+logging:
+  level:
+    org.springframework: INFO
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+  datasource:
+    url: jdbc:postgresql://localhost:5432/leaguetracker
+    username: user
+    password: password
+    driver-class-name: org.postgresql.Driver # Correct driver class
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect # Correct dialect for PostgreSQL
+logging:
+  level:
+    org.springframework: DEBUG
+
+---
+spring:
+  config:
+    activate:
+      on-profile: test
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+logging:
+  level:
+    org.springframework: DEBUG

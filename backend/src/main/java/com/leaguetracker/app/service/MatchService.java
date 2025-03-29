@@ -63,7 +63,7 @@ public class MatchService {
     }
 
     public List<SummonerMatch> getMatchesByPuuid(String puuid) {
-        return matchRepository.findByPuuidInJson(puuid);
+        return matchRepository.findByPuuid(puuid);
     }
 
     // Riot api calls
