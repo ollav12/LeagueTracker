@@ -8,6 +8,21 @@ import java.util.function.Function;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.leaguetracker.app.dto.*;
+import com.leaguetracker.app.dto.MatchDto.BanDto;
+import com.leaguetracker.app.dto.MatchDto.ChampionTransformDto;
+import com.leaguetracker.app.dto.MatchDto.InfoDto;
+import com.leaguetracker.app.dto.MatchDto.LaneDto;
+import com.leaguetracker.app.dto.MatchDto.ParticipantDto;
+import com.leaguetracker.app.dto.MatchDto.PerkStatsDto;
+import com.leaguetracker.app.dto.MatchDto.PerkStyleDto;
+import com.leaguetracker.app.dto.MatchDto.PerkStyleSelectionDto;
+import com.leaguetracker.app.dto.MatchDto.PerksDto;
+import com.leaguetracker.app.dto.MatchDto.RoleDto;
+import com.leaguetracker.app.dto.MatchDto.TeamDto;
+import com.leaguetracker.app.dto.MatchDto.TeamPositionDto;
+import com.leaguetracker.app.dto.MatchDto.MetadataDto;
+import com.leaguetracker.app.dto.MatchDto.ObjectiveDto;
+import com.leaguetracker.app.dto.MatchDto.ObjectivesDto;
 
 public class MatchMapper implements Function<String, MatchDto> {
 

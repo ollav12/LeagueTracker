@@ -5,7 +5,14 @@ meta {
 }
 
 get {
-  url: 
-  body: none
+  url: http://localhost:8080/matches/match/EUW1_7347524284/by-puuid/test/region/euw1
+  body: json
   auth: none
+}
+
+body:json {
+  {
+    "puuid": "",
+    "region": "euw1"
+  }
 }
