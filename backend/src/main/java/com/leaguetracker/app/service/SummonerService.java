@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.leaguetracker.app.dto.AccountDto;
 import com.leaguetracker.app.dto.LeagueDto;
+import com.leaguetracker.app.dto.LeagueDto.MiniSeriesDto;
 import com.leaguetracker.app.dto.SummonerDto;
 import com.leaguetracker.app.dto.response.SummonerResponse;
 import com.leaguetracker.app.mapper.SummonerMapper;
@@ -127,7 +128,9 @@ public class SummonerService {
                         rank.getVeteran(),
                         rank.getInactive(),
                         rank.getFreshBlood(),
-                        rank.getHotStreak()))
+                        rank.getHotStreak(),
+                        new MiniSeriesDto(rank.getMiniSeries().getWins(), rank.getMiniSeries().getProgress(),
+                                rank.getMiniSeries().getTarget(), rank.getMiniSeries().getLosses())))
                 .collect(Collectors.toList());
     }
 

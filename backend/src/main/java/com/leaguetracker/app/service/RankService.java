@@ -15,6 +15,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.leaguetracker.app.config.EnvConfig;
 import com.leaguetracker.app.dto.LeagueDto;
 import com.leaguetracker.app.model.SummonerRank;
+import com.leaguetracker.app.model.SummonerRank.MiniSeries;
 
 @Service
 public class RankService {
@@ -48,7 +49,9 @@ public class RankService {
                     rank.veteran(),
                     rank.inactive(),
                     rank.freshBlood(),
-                    rank.hotStreak());
+                    rank.hotStreak(),
+                    new MiniSeries(rank.miniSeries().wins(), rank.miniSeries().progress(), rank.miniSeries().target(),
+                            rank.miniSeries().losses()));
             rankRepository.save(sumRank);
         }
     }

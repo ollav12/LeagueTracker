@@ -7,6 +7,7 @@ import java.util.stream.StreamSupport;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.leaguetracker.app.dto.LeagueDto;
+import com.leaguetracker.app.dto.LeagueDto.MiniSeriesDto;
 
 public class LeagueMapper {
 
@@ -37,13 +38,25 @@ public class LeagueMapper {
                 jsonNode.get("rank").asText(),
                 jsonNode.get("summonerId").asText(),
                 jsonNode.get("puuid").asText(),
-                jsonNode.get("leaguePoints").asText(),
+                jsonNode.get("leaguePoints").asInt(),
                 jsonNode.get("wins").asInt(),
                 jsonNode.get("losses").asInt(),
                 jsonNode.get("veteran").asBoolean(),
                 jsonNode.get("inactive").asBoolean(),
                 jsonNode.get("freshBlood").asBoolean(),
-                jsonNode.get("hotStreak").asBoolean());
+                jsonNode.get("hotStreak").asBoolean(),
+                toMiniSeries(jsonNode));
 
+    }
+
+    private static LeagueDto.MiniSeriesDto toMiniSeries(JsonNode jsonNode) {
+        if (jsonNode == null || jsonNode.isMissingNode()) {
+            return null; // MiniSeries might be missing for some players
+        }
+        return new MiniSeriesDto(
+                jsonNode.get("losses").asInt(),
+                jsonNode.get("progress").asText(),
+                jsonNode.get("target").asInt(),
+                jsonNode.get("wins").asInt());
     }
 }
