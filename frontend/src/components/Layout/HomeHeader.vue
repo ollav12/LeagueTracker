@@ -16,11 +16,6 @@
         </svg>
       </button>
 
-      <!-- Search Form -->
-      <div class="searchForm">
-        <SearchForm @formSubmit="handleFormSubmit" />
-      </div>
-
       <!-- Dark Mode Toggle Button -->
       <button id="theme-switch" @click="toggleDarkMode">
         <svg

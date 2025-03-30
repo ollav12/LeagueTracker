@@ -9,12 +9,11 @@
 
 <script>
 import SearchForm from "@/components/Form/SearchForm.vue";
-import SimpleFooter from "@/components/Layout/SimpleFooter.vue";
 
 export default {
+  name: "HomeView",
   components: {
     SearchForm,
-    SimpleFooter,
   },
   methods: {
     redirect(region, summoner, tag) {

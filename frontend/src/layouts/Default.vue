@@ -13,17 +13,6 @@ export default {
     DefaultHeader,
     DefaultFooter,
   },
-  watch: {
-    $route(to, from) {
-      if (
-        !from ||
-        from.params.region !== to.params.region ||
-        from.params.name !== to.params.name
-      ) {
-        this.apiCall();
-      }
-    },
-  },
 };
 </script>
 <style scoped></style>

@@ -4,18 +4,20 @@
       <div class="profile-header">
         <div class="icon-container">
           <img
-            :src="localProfileIconUrl"
+            :src="getProfileIconUrl"
             alt="Profile Icon"
             class="profile-icon"
           />
-          <span class="level">{{ localSummonerLevel }}</span>
+          <span class="level">{{ summoner.account.summonerLevel }}</span>
         </div>
         <div class="name-container">
           <h2 class="summoner-name">
-            {{ this.localSummonerName }}
-            <span class="tag"> #{{ formatTag(localTag) }}</span>
+            {{ summoner.account.name }}
+            <span class="tag">#{{ formatTag(summoner.account.tagLine) }}</span>
           </h2>
-          <p class="ladder-rank">EUW | Ladder Rank 77,321 (3.71% of top)</p>
+          <p class="ladder-rank">
+            {{ summoner.account.region }} | Ladder Rank 77,321 (3.71% of top)
+          </p>
           <button
             class="update-button"
             @click="updateSummoner"
@@ -32,7 +34,7 @@
         </div>
       </div>
 
-      <!-- Add the nav bar here -->
+      <!-- Nav bar -->
       <div class="profile-nav">
         <button
           class="nav-item"
@@ -66,18 +68,17 @@
 
       <!-- Tab content -->
       <div class="tab-content">
-        <!-- Summary tab (current content) -->
         <div v-if="activeTab === 'summary'" class="summary-container">
           <div class="rank-container">
             <RankHistory
-              :soloRank="soloRank"
-              :soloWins="soloWins"
-              :soloLosses="soloLosses"
-              :soloRankIconUrl="soloRankIconUrl"
-              :flexRank="flexRank"
-              :flexWins="flexWins"
-              :flexLosses="flexLosses"
-              :flexRankIconUrl="flexRankIconUrl"
+              :soloRank="getSoloRank"
+              :soloWins="summoner.ranked.solo?.wins || 0"
+              :soloLosses="summoner.ranked.solo?.losses || 0"
+              :soloRankIconUrl="getSoloRankIconUrl"
+              :flexRank="getFlexRank"
+              :flexWins="summoner.ranked.flex?.wins || 0"
+              :flexLosses="summoner.ranked.flex?.losses || 0"
+              :flexRankIconUrl="getFlexRankIconUrl"
             />
           </div>
           <div class="match-table">
@@ -87,7 +88,6 @@
           </div>
         </div>
 
-        <!-- Placeholder for other tabs -->
         <div v-else-if="activeTab === 'champions'" class="placeholder-content">
           Champions stats will be shown here
         </div>
@@ -105,58 +105,35 @@
 </template>
 
 <script>
-import axios from "@/plugins/axios";
+import { storeToRefs } from "pinia";
+import { useSummonerStore } from "@/stores/modules/summoner";
+import { useGlobalStore } from "@/stores/global.js";
 import RankHistory from "@/components/Summoner/RankHistory.vue";
 import MatchHistory from "@/components/Summoner/MatchHistory.vue";
-import { useGlobalStore } from "@/stores/global.js";
+import axios from "@/plugins/axios";
 
 export default {
-  setup() {
-    const globalStore = useGlobalStore();
-
-    return {
-      globalStore,
-    };
-  },
+  name: "UserProfile",
   components: {
     RankHistory,
     MatchHistory,
   },
-  props: {
-    puuid: String,
-    region: String,
-    tag: String,
-    profileIconUrl: String,
-    summonerName: String,
-    summonerLevel: Number,
-    soloRank: String,
-    soloWins: Number,
-    soloLosses: Number,
-    flexRank: String,
-    flexWins: Number,
-    flexLosses: Number,
-    soloRankIconUrl: String,
-    flexRankIconUrl: String,
-    matches: Array,
+
+  setup() {
+    const summonerStore = useSummonerStore();
+    const globalStore = useGlobalStore();
+    const { summoner, isUpdating } = storeToRefs(summonerStore);
+
+    return {
+      summoner,
+      isUpdating,
+      globalStore,
+    };
   },
+
   data() {
     return {
-      localPuuid: this.puuid,
-      localRegion: this.region,
-      localTag: this.tag,
-      localProfileIconUrl: this.profileIconUrl,
-      localSummonerName: this.summonerName,
-      localSummonerLevel: this.summonerLevel,
-      localSummonerRank: this.soloRank,
-      localRankSoloIconUrl: this.soloRankIconUrl,
-      localRankFlexIconUrl: this.flexRankIconUrl,
-      localWins: this.soloWins,
-      localLosses: this.soloLosses,
-      localSummonerRankFlex: this.flexRank,
-      localWinsFlex: this.flexWins,
-      localLossesFlex: this.flexLosses,
-
-      isUpdating: false,
+      activeTab: "summary",
       cooldownActive: false,
       cooldownSeconds: 0,
       cooldownTimer: null,
@@ -164,277 +141,55 @@ export default {
       hasBeenUpdated: false,
       updateInterval: null,
       updateTicker: 0,
-
-      localMatches: this.matches,
-
-      activeTab: "summary",
     };
   },
-  watch: {
-    puuid(newVal) {
-      this.localPuuid = newVal;
-    },
-    region(newVal) {
-      this.localRegion = newVal;
-    },
-    tag(newVal) {
-      this.localTag = newVal;
-    },
-    profileIconUrl(newVal) {
-      this.localProfileIconUrl = newVal;
-    },
-    rankSoloIconUrl(newVal) {
-      this.localRankSoloIconUrl = newVal;
-    },
-    rankFlexIconUrl(newVal) {
-      this.localRankFlexIconUrl = newVal;
-    },
-    summonerName(newVal) {
-      this.localSummonerName = newVal;
-    },
-    summonerLevel(newVal) {
-      this.localSummonerLevel = newVal;
-    },
-    soloRank(newVal) {
-      this.localSummonerRank = newVal;
-    },
-    wins(newVal) {
-      this.localWins = newVal;
-    },
-    losses(newVal) {
-      this.localLosses = newVal;
-    },
-    flexRank(newVal) {
-      this.localSummonerRankFlex = newVal;
-    },
-    winsFlex(newVal) {
-      this.localWinsFlex = newVal;
-    },
-    lossesFlex(newVal) {
-      this.localLossesFlex = newVal;
-    },
-    matches(newVal) {
-      this.localMatches = newVal;
-    },
-  },
+
   computed: {
+    getProfileIconUrl() {
+      return `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/profile-icons/${this.summoner.account.profileIconId}.jpg`;
+    },
+    getSoloRankIconUrl() {
+      if (!this.summoner.ranked.solo?.tier)
+        return "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-iron.png";
+      return `https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-${this.summoner.ranked.solo.tier.toLowerCase()}.png`;
+    },
+    getFlexRankIconUrl() {
+      if (!this.summoner.ranked.flex?.tier)
+        return "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-iron.png";
+      return `https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-${this.summoner.ranked.flex.tier.toLowerCase()}.png`;
+    },
+    getSoloRank() {
+      if (!this.summoner.ranked.solo?.tier) return "Unranked";
+      return `${this.summoner.ranked.solo.tier} ${this.summoner.ranked.solo.rank} ${this.summoner.ranked.solo.leaguePoints} LP`;
+    },
+    getFlexRank() {
+      if (!this.summoner.ranked.flex?.tier) return "Unranked";
+      return `${this.summoner.ranked.flex.tier} ${this.summoner.ranked.flex.rank} ${this.summoner.ranked.flex.leaguePoints} LP`;
+    },
     lastUpdatedText() {
       this.updateTicker;
       if (!this.lastUpdatedAt) return "";
 
       const secondsAgo = Math.floor((Date.now() - this.lastUpdatedAt) / 1000);
-
-      if (secondsAgo < 60) {
-        return `${secondsAgo} seconds ago`;
-      } else {
-        const minutesAgo = Math.floor(secondsAgo / 60);
-        return `${minutesAgo} minute${minutesAgo !== 1 ? "s" : ""} ago`;
-      }
+      if (secondsAgo < 60) return `${secondsAgo} seconds ago`;
+      const minutesAgo = Math.floor(secondsAgo / 60);
+      return `${minutesAgo} minute${minutesAgo !== 1 ? "s" : ""} ago`;
     },
     buttonText() {
       if (this.isUpdating) return "Updating...";
-      if (this.cooldownActive) return `Updated`;
+      if (this.cooldownActive) return "Updated";
       return "Update";
     },
   },
-  mounted() {
-    this.$nextTick(() => {
-      // Wait for props to be fully available
-      this.checkCooldownStatus();
-    });
-  },
+
   methods: {
-    checkCooldownStatus() {
-      // Try multiple possible cooldown keys to handle prop/local value differences
-      const possibleKeys = [
-        `cooldown_${this.localSummonerName}_${this.localRegion}`,
-        `cooldown_${this.summonerName}_${this.region}`,
-        `cooldown_${this.$route.params.summoner.split("-")[0]}_${
-          this.$route.params.region
-        }`,
-      ];
-
-      let cooldownExpiration = null;
-      // Check all possible keys for an active cooldown
-      for (const key of possibleKeys) {
-        const value = localStorage.getItem(key);
-        if (value) {
-          cooldownExpiration = value;
-          this.activeCooldownKey = key; // Store the key that worked
-          break;
-        }
-      }
-
-      if (cooldownExpiration) {
-        const remainingTime = parseInt(cooldownExpiration) - Date.now();
-
-        // If cooldown is still active
-        if (remainingTime > 0) {
-          this.cooldownActive = true;
-          this.cooldownSeconds = Math.ceil(remainingTime / 1000);
-
-          // Start the cooldown timer
-          this.cooldownTimer = setInterval(() => {
-            this.cooldownSeconds--;
-
-            if (this.cooldownSeconds <= 0) {
-              clearInterval(this.cooldownTimer);
-              this.cooldownActive = false;
-              localStorage.removeItem(this.activeCooldownKey);
-            }
-          }, 1000);
-        } else {
-          // Cleanup expired cooldowns
-          localStorage.removeItem(this.activeCooldownKey);
-        }
-      }
-    },
     formatTag(tag) {
-      let [newTag, test] = tag.split("#");
-      return newTag;
-    },
-    async updateSummoner() {
-      // Existing update code...
-      try {
-        console.log("Update: fetching new data");
-        let newRegion = this.globalStore.regionsList[this.region.toLowerCase()];
-        const summonerResponse = await axios.get(
-          `/summoners/${newRegion}/${this.localSummonerName}-${this.localTag}`
-        );
-
-        console.log(summonerResponse.data);
-        // Update the profile data
-        this.profileIconUrl =
-          "https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/profile-icons/" +
-          summonerResponse.data.profileIconId +
-          ".jpg"; // Adjust based on actual response structure
-        this.localSummonerName = summonerResponse.data.summonerName;
-        this.localSummonerLevel = summonerResponse.data.summonerLevel;
-        this.localPuuid = summonerResponse.data.puuid;
-
-        const rankResponse = await axios.get(`/ranks/${this.localPuuid}`);
-
-        console.log(rankResponse.data);
-        if (!rankResponse.data || rankResponse.data.length === 0) {
-          // Set defaults for unranked players
-          this.localSummonerRank = "Unranked";
-          this.localRankSoloIconUrl =
-            "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-iron.png";
-          this.localWins = 0;
-          this.localLosses = 0;
-
-          this.localSummonerRankFlex = "Unranked";
-          this.localRankFlexIconUrl =
-            "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-iron.png";
-          this.localWinsFlex = 0;
-          this.localLossesFlex = 0;
-        } else {
-          // Process ranks with safety checks
-          let soloRankRes = rankResponse.data.ranks[0] || {};
-          let flexRankRes = rankResponse.data.ranks[1] || {};
-
-          if (soloRankRes.queueType === "RANKED_FLEX_SR") {
-            soloRankRes = rankResponse.data.ranks[1] || {};
-            flexRankRes = rankResponse.data.ranks[0] || {};
-          }
-
-          // Solo queue rank
-          if (soloRankRes && soloRankRes.tier) {
-            this.localSummonerRank = `${soloRankRes.tier} ${soloRankRes.rank} ${soloRankRes.leaguePoints} LP`;
-            this.localRankSoloIconUrl = `https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-${soloRankRes.tier.toLowerCase()}.png`;
-            this.localWins = soloRankRes.wins || 0;
-            this.localLosses = soloRankRes.losses || 0;
-          } else {
-            this.localSummonerRank = "Unranked";
-            this.localRankSoloIconUrl =
-              "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-iron.png";
-            this.localWins = 0;
-            this.localLosses = 0;
-          }
-
-          // Flex queue rank
-          if (flexRankRes && flexRankRes.tier) {
-            this.localSummonerRankFlex = `${flexRankRes.tier} ${flexRankRes.rank} ${flexRankRes.leaguePoints} LP`;
-            this.localRankFlexIconUrl = `https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-${flexRankRes.tier.toLowerCase()}.png`;
-            this.localWinsFlex = flexRankRes.wins || 0;
-            this.localLossesFlex = flexRankRes.losses || 0;
-          } else {
-            this.localSummonerRankFlex = "Unranked";
-            this.localRankFlexIconUrl =
-              "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-iron.png";
-            this.localWinsFlex = 0;
-            this.localLossesFlex = 0;
-          }
-        }
-
-        this.isUpdating = false;
-        this.startCooldown();
-
-        const currentTime = Date.now();
-        this.lastUpdatedAt = currentTime;
-        this.hasBeenUpdated = true;
-
-        // Store in localStorage for persistence
-        const lastUpdateKey = `lastUpdated_${this.localSummonerName}`;
-        localStorage.setItem(lastUpdateKey, currentTime.toString());
-
-        this.startUpdateTimeTracking();
-      } catch (error) {
-        console.error("Error updating summoner:", error);
-        this.isUpdating = false;
-        this.$emit("update-error", error);
-        this.startCooldown();
-      }
-    },
-    startCooldown() {
-      this.cooldownActive = true;
-      this.cooldownSeconds = 60; // 1 minute cooldown
-
-      // IMPORTANT: Use the localSummonerName and localRegion for consistency
-      const cooldownExpirationTime = Date.now() + this.cooldownSeconds * 1000;
-      const cooldownKey = `cooldown_${this.localSummonerName}_${this.localRegion}`;
-      localStorage.setItem(cooldownKey, cooldownExpirationTime.toString());
-
-      // Clear any existing timer
-      if (this.cooldownTimer) {
-        clearInterval(this.cooldownTimer);
-      }
-
-      // Start a new countdown timer
-      this.cooldownTimer = setInterval(() => {
-        this.cooldownSeconds--;
-
-        if (this.cooldownSeconds <= 0) {
-          clearInterval(this.cooldownTimer);
-          this.cooldownActive = false;
-          // Remove cooldown from localStorage when it expires
-          localStorage.removeItem(cooldownKey);
-        }
-      }, 1000);
-    },
-    startUpdateTimeTracking() {
-      // Clear any existing update tracking interval
-      if (this.updateInterval) {
-        clearInterval(this.updateInterval);
-      }
-
-      // Update the "last updated" text every 10 seconds
-      this.updateInterval = setInterval(() => {
-        // Increment the ticker to trigger reactivity
-        this.updateTicker++;
-      }, 1000); // Update every 10 seconds
-    },
-    beforeUnmount() {
-      if (this.cooldownTimer) {
-        clearInterval(this.cooldownTimer);
-      }
-      if (this.updateInterval) {
-        clearInterval(this.updateInterval);
-      }
+      return tag?.split("#")[0] || "";
     },
   },
 };
 </script>
+
 <style scoped>
 .match-table {
   margin-top: 59px;
