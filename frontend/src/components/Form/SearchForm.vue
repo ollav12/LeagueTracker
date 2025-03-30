@@ -3,9 +3,10 @@
     <div class="text">
       <!-- Region Selector -->
       <select v-model="region" required>
-        <option value="EUW">EUW</option>
+        <option value="BR">BR</option>
         <option value="EUNE">EUN</option>
-        <option value="NA">NA</option>
+        <option value="EUW">EUW</option>
+        <option value="JP">JP</option>
       </select>
 
       <div class="input-wrapper">
