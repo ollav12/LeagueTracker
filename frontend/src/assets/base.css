@@ -1,29 +1,4 @@
-/* semantic color variables for this project */
-:root {
-  --color-text: var(#2f2c26);
-  font-family: 'Roboto';
-}
-
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-  margin: 0;
-  font-weight: normal;
-}
-
-body {
-  min-height: 100vh;
-  color: var(--color-text);
-  background: var(--color-background);
-  transition:
-    color 0.5s,
-    background-color 0.5s;
-  line-height: 1.6;
-  font-family:
-  'Roboto';
-  font-size: 15px;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
+@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;

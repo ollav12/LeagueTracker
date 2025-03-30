@@ -1,6 +1,8 @@
 {
   "files": [],
-  "allowJs": true,
+  "compilerOptions": {
+    "allowJs": true
+  },
   "references": [
     {
       "path": "./tsconfig.node.json"
