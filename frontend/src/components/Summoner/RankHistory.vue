@@ -19,9 +19,7 @@
 
     <div class="rank-history">
       <h3 class="rank-title">Ranked Solo/Duo</h3>
-      <!-- Single rank-row containing both current and peak rank -->
       <div class="rank-row">
-        <!-- First rank display (current) -->
         <div class="rank-entry">
           <div class="rank-icon-container">
             <img :src="soloRankIconUrl" alt="Solo Rank" class="rank-icon" />
@@ -34,13 +32,13 @@
               >
             </div>
             <div class="stats-row">
-              <span class="lp-text">{{ soloLp }}</span>
-              <span class="win-percent">Win rate {{ winPercentage }}%</span>
+              <span class="lp-text">{{ getSoloLP }} LP</span>
+              <span class="win-percent">Win rate {{ getSoloWinRate }}%</span>
             </div>
           </div>
         </div>
 
-        <!-- Second rank display (peak) -->
+        <!-- Peak rank section -->
         <div class="rank-entry peak-rank">
           <div class="rank-icon-container">
             <img :src="soloRankIconUrl" alt="Peak Rank" class="rank-icon" />
@@ -48,10 +46,6 @@
           <div class="rank-info">
             <div class="rank-status">
               <span class="rankText">{{ formatRank(soloRank) }}</span>
-              <span class="top-tier">Top Tier</span>
-            </div>
-            <div class="stats-row">
-              <span class="lp-text">{{ soloLp }}</span>
             </div>
           </div>
         </div>
@@ -128,7 +122,7 @@
               >
             </div>
             <div class="stats-row">
-              <span class="lp-text">{{ flexLp }}</span>
+              <span class="lp-text">{{ flexLp }} LP</span>
               <span class="win-percent">Win rate {{ winPercentageFlex }}%</span>
             </div>
           </div>
@@ -186,21 +180,13 @@
   </div>
 </template>
 <script>
+import { storeToRefs } from "pinia";
+import { useSummonerStore } from "@/stores/modules/summoner";
+
 export default {
-  props: {
-    soloRank: String,
-    soloWins: Number,
-    soloLosses: Number,
-    soloRankIconUrl: String,
-    flexRank: String,
-    flexWins: Number,
-    flexLosses: Number,
-    flexRankIconUrl: String,
-  },
+  name: "RankHistory",
   data() {
     return {
-      soloLp: "",
-      flexLp: "",
       showAllSeasons: false,
       showAllFlexSeasons: false,
       data: {
@@ -211,21 +197,54 @@ export default {
       },
     };
   },
-  mounted() {
-    this.fetchSoloranks();
-    this.fetchFlexranks();
+
+  setup() {
+    const store = useSummonerStore();
+    const { summoner } = storeToRefs(store);
+    return { summoner };
   },
-  watch: {
-    soloRank(newVal) {
-      let [tier, rank, lp, text] = newVal.split(" ");
-      this.soloLp = lp + " " + text;
-    },
-    flexRank(newVal) {
-      let [tier, rank, lp, text] = newVal.split(" ");
-      this.flexLp = lp + " " + text;
-    },
-  },
+
   computed: {
+    soloRank() {
+      if (!this.summoner.ranked.solo?.tier) return "Unranked";
+      return `${this.summoner.ranked.solo.tier} ${this.summoner.ranked.solo.rank}`;
+    },
+    soloWins() {
+      return this.summoner.ranked.solo?.wins || 0;
+    },
+    soloLosses() {
+      return this.summoner.ranked.solo?.losses || 0;
+    },
+    getSoloLP() {
+      return this.summoner.ranked.solo?.leaguePoints || 0;
+    },
+    getSoloWinRate() {
+      const wins = this.soloWins;
+      const total = wins + this.soloLosses;
+      return total > 0 ? Math.round((wins / total) * 100) : 0;
+    },
+    flexRank() {
+      if (!this.summoner.ranked.flex?.tier) return "Unranked";
+      return `${this.summoner.ranked.flex.tier} ${this.summoner.ranked.flex.rank} ${this.summoner.ranked.flex.leaguePoints} LP`;
+    },
+    flexWins() {
+      return this.summoner.ranked.flex?.wins || 0;
+    },
+    flexLosses() {
+      return this.summoner.ranked.flex?.losses || 0;
+    },
+    soloRankIconUrl() {
+      if (!this.summoner.ranked.solo?.tier) {
+        return "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-iron.png";
+      }
+      return `https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-${this.summoner.ranked.solo.tier.toLowerCase()}.png`;
+    },
+    flexRankIconUrl() {
+      if (!this.summoner.ranked.flex?.tier) {
+        return "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-iron.png";
+      }
+      return `https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-${this.summoner.ranked.flex.tier.toLowerCase()}.png`;
+    },
     displayedFlexRows() {
       if (this.showAllFlexSeasons) {
         return this.flexData.rows;
@@ -241,13 +260,6 @@ export default {
         return this.data.rows.slice(0, 5);
       }
     },
-    winPercentage() {
-      const totalGames = this.soloWins + this.soloLosses;
-      if (totalGames === 0) {
-        return 0;
-      }
-      return Math.round((this.soloWins / totalGames) * 100);
-    },
     winPercentageFlex() {
       const totalGames = this.flexWins + this.flexLosses;
       if (totalGames === 0) {
@@ -255,148 +267,20 @@ export default {
       }
       return Math.round((this.flexWins / totalGames) * 100);
     },
+    flexLp() {
+      return this.summoner.ranked.flex?.leaguePoints || 0;
+    },
   },
+
   methods: {
     toggleFlexSeasonDisplay() {
       this.showAllFlexSeasons = !this.showAllFlexSeasons;
     },
-    async fetchFlexranks() {
-      try {
-        // Mock data for flex ranks
-        const mockData = {
-          rows: [
-            {
-              season: "S2024 S3",
-              rankIconId: 9,
-              tier: "Challenger",
-              leaguePoints: "2232",
-            },
-            {
-              season: "S2024 S2",
-              rankIconId: 8,
-              tier: "Grandmaster",
-              leaguePoints: "1200",
-            },
-            {
-              season: "S2024 S1",
-              rankIconId: 7,
-              tier: "Master",
-              leaguePoints: "460",
-            },
-            {
-              season: "S2023 S2",
-              rankIconId: 6,
-              tier: "Diamond I",
-              leaguePoints: "99",
-            },
-            {
-              season: "S2023 S1",
-              rankIconId: 5,
-              tier: "Emerald II",
-              leaguePoints: "15",
-            },
-            {
-              season: "S2022",
-              rankIconId: 4,
-              tier: "Platinum IV",
-              leaguePoints: "0",
-            },
-          ],
-        };
-        this.flexData = mockData;
-      } catch (error) {
-        console.error(error);
-      }
-    },
     toggleSeasonDisplay() {
       this.showAllSeasons = !this.showAllSeasons;
     },
-    async fetchSoloranks() {
-      try {
-        // Mock data
-        const mockData = {
-          rows: [
-            {
-              season: "S2024 S3",
-              rankIconId: 13,
-              tier: "Challenger",
-              leaguePoints: "1752",
-            },
-            {
-              season: "S2024 S2",
-              rankIconId: 12,
-              tier: "Grandmaster",
-              leaguePoints: "950",
-            },
-            {
-              season: "S2024 S1",
-              rankIconId: 11,
-              tier: "Master",
-              leaguePoints: "500",
-            },
-            {
-              season: "S2023 S2",
-              rankIconId: 10,
-              tier: "Diamond IV",
-              leaguePoints: "0",
-            },
-            {
-              season: "S2023 S1",
-              rankIconId: 9,
-              tier: "Platinum IV",
-              leaguePoints: "37",
-            },
-            {
-              season: "S2022",
-              rankIconId: 8,
-              tier: "Gold III",
-              leaguePoints: "0",
-            },
-            {
-              season: "S2021",
-              rankIconId: 7,
-              tier: "Silver I",
-              leaguePoints: "34",
-            },
-            {
-              season: "S2020",
-              rankIconId: 6,
-              tier: "Bronze IV",
-              leaguePoints: "17",
-            },
-            {
-              season: "S9",
-              rankIconId: 6,
-              tier: "Iron IV",
-              leaguePoints: "53",
-            },
-          ],
-        };
-        // Update data property
-        this.data = mockData;
-      } catch (error) {
-        console.error(error);
-      }
-    },
-    formatRank(soloRank) {
-      let [rank, tier, leaguePoints] = soloRank.split(" "); // Use proper array destructuring
-
-      // Convert to lowercase, then capitalize first letter
-      rank = rank.toLowerCase();
-      rank = rank.charAt(0).toUpperCase() + rank.slice(1);
-
-      if (tier == "I") {
-        tier = "1";
-      } else if (tier == "II") {
-        tier = "2";
-      } else if (tier == "III") {
-        tier = "3";
-      } else if (tier == "IV") {
-        tier = "4";
-      } else {
-        tier = "";
-      }
-      return rank + " " + tier; // Return the formatted value
+    formatRank(rank) {
+      return rank || "Unranked";
     },
     getRankName(rank) {
       if (!rank) return "";

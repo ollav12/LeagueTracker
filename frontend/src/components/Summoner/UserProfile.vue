@@ -70,21 +70,10 @@
       <div class="tab-content">
         <div v-if="activeTab === 'summary'" class="summary-container">
           <div class="rank-container">
-            <RankHistory
-              :soloRank="getSoloRank"
-              :soloWins="summoner.ranked.solo?.wins || 0"
-              :soloLosses="summoner.ranked.solo?.losses || 0"
-              :soloRankIconUrl="getSoloRankIconUrl"
-              :flexRank="getFlexRank"
-              :flexWins="summoner.ranked.flex?.wins || 0"
-              :flexLosses="summoner.ranked.flex?.losses || 0"
-              :flexRankIconUrl="getFlexRankIconUrl"
-            />
+            <RankHistory />
           </div>
           <div class="match-table">
-            <div class="match-container">
-              <MatchHistory />
-            </div>
+            <div class="match-container"></div>
           </div>
         </div>
 
@@ -110,7 +99,6 @@ import { useSummonerStore } from "@/stores/modules/summoner";
 import { useGlobalStore } from "@/stores/global.js";
 import RankHistory from "@/components/Summoner/RankHistory.vue";
 import MatchHistory from "@/components/Summoner/MatchHistory.vue";
-import axios from "@/plugins/axios";
 
 export default {
   name: "UserProfile",
@@ -123,7 +111,6 @@ export default {
     const summonerStore = useSummonerStore();
     const globalStore = useGlobalStore();
     const { summoner, isUpdating } = storeToRefs(summonerStore);
-
     return {
       summoner,
       isUpdating,
@@ -185,6 +172,9 @@ export default {
   methods: {
     formatTag(tag) {
       return tag?.split("#")[0] || "";
+    },
+    log() {
+      console.log("UserProfile mounted, summoner data:", summoner.value);
     },
   },
 };

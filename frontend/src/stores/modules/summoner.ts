@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import axios from "axios";
+import instance from "@/plugins/axios";
 
 interface RankedData {
   leagueId: string;
@@ -78,14 +78,17 @@ export const useSummonerStore = defineStore("summoner", {
     ) {
       this.summoner.status = "loading";
       try {
-        const response = await axios.get(
-          `summoner/${region}/${summoner}-${tag}`
+        console.log("Fecthing data riot");
+        const response = await instance.get(
+          `summoners/${region}/${summoner}-${tag}`
         );
 
         if (!response.data) {
           this.summoner.status = "error";
+          console.log("Error summoner details request");
           return;
         }
+        console.log("response: ", response.data);
 
         const soloRank = response.data.ranked.find(
           (queue: RankedData) => queue.queueType === "RANKED_SOLO_5x5"
