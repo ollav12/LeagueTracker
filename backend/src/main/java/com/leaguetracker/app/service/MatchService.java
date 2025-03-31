@@ -24,6 +24,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Pageable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import java.util.ArrayList;
+import org.springframework.data.domain.PageRequest;
 
 @Service
 public class MatchService {
@@ -58,8 +62,34 @@ public class MatchService {
     }
 
     public List<String> getNextMatchIds(String puuid, String lastMatchId, int limit) {
-        Pageable pageable = PageRequest.of(0, limit, Sort.by(Sort.Direction.DESC, "matchId"));
-        return matchListRepository.getNextMatchIds(puuid, lastMatchId, pageable);
+        if (puuid == null) {
+            System.out.println("PUUID cannot be null");
+            return new ArrayList<>();
+        }
+
+        try {
+            // Add count check before query
+            long matchCount = matchListRepository.count();
+            System.out.println("Total matches in database: " + matchCount);
+
+            if (lastMatchId != null) {
+                System.out.println(
+                        "Fetching matches for puuid: " + puuid + ", lastMatchId: " + lastMatchId + ", limit: " + limit);
+                List<String> matchIds = matchListRepository.getNextMatchIds(puuid, lastMatchId,
+                        PageRequest.of(0, limit));
+                System.out.println("Found " + matchIds.size() + " matches after lastMatchId: " + lastMatchId);
+                return matchIds;
+            } else {
+                System.out.println("Initial load for puuid: " + puuid + ", limit: " + limit);
+                List<String> matchIds = matchListRepository.findAllByPuuidOrderByMatchIdDesc(puuid, limit);
+                System.out.println("Initial load found " + matchIds.size() + " matches");
+                return matchIds;
+            }
+        } catch (Exception e) {
+            System.out.println("Error fetching next match IDs for puuid: " + puuid);
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
     }
 
     public List<MatchDto> getMatches(String region, List<String> matchIds) {

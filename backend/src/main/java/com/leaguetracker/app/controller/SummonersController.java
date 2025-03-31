@@ -66,7 +66,7 @@ public class SummonersController {
             @RequestParam String puuid,
             @RequestParam String region,
             @RequestParam(required = false) String lastMatchId,
-            @RequestParam(defaultValue = "20") int limit) {
+            @RequestParam(defaultValue = "10") int limit) {
         try {
             Map<String, Object> summary = summonerService.getSummary(puuid, region, lastMatchId, limit);
             return ResponseEntity.ok(summary);

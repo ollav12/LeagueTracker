@@ -134,22 +134,26 @@ export const useSummonerStore = defineStore("summoner", {
         this.summoner.loaded = false;
       }
     },
-    async summaryRequest(puuid: String, accountId: String, region: String) {
-      console.log("Fecthing summary data");
+    async summaryRequest(puuid: String, region: String) {
+      console.log("Fetching summary data");
       try {
         const response = await instance.get(`summoners/summary`, {
           params: {
             puuid: puuid,
-            accountId: accountId,
             region: region,
+            lastMatchId:
+              this.summary.matches.length > 0
+                ? this.summary.matches[this.summary.matches.length - 1].matchId
+                : null,
+            limit: this.summary.GAMES_TO_LOAD,
           },
         });
         console.log("---OVERVIEW---");
         console.log(response.data);
 
         this.summary = {
-          GAMES_TO_LOAD: 10,
-          matches: response.data.matches || [],
+          ...this.summary,
+          matches: [...this.summary.matches, ...(response.data.matches || [])], // Append new matches
           stats: response.data.stats || {},
           loaded: true,
           matchesLoading: false,
