@@ -1,5 +1,5 @@
 <template>
-  <div class="user-profile">
+  <div v-if="summaryLoaded" key="summary" class="user-profile">
     <div class="background-all">
       <div class="profile-header">
         <div class="icon-container">
@@ -91,6 +91,9 @@
       </div>
     </div>
   </div>
+  <div v-else>
+    <div class="no-matches">No matches Found.</div>
+  </div>
 </template>
 
 <script>
@@ -110,11 +113,12 @@ export default {
   setup() {
     const summonerStore = useSummonerStore();
     const globalStore = useGlobalStore();
-    const { summoner, isUpdating } = storeToRefs(summonerStore);
+    const { summoner, isUpdating, summaryLoaded } = storeToRefs(summonerStore);
     return {
       summoner,
       isUpdating,
       globalStore,
+      summaryLoaded,
     };
   },
 
@@ -181,6 +185,12 @@ export default {
 </script>
 
 <style scoped>
+.no-matches {
+  font-weight: 700;
+  font-style: "Roboto";
+  color: #202a38;
+  font-size: 12px;
+}
 .match-table {
   margin-top: 59px;
   margin-left: -765px;

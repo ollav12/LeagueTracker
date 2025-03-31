@@ -22,11 +22,14 @@ public class SummonerService {
 
     private final RiotService riotService;
     private final RankService rankService;
+    private final MatchService matchService;
 
-    public SummonerService(SummonerRepository summonerRepository, RiotService riotService, RankService rankService) {
+    public SummonerService(SummonerRepository summonerRepository, RiotService riotService, RankService rankService,
+            MatchService matchService) {
         this.summonerRepository = summonerRepository;
         this.rankService = rankService;
         this.riotService = riotService;
+        this.matchService = matchService;
     }
 
     /**
@@ -51,7 +54,7 @@ public class SummonerService {
             }
             SummonerDto summonerDto = riotService.Summoner.findByPuuid(account.puuid(), region);
             System.out.println("Fetched summoner from riot api: " + summonerDto);
-
+            
             List<LeagueDto> ranked = riotService.League.findBySummonerId(summonerDto.id(), region);
             System.out.println("Fetched ranked data from riot api: " + ranked);
 

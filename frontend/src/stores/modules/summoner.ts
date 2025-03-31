@@ -23,6 +23,15 @@ interface RankedData {
   };
 }
 
+interface SummaryState {
+  GAMES_TO_LOAD: number;
+  matches: any[]; // Replace 'any' with a proper Match interface if you have one
+  stats: Record<string, any>; // Replace 'any' with proper stats interface if you have one
+  loaded: boolean;
+  matchesLoading: boolean;
+  moreMatchesToFetch: boolean;
+}
+
 interface SummonerState {
   summoner: {
     account: {
@@ -41,6 +50,7 @@ interface SummonerState {
     };
     status: string;
   };
+  summary: SummaryState;
 }
 
 export const useSummonerStore = defineStore("summoner", {
@@ -62,12 +72,21 @@ export const useSummonerStore = defineStore("summoner", {
       },
       status: "",
     },
+    summary: {
+      GAMES_TO_LOAD: 10,
+      matches: [],
+      stats: {},
+      loaded: false,
+      matchesLoading: false,
+      moreMatchesToFetch: true,
+    },
   }),
 
   getters: {
     isLoaded: (state) => state.summoner.status === "success",
     isUpdating: (state) => state.summoner.status === "loading",
     hasError: (state) => state.summoner.status === "error",
+    overviewLoaded: (state) => state.summary.loaded,
   },
 
   actions: {
@@ -78,7 +97,7 @@ export const useSummonerStore = defineStore("summoner", {
     ) {
       this.summoner.status = "loading";
       try {
-        console.log("Fecthing data riot");
+        console.log("Fecthing summoner data");
         const response = await instance.get(
           `summoners/${region}/${summoner}-${tag}`
         );
@@ -117,6 +136,31 @@ export const useSummonerStore = defineStore("summoner", {
       } catch (error) {
         console.error("Error fetching summoner data:", error);
         this.summoner.status = "error";
+      }
+    },
+    async summaryRequest(puuid: String, accountId: String, region: String) {
+      console.log("Fecthing summary data");
+      try {
+        const response = await instance.get(`summoners/${region}/`);
+        console.log("---OVERVIEW---");
+        console.log(response.data);
+
+        this.summary = {
+          GAMES_TO_LOAD: 10,
+          matches: response.data.matches || [],
+          stats: response.data.stats || {},
+          loaded: true,
+          matchesLoading: false,
+          moreMatchesToFetch: response.data.matches?.length > 0,
+        };
+      } catch (error) {
+        console.error("Error fetching summary data:", error);
+        this.summary = {
+          ...this.summary,
+          loaded: false,
+          matchesLoading: false,
+          moreMatchesToFetch: false,
+        };
       }
     },
   },
