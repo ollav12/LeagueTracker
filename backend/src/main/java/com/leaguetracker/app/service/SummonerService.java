@@ -8,12 +8,15 @@ import org.springframework.stereotype.Service;
 import com.leaguetracker.app.dto.AccountDto;
 import com.leaguetracker.app.dto.LeagueDto;
 import com.leaguetracker.app.dto.LeagueDto.MiniSeriesDto;
+import com.leaguetracker.app.dto.MatchDto;
 import com.leaguetracker.app.dto.SummonerDto;
 import com.leaguetracker.app.dto.response.SummonerResponse;
 import com.leaguetracker.app.mapper.SummonerMapper;
+import com.leaguetracker.app.model.MatchList;
 import com.leaguetracker.app.model.Summoner;
 import com.leaguetracker.app.model.SummonerRank;
 import com.leaguetracker.app.repository.SummonerRepository;
+import com.leaguetracker.app.service.MatchService.MatchListMode;
 import com.leaguetracker.app.service.riot.RiotService;
 
 @Service
@@ -48,17 +51,19 @@ public class SummonerService {
                 System.out.println("Retrieved summoner from database: " + summoner);
 
                 List<LeagueDto> ranked = this.getRanked(summoner.puuid(), region);
+
                 System.out.println("Retrieved ranked data from database: " + ranked);
 
                 return SummonerMapper.toResponse(summonerName, tag, summoner, ranked);
             }
             SummonerDto summonerDto = riotService.Summoner.findByPuuid(account.puuid(), region);
             System.out.println("Fetched summoner from riot api: " + summonerDto);
-            
+
             List<LeagueDto> ranked = riotService.League.findBySummonerId(summonerDto.id(), region);
             System.out.println("Fetched ranked data from riot api: " + ranked);
 
-            rankService.saveLeagueDto(ranked);
+            // Fetch first 100 matches
+            matchService.updateMatchList(account.puuid(), region, MatchListMode.LIGHT);
 
             SummonerResponse response = SummonerMapper.toResponse(summonerName, tag, summonerDto, ranked);
             Summoner newSummoner = SummonerMapper.toEntity(region, response);
@@ -135,6 +140,16 @@ public class SummonerService {
                         new MiniSeriesDto(rank.getMiniSeries().getWins(), rank.getMiniSeries().getProgress(),
                                 rank.getMiniSeries().getTarget(), rank.getMiniSeries().getLosses())))
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * Get summary
+     * 
+     * @param summoner
+     * @return
+     */
+    public List<MatchList> getSummary(String puuid, String accountId, String region) {
+        return matchService.getMatchListByPuuid(puuid);
     }
 
     public Summoner saveSummoner(Summoner summoner) {

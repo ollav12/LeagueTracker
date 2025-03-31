@@ -25,7 +25,7 @@ public class AccountEndpoint {
      * @return
      */
     public AccountDto findByRiotId(String region, String summonerName, String tag) {
-        String endpoint = "riot/account/v1/accounts/by-riot-id/" + summonerName + "/" + tag.toUpperCase();
+        String endpoint = "riot/account/v1/accounts/by-riot-id/" + summonerName + "/" + tag.toUpperCase() + "?api_key=";
         RiotRequest<AccountDto> request = new RiotRequest<>(Helper.getRiotApiRegion(region), endpoint, apiKey,
                 new AccountMapper());
         return request.execute();

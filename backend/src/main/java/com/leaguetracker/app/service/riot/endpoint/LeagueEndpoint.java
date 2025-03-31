@@ -25,9 +25,10 @@ public class LeagueEndpoint {
      * @return
      */
     public List<LeagueDto> findBySummonerId(String summonerId, String region) {
-        String endpoint = "lol/league/v4/entries/by-summoner/" + summonerId;
+        String endpoint = "lol/league/v4/entries/by-summoner/" + summonerId + "?api_key=";
         RiotRequest<List<LeagueDto>> request = new RiotRequest<>(region, endpoint, apiKey,
                 LeagueMapper::toDtoList);
+        System.out.println("TEST");
         return request.execute();
     }
 

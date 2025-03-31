@@ -36,15 +36,19 @@ spring:
     password: password
     driver-class-name: org.postgresql.Driver # Correct driver class
   jpa:
+    show-sql: true
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
     properties:
       hibernate:
+        "[format_sql]": true
         dialect: org.hibernate.dialect.PostgreSQLDialect # Correct dialect for PostgreSQL
 logging:
   level:
     "[org.springframework]": INFO
     root: INFO
+    "[org.hibernate.SQL]": DEBUG
+    "[org.hibernate.type.descriptor.sql.BasicBinder]": TRACE
 
 ---
 spring:

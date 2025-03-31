@@ -7,7 +7,6 @@ import java.util.stream.StreamSupport;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.leaguetracker.app.dto.LeagueDto;
-import com.leaguetracker.app.dto.LeagueDto.MiniSeriesDto;
 
 public class LeagueMapper {
 
@@ -17,13 +16,15 @@ public class LeagueMapper {
         try {
             JsonNode rootNode = objectMapper.readTree(response);
 
-            // Riot API returns an array, so we map each item to LeagueDto
-            if (rootNode.isArray()) {
-                return StreamSupport.stream(rootNode.spliterator(), false)
-                        .map(LeagueMapper::toDto)
-                        .collect(Collectors.toList());
+            if (!rootNode.isArray()) {
+                return List.of();
             }
-            return List.of();
+
+            return StreamSupport.stream(rootNode.spliterator(), false)
+                    .map(LeagueMapper::toDto)
+                    .filter(dto -> dto != null)
+                    .distinct() // Add distinct to remove duplicates
+                    .collect(Collectors.toList());
 
         } catch (Exception e) {
             throw new RuntimeException("Failed to parse ranked data response", e);
@@ -31,32 +32,52 @@ public class LeagueMapper {
     }
 
     private static LeagueDto toDto(JsonNode jsonNode) {
-        return new LeagueDto(
-                jsonNode.get("leagueId").asText(),
-                jsonNode.get("queueType").asText(),
-                jsonNode.get("tier").asText(),
-                jsonNode.get("rank").asText(),
-                jsonNode.get("summonerId").asText(),
-                jsonNode.get("puuid").asText(),
-                jsonNode.get("leaguePoints").asInt(),
-                jsonNode.get("wins").asInt(),
-                jsonNode.get("losses").asInt(),
-                jsonNode.get("veteran").asBoolean(),
-                jsonNode.get("inactive").asBoolean(),
-                jsonNode.get("freshBlood").asBoolean(),
-                jsonNode.get("hotStreak").asBoolean(),
-                toMiniSeries(jsonNode));
+        try {
+            JsonNode miniSeriesNode = jsonNode.get("miniSeries");
+            LeagueDto.MiniSeriesDto miniSeries = null;
 
+            if (miniSeriesNode != null && !miniSeriesNode.isNull()) {
+                miniSeries = new LeagueDto.MiniSeriesDto(
+                        getIntValue(miniSeriesNode, "wins"),
+                        getValue(miniSeriesNode, "progress"),
+                        getIntValue(miniSeriesNode, "target"),
+                        getIntValue(miniSeriesNode, "losses"));
+            } else {
+                miniSeries = new LeagueDto.MiniSeriesDto(0, "", 0, 0);
+            }
+
+            return new LeagueDto(
+                    getValue(jsonNode, "leagueId"),
+                    getValue(jsonNode, "queueType"),
+                    getValue(jsonNode, "tier"),
+                    getValue(jsonNode, "rank"),
+                    getValue(jsonNode, "summonerId"),
+                    getValue(jsonNode, "puuid"),
+                    getIntValue(jsonNode, "leaguePoints"),
+                    getIntValue(jsonNode, "wins"),
+                    getIntValue(jsonNode, "losses"),
+                    getBoolValue(jsonNode, "veteran"),
+                    getBoolValue(jsonNode, "inactive"),
+                    getBoolValue(jsonNode, "freshBlood"),
+                    getBoolValue(jsonNode, "hotStreak"),
+                    miniSeries);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
-    private static LeagueDto.MiniSeriesDto toMiniSeries(JsonNode jsonNode) {
-        if (jsonNode == null || jsonNode.isMissingNode()) {
-            return null; // MiniSeries might be missing for some players
-        }
-        return new MiniSeriesDto(
-                jsonNode.get("losses").asInt(),
-                jsonNode.get("progress").asText(),
-                jsonNode.get("target").asInt(),
-                jsonNode.get("wins").asInt());
+    private static String getValue(JsonNode node, String fieldName) {
+        JsonNode field = node.get(fieldName);
+        return field != null && !field.isNull() ? field.asText() : null;
+    }
+
+    private static Integer getIntValue(JsonNode node, String fieldName) {
+        JsonNode field = node.get(fieldName);
+        return field != null && !field.isNull() ? field.asInt() : null;
+    }
+
+    private static Boolean getBoolValue(JsonNode node, String fieldName) {
+        JsonNode field = node.get(fieldName);
+        return field != null && !field.isNull() ? field.asBoolean() : null;
     }
 }

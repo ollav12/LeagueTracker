@@ -3,20 +3,24 @@ package com.leaguetracker.app.service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.leaguetracker.app.config.EnvConfig;
 import com.leaguetracker.app.dto.MatchDto;
+import com.leaguetracker.app.dto.MatchListDto;
+import com.leaguetracker.app.model.MatchList;
 import com.leaguetracker.app.model.SummonerMatch;
+import com.leaguetracker.app.repository.MatchListRepository;
 import com.leaguetracker.app.repository.MatchRepository;
 import com.leaguetracker.app.service.riot.RiotService;
+
+import org.springframework.data.jpa.repository.JpaRepository;
 
 @Service
 public class MatchService {
@@ -28,11 +32,14 @@ public class MatchService {
     private static final Logger logger = LoggerFactory.getLogger(MatchService.class);
 
     private final MatchRepository matchRepository;
+    private final MatchListRepository matchListRepository;
     private final RiotService riotService;
 
-    public MatchService(MatchRepository matchRepository, EnvConfig envConfig, RiotService riotService) {
+    public MatchService(MatchRepository matchRepository, EnvConfig envConfig, RiotService riotService,
+            MatchListRepository matchListRepository) {
         this.matchRepository = matchRepository;
         this.riotService = riotService;
+        this.matchListRepository = matchListRepository;
         this.apiKey = envConfig.getApiKey();
     }
 
@@ -48,15 +55,6 @@ public class MatchService {
     }
 
     /**
-     * Get matches from matchId
-     * 
-     * @return list of matches
-     */
-    public List<SummonerMatch> getMatches() {
-        return matchRepository.findAll();
-    }
-
-    /**
      * Get ranks of players from given match
      * 
      * @return list of ranks
@@ -65,75 +63,86 @@ public class MatchService {
         return null;
     }
 
-    public SummonerMatch saveMatch(Map<String, Object> matchData, String puuid) {
-        SummonerMatch match = new SummonerMatch();
-
-        // Extract the matchId from metadata
-        Map<String, Object> metadata = (Map<String, Object>) matchData.get("metadata");
-        String matchId = (String) metadata.get("matchId");
-
-        // Set the fields for easy querying
-        match.setMatchId(matchId);
-        match.setPuuid(puuid);
-
-        // Set the JSON data
-        try {
-            match.setMetadataJson(objectMapper.writeValueAsString(metadata));
-            match.setInfoJson(objectMapper.writeValueAsString(matchData.get("info")));
-        } catch (Exception e) {
-            throw new RuntimeException("Error serializing match data", e);
+    public void saveMatchList(List<MatchListDto> matchList, String puuid) {
+        if (matchList == null || matchList.isEmpty()) {
+            logger.debug("No matches to save for puuid: {}", puuid);
+            return;
         }
 
-        return matchRepository.save(match);
-    }
-
-    public List<SummonerMatch> getMatchesByPuuid(String puuid) {
-        return matchRepository.findByPuuid(puuid);
-    }
-
-    public List<SummonerMatch> fetchMatches(String puuid) {
         try {
-            String region = "europe";
-            int start = 0;
-            int end = 20;
-            String matchUrl = "https://" + region + ".api.riotgames.com/lol/match/v5/matches/by-puuid/" + puuid
-                    + "/ids?start=" + start + "&count=" + end + "&api_key=" + apiKey;
+            List<MatchList> entities = matchList.stream()
+                    .filter(dto -> dto != null && dto.matchId() != null)
+                    .map(dto -> {
+                        MatchList entity = new MatchList(dto.puuid(), dto.matchId());
+                        return entity;
+                    })
+                    .collect(Collectors.toList());
 
-            logger.info("Fetching matches from URL: {}", matchUrl);
-
-            @SuppressWarnings("rawtypes")
-            ResponseEntity<List> response = restTemplate.getForEntity(matchUrl, List.class);
-
-            if (response.getStatusCode().is2xxSuccessful()) {
-                List<SummonerMatch> list = new ArrayList<>();
-                @SuppressWarnings("unchecked")
-                List<String> matches = response.getBody();
-                if (matches != null) {
-                    for (String match : matches) {
-
-                        String matchDataUrl = "https://" + region + ".api.riotgames.com/lol/match/v5/matches/" + match
-                                + "?api_key=" + apiKey;
-                        @SuppressWarnings("rawtypes")
-                        ResponseEntity<Map> matchDataResponse = restTemplate.getForEntity(matchDataUrl,
-                                Map.class);
-
-                        Map<String, Object> matchData = matchDataResponse.getBody();
-                        SummonerMatch summonerMatch = saveMatch(matchData, puuid);
-                        list.add(summonerMatch);
-                    }
-                } else {
-                    logger.warn("No matches found for puuid: {}", puuid);
-                }
-                return list;
+            if (!entities.isEmpty()) {
+                matchListRepository.saveAll(entities);
+                logger.info("Saved {} matches for puuid: {}", entities.size(), puuid);
             } else {
-                logger.error("Failed to fetch matches. Status code: {}", response.getStatusCode());
+                logger.warn("No valid matches to save after filtering for puuid: {}", puuid);
+            }
+        } catch (Exception e) {
+            logger.error("Error saving match list for puuid: {}", puuid, e);
+            throw new RuntimeException("Failed to save match list", e);
+        }
+    }
+
+    public List<MatchList> getMatchListByPuuid(String puuid) {
+        System.out.println("Looking for matches with puuid: {}" + puuid);
+        List<MatchList> matches = matchListRepository.findByPuuid(puuid);
+        System.out.println("Found {} matches" + matches.size());
+        return matches;
+    }
+
+    public enum MatchListMode {
+        LIGHT,
+    }
+
+    public List<MatchListDto> updateMatchList(String puuid, String region, MatchListMode mode) {
+        List<MatchList> matchListTemp = matchListRepository.findByPuuid(puuid);
+        List<MatchListDto> matchList = new ArrayList<MatchListDto>();
+        for (MatchList match : matchListTemp) {
+            matchList.add(new MatchListDto(match.getPuuid(), match.getMatchid()));
+        }
+
+        int start = 0;
+        int count = 100;
+        boolean shouldContinueFetching = true;
+
+        while (shouldContinueFetching) {
+            List<MatchListDto> newMatchList = riotService.Match.findByPuuid(puuid, region, start, count);
+            System.out.println("FETCHES MATCHES");
+            System.out.println(newMatchList);
+            // Proper null and empty checks for List
+            if (newMatchList == null || newMatchList.isEmpty()) {
+                saveMatches(matchList, puuid);
+                return matchList;
             }
 
-        } catch (Exception e) {
-            logger.error("Exception occurred while fetching matches: ", e);
-        }
+            // Use addAll instead of spread operator (which is not available in Java)
+            matchList.addAll(newMatchList);
 
-        return new ArrayList<>();
+            // Update start index for next batch
+            start += count;
+
+            // Add logic to determine if we should continue fetching
+            if (mode == MatchListMode.LIGHT) {
+                shouldContinueFetching = false;
+            }
+        }
+        System.out.println("SAVING MATCHES");
+        saveMatches(matchList, puuid);
+        return matchList;
+    }
+
+    public void saveMatches(List<MatchListDto> matchList, String puuid) {
+        for (MatchListDto match : matchList) {
+            MatchList newMatch = new MatchList(puuid, match.matchId());
+            matchListRepository.save(newMatch);
+        }
     }
 
 }

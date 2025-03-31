@@ -11,4 +11,5 @@ public interface MatchRepository extends JpaRepository<SummonerMatch, Long> {
     SummonerMatch findByMatchId(String matchId);
 
     List<SummonerMatch> findByPuuid(String puuid);
+
 }

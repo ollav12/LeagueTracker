@@ -36,6 +36,14 @@ public class RankService {
 
     public void saveLeagueDto(List<LeagueDto> ranks) {
         for (LeagueDto rank : ranks) {
+            MiniSeries miniSeries;
+            if (rank.miniSeries() == null) {
+                miniSeries = new MiniSeries(0, "", 0, 0);
+            } else {
+                miniSeries = new MiniSeries(rank.miniSeries().wins(), rank.miniSeries().progress(),
+                        rank.miniSeries().target(),
+                        rank.miniSeries().losses());
+            }
             SummonerRank sumRank = new SummonerRank(
                     rank.leagueId(),
                     rank.summonerId(),
@@ -50,8 +58,8 @@ public class RankService {
                     rank.inactive(),
                     rank.freshBlood(),
                     rank.hotStreak(),
-                    new MiniSeries(rank.miniSeries().wins(), rank.miniSeries().progress(), rank.miniSeries().target(),
-                            rank.miniSeries().losses()));
+                    miniSeries);
+            System.out.println("SUMRANK: " + sumRank);
             rankRepository.save(sumRank);
         }
     }

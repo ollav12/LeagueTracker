@@ -11,7 +11,7 @@ public class RiotRequest<T> {
     private final Function<String, T> responseMapper;
 
     public RiotRequest(String region, String endpoint, String apiKey, Function<String, T> responseMapper) {
-        this.url = "https://" + region + ".api.riotgames.com/" + endpoint + "?api_key=" + apiKey;
+        this.url = "https://" + region + ".api.riotgames.com/" + endpoint + apiKey;
         this.webClient = WebClient.create();
         this.responseMapper = responseMapper;
     }
@@ -22,6 +22,7 @@ public class RiotRequest<T> {
                 .retrieve()
                 .bodyToMono(String.class)
                 .block();
+        System.out.println("Response from riot:" + response);
         return responseMapper.apply(response);
     }
 }

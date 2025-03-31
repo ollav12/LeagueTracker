@@ -137,7 +137,13 @@ export const useSummonerStore = defineStore("summoner", {
     async summaryRequest(puuid: String, accountId: String, region: String) {
       console.log("Fecthing summary data");
       try {
-        const response = await instance.get(`summoners/${region}/`);
+        const response = await instance.get(`summoners/summary`, {
+          params: {
+            puuid: puuid,
+            accountId: accountId,
+            region: region,
+          },
+        });
         console.log("---OVERVIEW---");
         console.log(response.data);
 

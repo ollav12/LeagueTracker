@@ -22,7 +22,7 @@ public class SummonerEndpoint {
      * @return
      */
     public SummonerDto findByPuuid(String puuid, String region) {
-        String endpoint = "lol/summoner/v4/summoners/by-puuid/" + puuid;
+        String endpoint = "lol/summoner/v4/summoners/by-puuid/" + puuid + "?api_key=";
         RiotRequest<SummonerDto> request = new RiotRequest<>(region, endpoint, apiKey,
                 new SummonerMapper());
         return request.execute();
