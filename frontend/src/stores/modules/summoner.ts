@@ -48,7 +48,7 @@ interface SummonerState {
       solo: RankedData | null;
       flex: RankedData | null;
     };
-    status: string;
+    loaded: boolean;
   };
   summary: SummaryState;
 }
@@ -70,7 +70,7 @@ export const useSummonerStore = defineStore("summoner", {
         solo: null,
         flex: null,
       },
-      status: "",
+      loaded: false,
     },
     summary: {
       GAMES_TO_LOAD: 10,
@@ -83,9 +83,7 @@ export const useSummonerStore = defineStore("summoner", {
   }),
 
   getters: {
-    isLoaded: (state) => state.summoner.status === "success",
-    isUpdating: (state) => state.summoner.status === "loading",
-    hasError: (state) => state.summoner.status === "error",
+    summonerLoaded: (state) => state.summoner.loaded,
     overviewLoaded: (state) => state.summary.loaded,
   },
 
@@ -95,7 +93,6 @@ export const useSummonerStore = defineStore("summoner", {
       region: string,
       tag: string
     ) {
-      this.summoner.status = "loading";
       try {
         console.log("Fecthing summoner data");
         const response = await instance.get(
@@ -103,12 +100,11 @@ export const useSummonerStore = defineStore("summoner", {
         );
 
         if (!response.data) {
-          this.summoner.status = "error";
           console.log("Error summoner details request");
           return;
         }
         console.log("response: ", response.data);
-
+        this.summoner.loaded = true;
         const soloRank = response.data.ranked.find(
           (queue: RankedData) => queue.queueType === "RANKED_SOLO_5x5"
         );
@@ -131,11 +127,11 @@ export const useSummonerStore = defineStore("summoner", {
             solo: soloRank || null,
             flex: flexRank || null,
           },
-          status: "success",
+          loaded: true,
         };
       } catch (error) {
         console.error("Error fetching summoner data:", error);
-        this.summoner.status = "error";
+        this.summoner.loaded = false;
       }
     },
     async summaryRequest(puuid: String, accountId: String, region: String) {

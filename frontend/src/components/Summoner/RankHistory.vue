@@ -1,180 +1,174 @@
 <template>
   <div class="rank-history-container">
-    <div class="queue-nav">
-      <button class="queue-nav-item active">All</button>
-      <button class="queue-nav-item">Ranked Solo/Duo</button>
-      <button class="queue-nav-item">Ranked Flex</button>
-      <button class="queue-nav-item">Aram</button>
-      <div class="queue-dropdown">
-        <button class="queue-nav-item">
-          QueueType <span class="dropdown-arrow">▼</span>
-        </button>
-        <div class="dropdown-content">
-          <a href="#">Normal Draft</a>
-          <a href="#">Normal Blind</a>
-          <a href="#">Clash</a>
-        </div>
-      </div>
-    </div>
-
     <div class="rank-history">
-      <h3 class="rank-title">Ranked Solo/Duo</h3>
-      <div class="rank-row">
-        <div class="rank-entry">
-          <div class="rank-icon-container">
-            <img :src="soloRankIconUrl" alt="Solo Rank" class="rank-icon" />
-          </div>
-          <div class="rank-info">
-            <div class="rank-status">
-              <span class="rankText">{{ formatRank(soloRank) }}</span>
-              <span class="win-loss-text"
-                >{{ soloWins }}W {{ soloLosses }}L</span
-              >
+      <!-- Solo/Duo Section -->
+      <template v-if="showSoloRank">
+        <h3 class="rank-title">Ranked Solo/Duo</h3>
+        <div class="rank-row">
+          <div class="rank-entry">
+            <div class="rank-icon-container">
+              <img :src="soloRankIconUrl" alt="Solo Rank" class="rank-icon" />
             </div>
-            <div class="stats-row">
-              <span class="lp-text">{{ getSoloLP }} LP</span>
-              <span class="win-percent">Win rate {{ getSoloWinRate }}%</span>
+            <div class="rank-info">
+              <div class="rank-status">
+                <span class="rankText">{{ formatRank(soloRank) }}</span>
+                <span class="win-loss-text"
+                  >{{ soloWins }}W {{ soloLosses }}L</span
+                >
+              </div>
+              <div class="stats-row">
+                <span class="lp-text">{{ getSoloLP }} LP</span>
+                <span class="win-percent">Win rate {{ getSoloWinRate }}%</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Peak rank section -->
+          <div class="rank-entry peak-rank">
+            <div class="rank-icon-container">
+              <img :src="soloRankIconUrl" alt="Peak Rank" class="rank-icon" />
+            </div>
+            <div class="rank-info">
+              <div class="rank-status">
+                <span class="rankText">{{ formatRank(soloRank) }}</span>
+              </div>
+              <div class="peak-stats-row">
+                <span class="lp-text">{{ getSoloLP }} LP</span>
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- Peak rank section -->
-        <div class="rank-entry peak-rank">
-          <div class="rank-icon-container">
-            <img :src="soloRankIconUrl" alt="Peak Rank" class="rank-icon" />
-          </div>
-          <div class="rank-info">
-            <div class="rank-status">
-              <span class="rankText">{{ formatRank(soloRank) }}</span>
-            </div>
-          </div>
-        </div>
-      </div>
+        <div class="ranks-section">
+          <div class="rank-row ranks-container">
+            <table class="ranks-table">
+              <thead>
+                <tr>
+                  <th class="title-season">Season</th>
+                  <th class="title-tier">Tier</th>
+                  <!-- Combined column -->
+                  <th class="title-lp">LP</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(row, i) in displayedRows" :key="i">
+                  <td class="season-row">{{ row.season }}</td>
+                  <!-- Combined tier cell with both icon and text -->
 
-      <div class="ranks-section">
-        <div class="rank-row ranks-container">
-          <table class="ranks-table">
-            <thead>
-              <tr>
-                <th class="title-season">Season</th>
-                <th class="title-tier">Tier</th>
-                <!-- Combined column -->
-                <th class="title-lp">LP</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(row, i) in displayedRows" :key="i">
-                <td class="season-row">{{ row.season }}</td>
-                <!-- Combined tier cell with both icon and text -->
-
-                <td class="tier-row">
-                  <div class="tier-content">
-                    <div class="mini-icon-container">
-                      <img
-                        :src="`https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/ux/fonts/texticons/lol/ranks/rank${getRankName(
-                          row.tier
-                        )}.png`"
-                        :alt="row.tier"
-                        class="mini-rank-icon"
-                      />
+                  <td class="tier-row">
+                    <div class="tier-content">
+                      <div class="mini-icon-container">
+                        <img
+                          :src="`https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/ux/fonts/texticons/lol/ranks/rank${getRankName(
+                            row.tier
+                          )}.png`"
+                          :alt="row.tier"
+                          class="mini-rank-icon"
+                        />
+                      </div>
+                      <span class="tier-text">{{ formatRank(row.tier) }}</span>
                     </div>
-                    <span class="tier-text">{{ formatRank(row.tier) }}</span>
-                  </div>
-                </td>
-                <td class="lp-row">{{ row.leaguePoints }}</td>
-              </tr>
-            </tbody>
-          </table>
+                  </td>
+                  <td class="lp-row">{{ row.leaguePoints }}</td>
+                </tr>
+              </tbody>
+            </table>
 
-          <div class="view-all-container" v-if="data.rows.length > 5">
-            <button @click="toggleSeasonDisplay" class="view-all-button">
-              {{ showAllSeasons ? "Close" : "View all season tiers" }}
-              <span
-                class="toggle-arrow"
-                :class="{ 'arrow-up': showAllSeasons }"
-              >
-                ▼
-              </span>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <h3 class="rank-title rank-flex-title">
-        Ranked Flex
-        <span v-if="flexRank === 'Unranked'" class="unranked-badge"
-          >Unranked</span
-        >
-      </h3>
-
-      <div v-if="flexRank === 'Unranked'" class="unranked-spacer"></div>
-
-      <div v-if="flexRank !== 'Unranked'" class="rank-row">
-        <div class="rank-entry">
-          <div class="rank-icon-container">
-            <img :src="flexRankIconUrl" alt="Flex Rank" class="rank-icon" />
-          </div>
-          <div class="rank-info">
-            <div class="rank-status">
-              <span class="rankText">{{ formatRank(flexRank) }}</span>
-              <span class="win-loss-text"
-                >{{ flexWins }}W {{ flexLosses }}L</span
-              >
-            </div>
-            <div class="stats-row">
-              <span class="lp-text">{{ flexLp }} LP</span>
-              <span class="win-percent">Win rate {{ winPercentageFlex }}%</span>
+            <div class="view-all-container" v-if="data.rows.length > 5">
+              <button @click="toggleSeasonDisplay" class="view-all-button">
+                {{ showAllSeasons ? "Close" : "View all season tiers" }}
+                <span
+                  class="toggle-arrow"
+                  :class="{ 'arrow-up': showAllSeasons }"
+                >
+                  ▼
+                </span>
+              </button>
             </div>
           </div>
         </div>
-      </div>
-      <div
-        class="ranks-section"
-        v-if="flexRank === 'Unranked' || flexRank !== 'Unranked'"
-      >
-        <div class="rank-row ranks-container">
-          <table class="ranks-table">
-            <thead>
-              <tr>
-                <th class="title-season">Season</th>
-                <th class="title-tier">Tier</th>
-                <th class="title-lp">LP</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(row, i) in displayedFlexRows" :key="i">
-                <td class="season-row">{{ row.season }}</td>
-                <td class="tier-row">
-                  <div class="tier-content">
-                    <div class="mini-icon-container">
-                      <img
-                        :src="`https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/ux/fonts/texticons/lol/ranks/rank${getRankName(
-                          row.tier
-                        )}.png`"
-                        :alt="row.tier"
-                        class="mini-rank-icon"
-                      />
+      </template>
+
+      <!-- Flex Section -->
+      <template v-if="showFlexRank">
+        <h3 class="rank-title rank-flex-title">
+          Ranked Flex
+          <span v-if="flexRank === 'Unranked'" class="unranked-badge"
+            >Unranked</span
+          >
+        </h3>
+        <div v-if="flexRank === 'Unranked'" class="unranked-spacer"></div>
+        <div v-if="flexRank !== 'Unranked'" class="rank-row">
+          <div class="rank-entry">
+            <div class="rank-icon-container">
+              <img :src="flexRankIconUrl" alt="Flex Rank" class="rank-icon" />
+            </div>
+            <div class="rank-info">
+              <div class="rank-status">
+                <span class="rankText">{{ formatRank(flexRank) }}</span>
+                <span class="win-loss-text"
+                  >{{ flexWins }}W {{ flexLosses }}L</span
+                >
+              </div>
+              <div class="stats-row">
+                <span class="lp-text">{{ flexLp }} LP</span>
+                <span class="win-percent"
+                  >Win rate {{ winPercentageFlex }}%</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="ranks-section">
+          <div class="rank-row ranks-container">
+            <table class="ranks-table">
+              <thead>
+                <tr>
+                  <th class="title-season">Season</th>
+                  <th class="title-tier">Tier</th>
+                  <th class="title-lp">LP</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(row, i) in displayedFlexRows" :key="i">
+                  <td class="season-row">{{ row.season }}</td>
+                  <td class="tier-row">
+                    <div class="tier-content">
+                      <div class="mini-icon-container">
+                        <img
+                          :src="`https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/ux/fonts/texticons/lol/ranks/rank${getRankName(
+                            row.tier
+                          )}.png`"
+                          :alt="row.tier"
+                          class="mini-rank-icon"
+                        />
+                      </div>
+                      <span class="tier-text">{{ formatRank(row.tier) }}</span>
                     </div>
-                    <span class="tier-text">{{ formatRank(row.tier) }}</span>
-                  </div>
-                </td>
-                <td class="lp-row">{{ row.leaguePoints }}</td>
-              </tr>
-            </tbody>
-          </table>
+                  </td>
+                  <td class="lp-row">{{ row.leaguePoints }}</td>
+                </tr>
+              </tbody>
+            </table>
 
-          <div class="view-all-container" v-if="flexData.rows.length > 5">
-            <button @click="toggleFlexSeasonDisplay" class="view-all-button">
-              {{ showAllFlexSeasons ? "Close" : "View all season tiers" }}
-              <span
-                class="toggle-arrow"
-                :class="{ 'arrow-up': showAllFlexSeasons }"
-              >
-                ▼
-              </span>
-            </button>
+            <div class="view-all-container" v-if="flexData.rows.length > 5">
+              <button @click="toggleFlexSeasonDisplay" class="view-all-button">
+                {{ showAllFlexSeasons ? "Close" : "View all season tiers" }}
+                <span
+                  class="toggle-arrow"
+                  :class="{ 'arrow-up': showAllFlexSeasons }"
+                >
+                  ▼
+                </span>
+              </button>
+            </div>
           </div>
         </div>
+      </template>
+
+      <!-- Show message when ARAM is selected -->
+      <div v-if="activeQueue === 'aram'" class="no-rank-message">
+        <p>No rank information available for ARAM queue</p>
       </div>
     </div>
   </div>
@@ -182,6 +176,7 @@
 <script>
 import { storeToRefs } from "pinia";
 import { useSummonerStore } from "@/stores/modules/summoner";
+import { useQueueFilterStore } from "@/stores/modules/queueFilter";
 
 export default {
   name: "RankHistory",
@@ -199,9 +194,15 @@ export default {
   },
 
   setup() {
-    const store = useSummonerStore();
-    const { summoner } = storeToRefs(store);
-    return { summoner };
+    const summonerStore = useSummonerStore();
+    const queueFilterStore = useQueueFilterStore();
+    const { summoner } = storeToRefs(summonerStore);
+    const { activeQueue } = storeToRefs(queueFilterStore);
+
+    return {
+      summoner,
+      activeQueue,
+    };
   },
 
   computed: {
@@ -270,6 +271,22 @@ export default {
     flexLp() {
       return this.summoner.ranked.flex?.leaguePoints || 0;
     },
+    showSoloRank() {
+      // Show for 'all', 'solo', and all dropdown queue types
+      return (
+        this.activeQueue === "all" ||
+        this.activeQueue === "solo" ||
+        ["normal-draft", "normal-blind", "clash"].includes(this.activeQueue)
+      );
+    },
+    showFlexRank() {
+      // Show for 'all', 'flex', and all dropdown queue types
+      return (
+        this.activeQueue === "all" ||
+        this.activeQueue === "flex" ||
+        ["normal-draft", "normal-blind", "clash"].includes(this.activeQueue)
+      );
+    },
   },
 
   methods: {
@@ -280,7 +297,27 @@ export default {
       this.showAllSeasons = !this.showAllSeasons;
     },
     formatRank(rank) {
-      return rank || "Unranked";
+      if (!rank) return "Unranked";
+
+      // Split the rank into tier and division
+      const [tier, division] = rank.split(" ");
+
+      // Convert roman numerals to numbers
+      const romanToNumber = {
+        I: "1",
+        II: "2",
+        III: "3",
+        IV: "4",
+      };
+
+      // Capitalize first letter, lowercase rest, and convert division
+      const formattedTier =
+        tier.charAt(0).toUpperCase() + tier.slice(1).toLowerCase();
+      const formattedDivision = romanToNumber[division] || "";
+
+      return formattedDivision
+        ? `${formattedTier} ${formattedDivision}`
+        : formattedTier;
     },
     getRankName(rank) {
       if (!rank) return "";
@@ -794,5 +831,16 @@ export default {
   .rankText {
     font-size: 14px;
   }
+}
+
+.no-rank-message {
+  background-color: white;
+  border-radius: 4px;
+  padding: 16px;
+  text-align: center;
+  width: 332px;
+  color: rgb(117, 133, 146);
+  font-family: "Roboto";
+  font-size: 14px;
 }
 </style>

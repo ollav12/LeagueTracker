@@ -32,32 +32,14 @@
     <!-- Nav bar -->
     <div class="profile-nav">
       <button
+        v-for="tab in tabs"
+        :key="tab.name"
         class="nav-item"
-        :class="{ active: activeTab === 'summary' }"
-        @click="activeTab = 'summary'"
+        :class="{ active: activeTab === tab.id }"
+        @click="activeTab = tab.id"
       >
-        Summary
-      </button>
-      <button
-        class="nav-item"
-        :class="{ active: activeTab === 'champions' }"
-        @click="activeTab = 'champions'"
-      >
-        Champions <span class="update-badge">U</span>
-      </button>
-      <button
-        class="nav-item"
-        :class="{ active: activeTab === 'mastery' }"
-        @click="activeTab = 'mastery'"
-      >
-        Mastery
-      </button>
-      <button
-        class="nav-item"
-        :class="{ active: activeTab === 'live' }"
-        @click="activeTab = 'live'"
-      >
-        Live Game
+        {{ tab.name }}
+        <span v-if="tab.badge" class="update-badge">U</span>
       </button>
     </div>
 
@@ -102,6 +84,22 @@ export default {
     };
   },
 
+  data() {
+    return {
+      activeTab: "summary",
+      cooldownActive: false,
+      cooldownSeconds: 0,
+      hasBeenUpdated: false,
+      lastUpdatedText: "",
+      tabs: [
+        { id: "summary", name: "Summary" },
+        { id: "champions", name: "Champions", badge: true },
+        { id: "mastery", name: "Mastery" },
+        { id: "live", name: "Live Game" },
+      ],
+    };
+  },
+
   computed: {
     buttonText() {
       return this.isUpdating ? "Updating..." : "Update";
@@ -121,16 +119,6 @@ export default {
     async fetchSummonerData(region, summoner, tag) {
       await this.summonerStore.summonerDetailsRequest(summoner, region, tag);
     },
-  },
-
-  data() {
-    return {
-      activeTab: "summary",
-      cooldownActive: false,
-      cooldownSeconds: 0,
-      hasBeenUpdated: false,
-      lastUpdatedText: "",
-    };
   },
 
   watch: {
@@ -153,31 +141,70 @@ export default {
 </script>
 
 <style scoped>
-.no-matches {
-  font-weight: 700;
-  font-style: "Roboto";
-  color: #202a38;
-  font-size: 12px;
-}
-.match-table {
-  margin-top: 59px;
-  margin-left: -765px;
-}
-
-.summary-container {
-  display: flex;
+.background-all {
+  background-color: #edeef2; /* Changed from white to match the theme */
   width: 100%;
-  justify-content: flex-start; /* Keep elements spread apart */
+  height: 100%;
+  margin: 0 auto;
+  position: relative;
 }
 
-.rank-container {
-  flex: 0 0 332px; /* Fixed width for rank container */
-  max-width: 100%; /* But don't overflow on small screens */
+.profile-header {
+  background-color: white; /* Add white background to header */
+  display: flex;
+  align-items: top;
+  margin-bottom: 0; /* Changed from 50px to 0 */
+  height: 200px;
+  padding: 40px 20px 20px 400px;
+  position: relative;
 }
 
-.match-container {
-  flex: 1; /* Take remaining space */
-  width: 740;
+.icon-container {
+  position: relative;
+  display: inline-block;
+  width: 100px;
+  height: 100px;
+  margin-right: 20px;
+}
+
+.profile-icon {
+  width: 100%;
+  height: 100%;
+  border-radius: 20%;
+  object-fit: cover;
+}
+
+.level {
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #202a38;
+  color: white;
+  border-radius: 50px;
+  padding: 1px 8px;
+  font-size: 10px;
+  min-width: 20px;
+  max-width: 80px;
+  text-align: center;
+  z-index: 2;
+}
+
+.name-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  position: relative;
+  padding-bottom: 20px;
+}
+
+.summoner-name {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 28px;
+  padding-bottom: 2px;
+  color: rgb(32, 45, 55);
 }
 
 .tag {
@@ -185,6 +212,89 @@ export default {
   line-height: 28px;
   font-weight: 400;
   color: rgb(117, 133, 146);
+}
+
+.ladder-rank {
+  margin: 0;
+  font-size: 12px;
+  line-height: 16px;
+  color: rgb(117, 133, 146);
+  font-weight: 400;
+}
+
+.update-button {
+  margin-top: 8px;
+  background-color: #5383e9;
+  color: white;
+  border: none;
+  border-radius: 3px;
+  padding: 11px 15px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  font-family: "Roboto";
+  font-weight: 400;
+  line-height: 20px;
+}
+
+.update-button:hover {
+  background-color: #496fd0;
+}
+
+.update-button:disabled {
+  background-color: #edeef2;
+  color: #c5c8cd;
+  cursor: default;
+}
+
+.cooldown-text {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  margin: 0;
+  font-size: 12px;
+  color: #8a8a8a;
+  height: 16px;
+}
+
+.profile-nav {
+  background-color: white; /* Add white background to nav */
+  position: relative;
+  z-index: 1;
+  padding: 4px 0 4px 400px;
+  border-top: 1px solid #e9e9e9;
+  border-bottom: 1px solid #e9e9e9;
+  display: flex;
+  flex-wrap: nowrap;
+  margin-top: 0; /* Ensure no gap */
+}
+
+.nav-item {
+  padding: 1px 16px;
+  margin-right: 5px;
+  background: none;
+  border: none;
+  font-size: 14px;
+  line-height: 36px;
+  color: rgb(32, 45, 55);
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 400;
+  border-radius: 3px;
+  font-family: "Roboto";
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.nav-item:hover {
+  background-color: #f7f7f9;
+}
+
+.nav-item.active {
+  color: #4f84ea;
+  font-weight: 700;
+  background-color: rgba(79, 132, 234, 0.1);
 }
 
 .update-badge {
@@ -202,188 +312,23 @@ export default {
   font-family: "Roboto";
 }
 
-/* Adjust padding on the Champions button to accommodate badge */
-.nav-item:has(.update-badge) {
-  display: flex;
-  align-items: center;
-  gap: 3px;
-}
-
-/* Make badge visible when button is active */
 .nav-item.active .update-badge {
-  background-color: #ffb900; /* Keep yellow even when button is active */
+  background-color: #ffb900;
 }
 
-.profile-nav {
-  position: relative;
-  background-color: transparent;
-  z-index: 1;
-  padding-left: 400px;
-  padding-top: 4px; /* Add top padding */
-  padding-bottom: 4px; /* Add bottom padding */
-  border-top: 1px solid #e9e9e9; /* Add grey top border */
-  border-bottom: 1px solid #e9e9e9; /* Add grey bottom border */
-  display: flex; /* Add this to create a flexbox layout */
-  flex-wrap: nowrap; /* Prevent wrapping of buttons */
-}
-
-.nav-item {
-  padding: 1px 16px;
-  margin-right: 5px;
-  background: none;
-  border: none;
-  font-size: 14px;
-  line-height: 36px;
-  color: rgb(32, 45, 55);
-  cursor: pointer;
-  position: relative;
-  transition: all 0.2s;
-  font-weight: 400;
-  border-radius: 3px;
-  font-family: "Roboto";
-}
-
-.nav-item:hover {
-  background-color: #f7f7f9;
-}
-.nav-item.active {
-  color: #4f84ea;
-  font-weight: 700;
-  background-color: rgba(79, 132, 234, 0.1); /* Light blue background */
-}
-
-.user-profile {
-  text-align: left;
-  position: relative; /* Add this to contain the nav bar */
-  overflow-x: hidden; /* Prevent horizontal scrollbar */
+.tab-content {
   background-color: #edeef2;
-  padding-bottom: 20px;
-  size: 100%;
-}
-
-.ladder-rank {
-  margin: 0px 0;
-  font-size: 12px;
-  line-height: 16px;
-  color: rgb(117, 133, 146);
-  font-weight: 400;
-}
-
-.icon-container {
-  position: relative;
-  display: inline-block;
-  width: 100px; /* Match the profile icon width */
-  height: 100px; /* Match the profile icon height */
-  margin-right: 20px;
-}
-
-.profile-header {
-  display: flex;
-  align-items: top;
-  margin-bottom: 50px;
-  padding: 20px;
-  position: relative; /* Keep content above the white background */
-  padding-top: 40px;
-  padding-left: 400px;
-}
-
-.profile-icon {
+  padding-top: 0;
   width: 100%;
-  height: 100%;
-  border-radius: 20%;
-  object-fit: cover; /* Ensures the image covers the entire container */
+  min-height: calc(100vh - 200px); /* Ensure background extends to bottom */
 }
 
-.summoner-name {
-  margin: 0;
-  font-size: 24px;
-  font-weight: 700;
-  line-height: 28px;
-  padding-bottom: 2px;
-  color: rgb(32, 45, 55);
-}
-
-.level {
-  position: absolute;
-  bottom: -8px; /* Fixed position from the bottom */
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: #202a38;
-  color: white;
-  border-radius: 50px;
-  padding: 1px 8px;
-  font-size: 10px;
-  min-width: 20px;
-  max-width: 80px;
-  text-align: center;
-  z-index: 2; /* Ensure it's above the image */
-}
-
-.update-button {
-  margin-top: 8px;
-  background-color: #5383e9;
-  color: white;
-  border: none;
-  border-radius: 3px;
-  padding: 11px 15px;
-  font-size: 14px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-  align-self: flex-start;
-  font-family: "Roboto";
-  font-weight: 400;
-  line-height: 20px;
-}
-
-.update-button:hover {
-  background-color: #496fd0;
-}
-
-.update-button:disabled {
-  background-color: #edeef2;
-  color: #c5c8cd;
-  cursor: default;
-}
-
-.name-container {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  position: relative;
-  padding-bottom: 20px;
-}
-
-.cooldown-text {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  margin: 0;
-  font-size: 12px;
-  color: #8a8a8a;
-  height: 16px; /* Fixed height to prevent layout shifts */
-}
-
-.rankText {
-  font-weight: 700;
-  font-size: 20px;
-  line-height: 28px;
-}
-
-/* Optional: Adjust font size for larger numbers */
 @media screen and (max-width: 720px) {
   .level {
-    position: absolute;
     bottom: -2px;
     left: 25px;
-    transform: translateX(-50%);
-    background-color: #202a38;
-    color: white;
-    border-radius: 50px;
     padding: 1px 6px;
     font-size: 9px;
-    min-width: 20px;
-    max-width: 80px;
-    text-align: center;
   }
 
   .profile-icon {
@@ -394,22 +339,8 @@ export default {
   }
 
   .summoner-name {
-    margin: 0;
     font-size: 14px;
     font-weight: 550;
   }
-}
-.background-all {
-  background-color: white;
-  width: 100%;
-  height: 100%;
-  margin: 0 auto;
-  position: relative;
-}
-
-.tab-content {
-  background-color: #edeef2; /* Move the grey background here */
-  padding-top: 0px; /* Add some spacing after the nav bar */
-  width: 100%;
 }
 </style>
