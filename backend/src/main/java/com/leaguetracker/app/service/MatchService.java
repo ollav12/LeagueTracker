@@ -20,7 +20,10 @@ import com.leaguetracker.app.repository.MatchListRepository;
 import com.leaguetracker.app.repository.MatchRepository;
 import com.leaguetracker.app.service.riot.RiotService;
 
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Pageable;
 
 @Service
 public class MatchService {
@@ -52,6 +55,17 @@ public class MatchService {
      */
     public MatchDto getMatch(String matchId, String region) {
         return riotService.Match.findByMatchId(matchId, region);
+    }
+
+    public List<String> getNextMatchIds(String puuid, String lastMatchId, int limit) {
+        Pageable pageable = PageRequest.of(0, limit, Sort.by(Sort.Direction.DESC, "matchId"));
+        return matchListRepository.getNextMatchIds(puuid, lastMatchId, pageable);
+    }
+
+    public List<MatchDto> getMatches(String region, List<String> matchIds) {
+        return matchIds.stream()
+                .map(matchId -> riotService.Match.findByMatchId(matchId, region))
+                .collect(Collectors.toList());
     }
 
     /**

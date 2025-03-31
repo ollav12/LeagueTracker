@@ -1,6 +1,8 @@
 package com.leaguetracker.app.service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -26,13 +28,15 @@ public class SummonerService {
     private final RiotService riotService;
     private final RankService rankService;
     private final MatchService matchService;
+    private final StatsService statsService;
 
     public SummonerService(SummonerRepository summonerRepository, RiotService riotService, RankService rankService,
-            MatchService matchService) {
+            MatchService matchService, StatsService statsService) {
         this.summonerRepository = summonerRepository;
         this.rankService = rankService;
         this.riotService = riotService;
         this.matchService = matchService;
+        this.statsService = statsService;
     }
 
     /**
@@ -150,6 +154,24 @@ public class SummonerService {
      */
     public List<MatchList> getSummary(String puuid, String accountId, String region) {
         return matchService.getMatchListByPuuid(puuid);
+    }
+
+    public Map<String, Object> getSummary(String puuid, String region, String lastMatchId, int limit) {
+        Map<String, Object> summary = new HashMap<>();
+
+        // Fetch next match IDs
+        List<String> matchIds = matchService.getNextMatchIds(puuid, lastMatchId, limit);
+        summary.put("matchIds", matchIds);
+
+        // Fetch match details
+        List<MatchDto> matchDetails = matchService.getMatches(region, matchIds);
+        summary.put("matchDetails", matchDetails);
+
+        // Fetch additional stats (if needed)
+        Map<String, Object> stats = statsService.getSummonerStats(puuid);
+        summary.put("stats", stats);
+
+        return summary;
     }
 
     public Summoner saveSummoner(Summoner summoner) {

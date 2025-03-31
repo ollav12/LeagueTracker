@@ -1,14 +1,19 @@
 package com.leaguetracker.app.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.leaguetracker.app.dto.response.SummonerResponse;
 import com.leaguetracker.app.model.MatchList;
@@ -23,6 +28,8 @@ public class SummonersController {
     private final SummonerService summonerService;
     @Autowired
     private MatchListRepository matchListRepository;
+
+    private static final Logger logger = LoggerFactory.getLogger(SummonersController.class);
 
     public SummonersController(SummonerService summonerService) {
         this.summonerService = summonerService;
@@ -55,18 +62,17 @@ public class SummonersController {
     }
 
     @GetMapping("/summary")
-    public ResponseEntity<List<MatchList>> getSummary(
+    public ResponseEntity<Map<String, Object>> getSummary(
             @RequestParam String puuid,
-            @RequestParam String accountId,
-            @RequestParam String region
-
-    ) {
+            @RequestParam String region,
+            @RequestParam(required = false) String lastMatchId,
+            @RequestParam(defaultValue = "20") int limit) {
         try {
-            List<MatchList> matchSummary = summonerService.getSummary(puuid, accountId,
-                    region);
-            return ResponseEntity.ok(matchSummary);
+            Map<String, Object> summary = summonerService.getSummary(puuid, region, lastMatchId, limit);
+            return ResponseEntity.ok(summary);
         } catch (Exception e) {
-            return null;
+            logger.error("Error fetching summary for puuid: {}", puuid, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 }
