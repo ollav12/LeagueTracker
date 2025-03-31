@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import instance from "@/plugins/axios";
+import { useSettingsStore } from "./settings";
 
 interface RankedData {
   leagueId: string;
@@ -84,7 +85,7 @@ export const useSummonerStore = defineStore("summoner", {
 
   getters: {
     summonerLoaded: (state) => state.summoner.loaded,
-    overviewLoaded: (state) => state.summary.loaded,
+    summaryLoaded: (state) => state.summary.loaded,
   },
 
   actions: {
@@ -134,13 +135,14 @@ export const useSummonerStore = defineStore("summoner", {
         this.summoner.loaded = false;
       }
     },
-    async summaryRequest(puuid: String, region: String) {
+    async summaryRequest() {
+      const settingsStore = useSettingsStore();
       console.log("Fetching summary data");
       try {
         const response = await instance.get(`summoners/summary`, {
           params: {
-            puuid: puuid,
-            region: region,
+            puuid: this.summoner.account.puuid,
+            region: settingsStore.region,
             lastMatchId:
               this.summary.matches.length > 0
                 ? this.summary.matches[this.summary.matches.length - 1].matchId
@@ -153,7 +155,7 @@ export const useSummonerStore = defineStore("summoner", {
 
         this.summary = {
           ...this.summary,
-          matches: [...this.summary.matches, ...(response.data.matches || [])], // Append new matches
+          matches: [...this.summary.matches, ...(response.data.matches || [])],
           stats: response.data.stats || {},
           loaded: true,
           matchesLoading: false,

@@ -27,11 +27,13 @@
       </div>
     </div>
 
-    <div class="rank-container">
-      <RankHistory v-if="summonerLoaded" />
-    </div>
-    <div class="match-table">
-      <MatchHistory v-if="summaryLoaded" />
+    <div class="content-container">
+      <div class="rank-container">
+        <RankHistory v-if="summonerLoaded" />
+      </div>
+      <div class="match-table">
+        <MatchHistory v-if="summaryLoaded" />
+      </div>
     </div>
   </div>
 </template>
@@ -42,6 +44,7 @@ import { useSummonerStore } from "@/stores/modules/summoner";
 import { useQueueFilterStore } from "@/stores/modules/queueFilter";
 import RankHistory from "@/components/Summoner/RankHistory.vue";
 import MatchHistory from "@/components/Summoner/MatchHistory.vue";
+import { watch } from "vue";
 
 export default {
   name: "SummaryView",
@@ -54,6 +57,14 @@ export default {
     const { summoner, summary, summonerLoaded, summaryLoaded } =
       storeToRefs(summonerStore);
     const { activeQueue } = storeToRefs(queueFilterStore);
+
+    // Watch for changes in summonerLoaded
+    watch(summonerLoaded, (isLoaded) => {
+      if (isLoaded) {
+        console.log("Summoner loaded, fetching summary data");
+        summonerStore.summaryRequest();
+      }
+    });
 
     const queueTypes = [
       { id: "all", name: "All" },
@@ -94,27 +105,24 @@ export default {
   width: 100%;
 }
 
+.content-container {
+  display: flex;
+  gap: 0x;
+  margin-left: 0x;
+  margin-top: 0px;
+}
+
 .rank-container {
-  flex: 0 0 332px;
   max-width: 100%;
-  margin-left: 400px; /* Keep left alignment */
+  padding-left: -5px;
+  margin-right: -16px;
+  margin-top: -18px;
 }
 
 .match-table {
-  flex: 1;
   width: 740px;
-  margin-top: 20px;
-  margin-left: 400px; /* Keep left alignment */
-}
-
-.rank-history-container {
-  width: auto;
-  height: auto;
-  background-color: #edeef2;
-  border-radius: 0px;
-  padding: 5px;
-  box-sizing: border-box;
-  padding-left: 0; /* Remove left padding since we use margin */
+  padding-top: 5px;
+  padding-left: -50px;
 }
 
 /* Queue Navigation */
@@ -125,9 +133,9 @@ export default {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   position: relative;
   height: 44px;
-  width: 1080px; /* Match match-table width */
-  margin-top: 5px; /* Keep top padding */
-  margin-left: 400px; /* Align with SummonerView nav bar */
+  width: 1080px;
+  margin-top: 5px;
+  margin-left: 400px;
 }
 
 .queue-nav-item {
@@ -213,9 +221,17 @@ export default {
 /* Mobile Responsiveness */
 @media screen and (max-width: 720px) {
   .queue-nav,
+  .content-container {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .content-container {
+    flex-direction: column;
+  }
+
   .rank-container,
   .match-table {
-    margin-left: 0;
     width: 100%;
   }
 }

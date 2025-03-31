@@ -57,6 +57,7 @@
 import { storeToRefs } from "pinia";
 import { useSummonerStore } from "@/stores/modules/summoner";
 import { useGlobalStore } from "@/stores/global";
+import { useSettingsStore } from "@/stores/modules/settings";
 import SummaryView from "./Summoner/SummaryView.vue";
 import ChampionsView from "./Summoner/ChampionsView.vue";
 import MasteryView from "./Summoner/MasteryView.vue";
@@ -74,6 +75,7 @@ export default {
   setup() {
     const summonerStore = useSummonerStore();
     const globalStore = useGlobalStore();
+    const settingsStore = useSettingsStore();
     const { summoner, isUpdating } = storeToRefs(summonerStore);
 
     return {
@@ -81,6 +83,7 @@ export default {
       isUpdating,
       summonerStore,
       globalStore,
+      settingsStore,
     };
   },
 
@@ -131,6 +134,7 @@ export default {
         ) {
           const { region, summoner, tag } = to.params;
           let newRegion = this.globalStore.regionsList[region.toLowerCase()];
+          this.settingsStore.setRegion(newRegion);
           this.fetchSummonerData(newRegion, summoner, tag);
         }
       },
