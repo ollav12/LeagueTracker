@@ -7,12 +7,15 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.Data;
 
 @Data
 @Entity
 @Table(name = "summoner_matchlist", indexes = {
         @Index(name = "idx_puuid", columnList = "puuid")
+}, uniqueConstraints = {
+        @UniqueConstraint(name = "uk_puuid_match", columnNames = { "puuid", "match_id" })
 })
 public class MatchList {
 
@@ -21,7 +24,7 @@ public class MatchList {
     private Long id;
 
     private String puuid;
-    @Column(unique = true)
+
     private String matchId;
 
     public MatchList(String puuid, String matchId) {

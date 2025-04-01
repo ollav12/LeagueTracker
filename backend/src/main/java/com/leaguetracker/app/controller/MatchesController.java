@@ -76,7 +76,7 @@ public class MatchesController {
         return ResponseEntity.ok(matchService.getSummonersRanks(matchId));
     }
 
-    @GetMapping("/macthlist")
+    @GetMapping("/matchlist")
     public ResponseEntity<List<MatchListDto>> updateMatchList(@RequestParam String puuid, @RequestParam String region,
             @RequestParam MatchListMode mode) {
         return ResponseEntity.ok(matchService.updateMatchList(puuid, region, mode));

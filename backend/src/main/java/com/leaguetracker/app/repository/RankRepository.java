@@ -8,6 +8,6 @@ import org.springframework.stereotype.Repository;
 import com.leaguetracker.app.model.SummonerRank;
 
 @Repository
-public interface RankRepository extends JpaRepository<SummonerRank, String>{
-   List<SummonerRank> findByPuuid(String puuid);
+public interface RankRepository extends JpaRepository<SummonerRank, String> {
+   List<SummonerRank> findAllByPuuid(String puuid);
 }

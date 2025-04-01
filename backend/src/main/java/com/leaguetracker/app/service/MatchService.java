@@ -21,13 +21,6 @@ import com.leaguetracker.app.repository.MatchRepository;
 import com.leaguetracker.app.service.riot.RiotService;
 
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Pageable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import java.util.ArrayList;
-import org.springframework.data.domain.PageRequest;
 
 @Service
 public class MatchService {
@@ -108,29 +101,17 @@ public class MatchService {
     }
 
     public void saveMatchList(List<MatchListDto> matchList, String puuid) {
-        if (matchList == null || matchList.isEmpty()) {
-            logger.debug("No matches to save for puuid: {}", puuid);
-            return;
-        }
-
-        try {
-            List<MatchList> entities = matchList.stream()
-                    .filter(dto -> dto != null && dto.matchId() != null)
-                    .map(dto -> {
-                        MatchList entity = new MatchList(dto.puuid(), dto.matchId());
-                        return entity;
-                    })
-                    .collect(Collectors.toList());
-
-            if (!entities.isEmpty()) {
-                matchListRepository.saveAll(entities);
-                logger.info("Saved {} matches for puuid: {}", entities.size(), puuid);
-            } else {
-                logger.warn("No valid matches to save after filtering for puuid: {}", puuid);
+        for (MatchListDto match : matchList) {
+            try {
+                if (!matchListRepository.existsByPuuidAndMatchId(puuid, match.matchId())) {
+                    MatchList newMatch = new MatchList(puuid, match.matchId());
+                    matchListRepository.save(newMatch);
+                } else {
+                    System.out.println("Match already exists for puuid: " + puuid + ", matchId: " + match.matchId());
+                }
+            } catch (Exception e) {
+                System.err.println("Error saving match: " + e.getMessage());
             }
-        } catch (Exception e) {
-            logger.error("Error saving match list for puuid: {}", puuid, e);
-            throw new RuntimeException("Failed to save match list", e);
         }
     }
 
@@ -162,7 +143,7 @@ public class MatchService {
             System.out.println(newMatchList);
             // Proper null and empty checks for List
             if (newMatchList == null || newMatchList.isEmpty()) {
-                saveMatches(matchList, puuid);
+                saveMatchList(matchList, puuid);
                 return matchList;
             }
 
@@ -178,7 +159,7 @@ public class MatchService {
             }
         }
         System.out.println("SAVING MATCHES");
-        saveMatches(matchList, puuid);
+        saveMatchList(matchList, puuid);
         return matchList;
     }
 

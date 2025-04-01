@@ -104,7 +104,7 @@ export const useSummonerStore = defineStore("summoner", {
           console.log("Error summoner details request");
           return;
         }
-        console.log("response: ", response.data);
+        console.log("SUMMONER DETAILS: ", response.data);
         this.summoner.loaded = true;
         const soloRank = response.data.ranked.find(
           (queue: RankedData) => queue.queueType === "RANKED_SOLO_5x5"

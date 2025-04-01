@@ -64,6 +64,7 @@ public class SummonerService {
             System.out.println("Fetched summoner from riot api: " + summonerDto);
 
             List<LeagueDto> ranked = riotService.League.findBySummonerId(summonerDto.id(), region);
+            rankService.saveLeagueDto(ranked);
             System.out.println("Fetched ranked data from riot api: " + ranked);
 
             // Fetch first 100 matches
@@ -126,6 +127,7 @@ public class SummonerService {
      */
     public List<LeagueDto> getRanked(String puuid, String region) {
         List<SummonerRank> ranked = rankService.getRankByPuuid(puuid);
+        System.out.println("RANKED: " + ranked);
         return ranked.stream()
                 .map(rank -> new LeagueDto(
                         rank.getLeagueId(),

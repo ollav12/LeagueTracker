@@ -48,6 +48,10 @@ public class SummonerRank {
             this.losses = losses;
         }
 
+        public MiniSeries() {
+
+        }
+
         public int getLosses() {
             return losses;
         }
