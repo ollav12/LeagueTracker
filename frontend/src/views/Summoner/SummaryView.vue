@@ -45,7 +45,7 @@ import { useSummonerStore } from "@/stores/modules/summoner";
 import { useQueueFilterStore } from "@/stores/modules/queueFilter";
 import RankHistory from "@/components/Summoner/RankHistory.vue";
 import MatchHistory from "@/components/Summoner/MatchHistory.vue";
-import { watch } from "vue";
+import { watch, onMounted } from "vue";
 
 export default {
   name: "SummaryView",
@@ -59,12 +59,16 @@ export default {
     const { activeQueue } = storeToRefs(queueFilterStore);
 
     // Watch for changes in summonerLoaded
-    watch(summonerLoaded, (isLoaded) => {
-      if (isLoaded) {
-        console.log("Summoner loaded, fetching summary data");
-        summonerStore.summaryRequest();
-      }
-    });
+    watch(
+      summonerLoaded,
+      async (isLoaded) => {
+        if (isLoaded) {
+          console.log("Summoner loaded, fetching summary data");
+          await summonerStore.summaryRequest();
+        }
+      },
+      { immediate: true }
+    ); // Add immediate: true to run on component mount
 
     const queueTypes = [
       { id: "all", name: "All" },

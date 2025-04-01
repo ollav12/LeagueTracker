@@ -75,7 +75,7 @@ export default {
       summary,
       summoner,
       activeQueue,
-      loadMoreMatches: summonerStore.summaryRequest,
+      loadMoreMatches: summonerStore.moreMatches, // Changed from summaryRequest to moreMatches
     };
   },
 
