@@ -11,8 +11,10 @@ public record MatchDto(
         }
 
         public static record InfoDto(
+                        String endOfGameResult,
                         long gameCreation,
                         long gameDuration,
+                        long gameEndTimestamp,
                         long gameId,
                         String gameMode,
                         String gameName,

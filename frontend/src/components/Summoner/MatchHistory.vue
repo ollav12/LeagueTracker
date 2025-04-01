@@ -22,23 +22,140 @@
           loss: !getPlayerStats(match).win,
         }"
       >
-        <div class="match-result">
-          {{ getPlayerStats(match).win ? "Victory" : "Defeat" }}
-          <span class="queue-type">{{ getQueueType(match.info.queueId) }}</span>
-        </div>
-        <div class="champion-info">
-          <img
-            :src="getChampionIcon(getPlayerStats(match).championId)"
-            :alt="getChampionName(getPlayerStats(match).championId)"
-            class="champion-icon"
-          />
-          <div class="champion-name">
-            {{ getChampionName(getPlayerStats(match).championId) }}
+        <div class="match-card-main">
+          <!-- Left side -->
+          <div class="match-info">
+            <div class="game-type">
+              {{ getQueueType(match.info.queueId) }}
+              <div class="time-ago">
+                {{ formatTimeAgo(match.info.gameEndTimestamp) }}
+              </div>
+            </div>
+            <div class="game-result">
+              {{ getPlayerStats(match).win ? "Victory" : "Defeat" }}
+              <div class="game-duration">
+                {{ formatGameDuration(match.info.gameDuration) }}
+              </div>
+            </div>
           </div>
-          <div class="kda">
-            {{ getPlayerStats(match).kills }}/{{
-              getPlayerStats(match).deaths
-            }}/{{ getPlayerStats(match).assists }}
+
+          <!-- Middle - Players -->
+          <div class="teams-preview">
+            <div class="team-column">
+              <!-- Blue team -->
+              <div
+                v-for="role in ['TOP', 'JUNGLE', 'MIDDLE', 'BOTTOM', 'UTILITY']"
+                :key="role"
+                class="player-preview"
+              >
+                <img
+                  :src="
+                    getChampionIcon(
+                      getPlayerByRole(match, 100, role).championId
+                    )
+                  "
+                  class="preview-champion-icon"
+                />
+                <span class="preview-name">{{
+                  getPlayerByRole(match, 100, role).summonerName
+                }}</span>
+              </div>
+            </div>
+            <div class="team-column">
+              <!-- Red team -->
+              <div
+                v-for="role in ['TOP', 'JUNGLE', 'MIDDLE', 'BOTTOM', 'UTILITY']"
+                :key="role"
+                class="player-preview"
+              >
+                <img
+                  :src="
+                    getChampionIcon(
+                      getPlayerByRole(match, 200, role).championId
+                    )
+                  "
+                  class="preview-champion-icon"
+                />
+                <span class="preview-name">{{
+                  getPlayerByRole(match, 200, role).summonerName
+                }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right side - Expand button -->
+          <button
+            class="expand-button"
+            :class="{
+              win: getPlayerStats(match).win,
+              loss: !getPlayerStats(match).win,
+            }"
+            @click="toggleMatchDetails(match.metadata.matchId)"
+          >
+            ▼
+          </button>
+        </div>
+
+        <!-- Expanded details (your existing expanded view) -->
+        <div
+          v-if="expandedMatches.has(match.metadata.matchId)"
+          class="match-details"
+        >
+          <div class="teams-container">
+            <div class="team" v-for="team in [100, 200]" :key="team">
+              <h4>{{ team === 100 ? "Blue Team" : "Red Team" }}</h4>
+              <div class="players-list">
+                <div
+                  v-for="player in match.info.participants.filter(
+                    (p) => p.teamId === team
+                  )"
+                  :key="player.puuid"
+                  class="player-row"
+                  :class="{
+                    'current-player': player.puuid === summoner.account.puuid,
+                  }"
+                >
+                  <img
+                    :src="getChampionIcon(player.championId)"
+                    class="small-champion-icon"
+                  />
+                  <span class="player-name">{{ player.summonerName }}</span>
+                  <div class="player-stats">
+                    <span class="player-kda"
+                      >{{ player.kills }}/{{ player.deaths }}/{{
+                        player.assists
+                      }}</span
+                    >
+                    <span class="player-cs"
+                      >{{
+                        player.totalMinionsKilled + player.neutralMinionsKilled
+                      }}
+                      CS</span
+                    >
+                    <span class="player-vision"
+                      >Vision: {{ player.visionScore }}</span
+                    >
+                    <div class="player-items">
+                      <img
+                        v-for="itemId in [
+                          player.item0,
+                          player.item1,
+                          player.item2,
+                          player.item3,
+                          player.item4,
+                          player.item5,
+                          player.item6,
+                        ]"
+                        :key="itemId"
+                        :src="getItemIcon(itemId)"
+                        class="item-icon"
+                        v-if="itemId !== 0"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -82,6 +199,7 @@ export default {
   data() {
     return {
       displayLimit: 20,
+      expandedMatches: new Set(), // Track which matches are expanded
     };
   },
 
@@ -215,6 +333,69 @@ export default {
         winRate: Math.round((wins / (wins + losses)) * 100) || 0,
       };
     },
+
+    toggleMatchDetails(matchId) {
+      if (this.expandedMatches.has(matchId)) {
+        this.expandedMatches.delete(matchId);
+      } else {
+        this.expandedMatches.add(matchId);
+      }
+    },
+
+    getItemIcon(itemId) {
+      // Temporary placeholder until item data is implemented
+      return `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/item-icons/${itemId}.png`;
+    },
+
+    formatTimeAgo(timestamp) {
+      console.log(timestamp);
+      const now = Date.now();
+      const diffInSeconds = Math.floor((now - timestamp) / 1000);
+      console.log(diffInSeconds);
+      const minutes = Math.floor(diffInSeconds / 60);
+      const hours = Math.floor(minutes / 60);
+      const days = Math.floor(hours / 24);
+      const weeks = Math.floor(days / 7);
+      const months = Math.floor(weeks / 4);
+
+      if (months == 1) return `${months} month ago`;
+      else if (months > 1) return `${months} months ago`;
+
+      if (weeks == 1) return `${weeks} week ago`;
+      else if (weeks > 1) return `${weeks} weeks ago`;
+
+      if (days == 1) return `${days} day ago`;
+      else if (days > 1) return `${days} days ago`;
+      if (hours == 1) return `${hours} hour ago`;
+      else if (hours > 1) return `${hours} hours ago`;
+      if (minutes == 1) return `${minutes} minute ago`;
+      else if (minutes > 1) return `${minutes} minutes ago`;
+      return "just now";
+    },
+
+    formatGameDuration(duration) {
+      const hours = Math.floor(duration / 3600);
+      const minutes = Math.floor((duration % 3600) / 60);
+      const seconds = duration % 60;
+
+      if (hours > 0) {
+        return `${hours}h ${minutes.toString().padStart(2, "0")}m ${seconds
+          .toString()
+          .padStart(2, "0")}s`;
+      }
+      return `${minutes}m ${seconds.toString().padStart(2, "0")}s`;
+    },
+
+    getPlayerByRole(match, teamId, role) {
+      return (
+        match.info.participants.find(
+          (p) => p.teamId === teamId && p.teamPosition === role
+        ) || {
+          championId: 0,
+          summonerName: "Unknown",
+        }
+      );
+    },
   },
 };
 </script>
@@ -288,11 +469,8 @@ export default {
 
 .match-card {
   border-radius: 4px;
-  padding: 14px;
-  display: flex;
-  flex-direction: column;
-  width: 740px;
-  height: 96px;
+  margin-bottom: 8px;
+  background-color: white;
 }
 
 .match-card.win {
@@ -303,6 +481,184 @@ export default {
 .match-card.loss {
   border-left: 6px solid #ea4156;
   background-color: #fff0f3;
+}
+
+.match-card.expanded {
+  height: auto;
+}
+
+.match-card-main {
+  height: 96px;
+  padding: 12px 0 12px 12px; /* Remove right padding */
+  display: flex;
+  align-items: center;
+}
+
+.match-info {
+  width: 130px;
+  padding-right: 12px;
+  border-right: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.game-type {
+  font-size: 12px;
+  color: #758592;
+  margin-bottom: 4px;
+}
+
+.time-ago {
+  font-size: 11px;
+  color: #9aa4af;
+  margin-top: 2px;
+}
+
+.game-result {
+  font-size: 14px;
+  font-weight: 600;
+  margin-top: 8px;
+}
+
+.win .game-result {
+  color: #5383e8;
+}
+
+.loss .game-result {
+  color: #e84057;
+}
+
+.game-duration {
+  font-size: 11px;
+  color: #9aa4af;
+  margin-top: 2px;
+}
+
+.teams-preview {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 20px;
+}
+
+.team-column {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.player-preview {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.preview-champion-icon {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+}
+
+.preview-name {
+  font-size: 12px;
+  color: #758592;
+}
+
+.expand-button {
+  width: 30px;
+  height: 96px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 12px;
+  margin-right: 0px; /* Pull button to edge */
+  margin-left: 12px; /* Add spacing from content */
+  border-top-right-radius: 4px; /* Add this */
+  border-bottom-right-radius: 4px; /* Add this */
+}
+
+.expand-button.win {
+  background-color: #4b73d6;
+}
+
+.expand-button.loss {
+  background-color: #d63d52;
+}
+
+/* Remove the hover effect */
+.expand-button:hover {
+  transform: none;
+}
+
+.match-details {
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 16px;
+}
+
+.teams-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.team h4 {
+  margin: 0 0 8px 0;
+  color: #758592;
+  font-size: 14px;
+}
+
+.players-list {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.player-row {
+  display: flex;
+  align-items: center;
+  padding: 4px;
+  border-radius: 4px;
+  margin-bottom: 4px;
+}
+
+.player-row.current-player {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.small-champion-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+.player-name {
+  font-size: 12px;
+  font-weight: 500;
+  color: #202d37;
+}
+
+.player-stats {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-left: auto;
+  font-size: 12px;
+  color: #758592;
+}
+
+.player-items {
+  display: flex;
+  gap: 2px;
+  margin-left: 8px;
+}
+
+.item-icon {
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  margin-right: 2px;
 }
 
 .show-more-button {

@@ -196,6 +196,7 @@ export const useSummonerStore = defineStore("summoner", {
           this.summary.matchesLoading = false;
           this.summary.moreMatchesToFetch = true;
         }
+        console.log(this.summary);
       } catch (error) {
         console.error("Error fetching initial summary data:", error);
         this.summary = {

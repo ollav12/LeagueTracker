@@ -47,8 +47,10 @@ public class MatchMapper implements Function<String, MatchDto> {
             // Parse Info
             JsonNode infoNode = jsonNode.path("info");
             InfoDto infoDto = new InfoDto(
+                    infoNode.path("endOfGameResult").asText(),
                     infoNode.path("gameCreation").asLong(),
                     infoNode.path("gameDuration").asLong(),
+                    infoNode.path("gameEndTimestamp").asLong(),
                     infoNode.path("gameId").asLong(),
                     infoNode.path("gameMode").asText(),
                     infoNode.path("gameName").asText(),
