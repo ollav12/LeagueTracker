@@ -31,9 +31,10 @@
       <div class="rank-container">
         <RankHistory v-if="summonerLoaded" />
       </div>
-      <div class="match-table">
-        <MatchHistory v-if="summaryLoaded" />
+      <div v-if="summonerStore.summary.matches.length" class="match-table">
+        <MatchHistory />
       </div>
+      <div v-else>No matches found.</div>
     </div>
   </div>
 </template>
@@ -54,8 +55,7 @@ export default {
     const summonerStore = useSummonerStore();
     const queueFilterStore = useQueueFilterStore();
 
-    const { summoner, summary, summonerLoaded, summaryLoaded } =
-      storeToRefs(summonerStore);
+    const { summonerLoaded } = storeToRefs(summonerStore);
     const { activeQueue } = storeToRefs(queueFilterStore);
 
     // Watch for changes in summonerLoaded
@@ -84,10 +84,8 @@ export default {
     };
 
     return {
-      summoner,
-      summary,
+      summonerStore, // Return the whole store
       summonerLoaded,
-      summaryLoaded,
       activeQueue,
       queueTypes,
       dropdownQueues,

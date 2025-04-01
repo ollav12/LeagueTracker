@@ -1,8 +1,8 @@
 <template>
-  <div class="rank-history-container">
+  <div class="rank-history-container" v-if="summoner">
     <div class="rank-history">
       <!-- Solo/Duo Section -->
-      <template v-if="showSoloRank">
+      <template v-if="showSoloRank && summoner.ranked">
         <h3 class="rank-title">Ranked Solo/Duo</h3>
         <div class="rank-row">
           <div class="rank-entry">
@@ -90,7 +90,7 @@
       </template>
 
       <!-- Flex Section -->
-      <template v-if="showFlexRank">
+      <template v-if="showFlexRank && summoner.ranked">
         <h3 class="rank-title rank-flex-title">
           Ranked Flex
           <span v-if="flexRank === 'Unranked'" class="unranked-badge"
@@ -177,6 +177,7 @@
 import { storeToRefs } from "pinia";
 import { useSummonerStore } from "@/stores/modules/summoner";
 import { useQueueFilterStore } from "@/stores/modules/queueFilter";
+import { onMounted, onBeforeUnmount } from "vue";
 
 export default {
   name: "RankHistory",
@@ -198,6 +199,11 @@ export default {
     const queueFilterStore = useQueueFilterStore();
     const { summoner } = storeToRefs(summonerStore);
     const { activeQueue } = storeToRefs(queueFilterStore);
+
+    // Cleanup function for component unmount
+    onBeforeUnmount(() => {
+      // Add any cleanup if needed
+    });
 
     return {
       summoner,
@@ -235,16 +241,16 @@ export default {
       return this.summoner.ranked.flex?.losses || 0;
     },
     soloRankIconUrl() {
-      if (!this.summoner.ranked.solo?.tier) {
+      if (!this.summoner.ranked.solo) {
         return "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-iron.png";
       }
-      return `https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-${this.summoner.ranked.solo.tier.toLowerCase()}.png`;
+      return this.summoner.ranked.solo.rankUrl;
     },
     flexRankIconUrl() {
-      if (!this.summoner.ranked.flex?.tier) {
+      if (!this.summoner.ranked.flex) {
         return "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-iron.png";
       }
-      return `https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-${this.summoner.ranked.flex.tier.toLowerCase()}.png`;
+      return this.summoner.ranked.flex.rankUrl;
     },
     displayedFlexRows() {
       if (this.showAllFlexSeasons) {
@@ -310,11 +316,18 @@ export default {
         IV: "4",
       };
 
-      // Capitalize first letter, lowercase rest, and convert division
+      // Capitalize first letter, lowercase rest
       const formattedTier =
         tier.charAt(0).toUpperCase() + tier.slice(1).toLowerCase();
-      const formattedDivision = romanToNumber[division] || "";
 
+      // Check if tier is one without divisions
+      const noDivisionTiers = ["challenger", "grandmaster", "master"];
+      if (noDivisionTiers.includes(tier.toLowerCase())) {
+        return formattedTier;
+      }
+
+      // For other tiers, include the division number
+      const formattedDivision = romanToNumber[division] || "";
       return formattedDivision
         ? `${formattedTier} ${formattedDivision}`
         : formattedTier;
@@ -644,18 +657,17 @@ export default {
   margin-left: 5px;
 }
 .peak-rank .rank-icon-container {
-  width: 36px; /* Smaller than the 72px for main rank */
-  height: 36px;
-  margin-right: 5px; /* Same as the main icon container */
-  margin-left: 18px; /* Add this to center the smaller icon (72-36)/2 = 18px */
+  height: 44px;
+  width: 44px;
+  margin-right: 0px; /* Same as the main icon container */
+  margin-left: 14px; /* Add this to center the smaller icon (72-36)/2 = 18px */
   position: right; /* Use relative instead of invalid 'left' */
   overflow: hidden;
 }
 
 .peak-rank .rank-icon {
-  width: 65px;
-  height: 65px;
-  transform: scale(1.2); /* Scale the icon to fill container better */
+  height: 36px;
+  transform: scale(1); /* Scale the icon to fill container better */
   object-position: center 85%; /* Position icon consistently */
 }
 
@@ -769,11 +781,10 @@ export default {
 }
 
 .rank-icon {
-  width: 130px;
-  height: 130px;
+  height: 72px;
   object-fit: cover;
   object-position: center 85%;
-  transform: scale(1.3);
+  transform: scale(0.9);
 }
 
 .rank-icon-container {
@@ -826,6 +837,9 @@ export default {
   .rank-icon {
     width: 110px;
     height: 110px;
+    object-fit: cover;
+    object-position: center 85%;
+    transform: scale(0.2); /* Changed from 1.3 to 1 */
   }
 
   .rankText {

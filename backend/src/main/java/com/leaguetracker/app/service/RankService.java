@@ -59,9 +59,7 @@ public class RankService {
                     rank.freshBlood(),
                     rank.hotStreak(),
                     miniSeries);
-            System.out.println("Attempting to save rank: " + sumRank);
-            SummonerRank savedRank = rankRepository.save(sumRank);
-            System.out.println("Successfully saved rank with ID: " + savedRank.getLeagueId());
+            rankRepository.save(sumRank);
         }
     }
 

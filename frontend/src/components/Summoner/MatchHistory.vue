@@ -4,29 +4,42 @@
     <div class="match-history-header">
       <h3 class="history-title">Recent Games</h3>
       <div class="match-stats" v-if="summary.stats">
-        <span class="total-games">{{ totalGames }}G</span>
-        <span class="wins">{{ wins }}W</span>
-        <span class="losses">{{ losses }}L</span>
-        <span class="win-rate">{{ winRate }}% WR</span>
+        <span class="total-games">{{ filteredMatches.length }}G</span>
+        <span class="wins">{{ stats.wins }}W</span>
+        <span class="losses">{{ stats.losses }}L</span>
+        <span class="win-rate">{{ stats.winRate }}% WR</span>
       </div>
     </div>
 
     <!-- Match cards -->
     <div class="match-cards">
       <div
-        v-for="(match, index) in displayedMatches"
-        :key="match.matchId"
+        v-for="match in filteredMatches"
+        :key="match.metadata.matchId"
         class="match-card"
-        :class="{ win: match.win, loss: !match.win }"
+        :class="{
+          win: getPlayerStats(match).win,
+          loss: !getPlayerStats(match).win,
+        }"
       >
-        <div class="match-result">{{ match.win ? "Victory" : "Defeat" }}</div>
+        <div class="match-result">
+          {{ getPlayerStats(match).win ? "Victory" : "Defeat" }}
+          <span class="queue-type">{{ getQueueType(match.info.queueId) }}</span>
+        </div>
         <div class="champion-info">
           <img
-            :src="match.champion.iconUrl"
-            :alt="match.champion.name"
+            :src="getChampionIcon(getPlayerStats(match).championId)"
+            :alt="getChampionName(getPlayerStats(match).championId)"
             class="champion-icon"
           />
-          <div class="champion-name">{{ match.champion.name }}</div>
+          <div class="champion-name">
+            {{ getChampionName(getPlayerStats(match).championId) }}
+          </div>
+          <div class="kda">
+            {{ getPlayerStats(match).kills }}/{{
+              getPlayerStats(match).deaths
+            }}/{{ getPlayerStats(match).assists }}
+          </div>
         </div>
       </div>
     </div>
@@ -46,17 +59,23 @@
 <script>
 import { storeToRefs } from "pinia";
 import { useSummonerStore } from "@/stores/modules/summoner";
+import { useQueueFilterStore } from "@/stores/modules/queueFilter";
+import { QUEUE_MODES, QUEUE_FILTER_MAPPING } from "@/constants/queueModes";
 
 export default {
   name: "MatchHistory",
 
   setup() {
-    const store = useSummonerStore();
-    const { summary } = storeToRefs(store);
+    const summonerStore = useSummonerStore();
+    const queueFilterStore = useQueueFilterStore();
+    const { summary, summoner } = storeToRefs(summonerStore);
+    const { activeQueue } = storeToRefs(queueFilterStore);
 
     return {
       summary,
-      loadMoreMatches: store.summaryRequest,
+      summoner,
+      activeQueue,
+      loadMoreMatches: summonerStore.summaryRequest,
     };
   },
 
@@ -93,6 +112,108 @@ export default {
 
     winRate() {
       return this.summary.stats.winRate || 0;
+    },
+
+    currentPuuid() {
+      return this.summary?.puuid || this.$store.state.summoner?.account?.puuid;
+    },
+
+    filteredMatches() {
+      const queueIds = QUEUE_FILTER_MAPPING[this.activeQueue];
+      if (!queueIds.length) return this.summary.matches; // Return all matches for 'all' filter
+
+      return this.summary.matches.filter((match) =>
+        queueIds.includes(match.info.queueId)
+      );
+    },
+
+    stats() {
+      let wins = 0;
+      let losses = 0;
+
+      this.filteredMatches.forEach((match) => {
+        const playerStats = this.getPlayerStats(match);
+        if (playerStats.win) wins++;
+        else losses++;
+      });
+
+      return {
+        wins,
+        losses,
+        winRate: Math.round((wins / (wins + losses)) * 100) || 0,
+      };
+    },
+  },
+
+  watch: {
+    "summary.matches": {
+      handler(matches) {
+        this.updateMatchStats(matches);
+      },
+      immediate: true,
+    },
+  },
+
+  methods: {
+    getChampionIcon(championId) {
+      // Temporary placeholder until champion data is implemented
+      return `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-icons/${championId}.png`;
+    },
+    getChampionName(championId) {
+      // Temporary placeholder until champion data is implemented
+      return `Champion ${championId}`;
+    },
+    getPlayerStats(match) {
+      const playerParticipant = match.info.participants.find(
+        (p) => p.puuid === this.summoner.account.puuid
+      );
+
+      if (!playerParticipant) {
+        console.warn("Player not found in match:", match.metadata.matchId);
+        return {
+          win: false,
+          championId: 0,
+          kills: 0,
+          deaths: 0,
+          assists: 0,
+        };
+      }
+
+      return {
+        win: playerParticipant.win,
+        championId: playerParticipant.championId,
+        kills: playerParticipant.kills,
+        deaths: playerParticipant.deaths,
+        assists: playerParticipant.assists,
+        // Add more stats as needed
+      };
+    },
+
+    getQueueType(queueId) {
+      return QUEUE_MODES[queueId] || "Custom Game";
+    },
+
+    updateMatchStats(matches) {
+      let wins = 0;
+      let losses = 0;
+
+      matches.forEach((match) => {
+        const stats = this.getPlayerStats(match);
+        if (stats.win) {
+          wins++;
+        } else {
+          losses++;
+        }
+      });
+
+      // Update summary stats
+      this.summary.stats = {
+        ...this.summary.stats,
+        totalGames: wins + losses,
+        wins: wins,
+        losses: losses,
+        winRate: Math.round((wins / (wins + losses)) * 100) || 0,
+      };
     },
   },
 };
@@ -200,5 +321,25 @@ export default {
   font-weight: 400;
   text-align: center;
   display: block;
+}
+
+.placeholder {
+  background-color: #eaeaea;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+}
+
+/* Add this new style */
+.kda {
+  margin-left: auto;
+  color: #666;
+  font-size: 14px;
+}
+
+.queue-type {
+  font-size: 12px;
+  color: #758592;
+  margin-left: 8px;
 }
 </style>

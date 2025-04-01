@@ -16,6 +16,7 @@ interface RankedData {
   inactive: boolean;
   freshBlood: boolean;
   hotStreak: boolean;
+  rankUrl: String;
   miniSeries: {
     losses: number;
     progress: string;
@@ -24,10 +25,32 @@ interface RankedData {
   };
 }
 
+// Add MatchData interface
+interface MatchData {
+  metadata: {
+    matchId: string;
+  };
+  info: {
+    participants: Array<{
+      puuid: string;
+      championId: number;
+      win: boolean;
+      kills: number;
+      deaths: number;
+      assists: number;
+    }>;
+  };
+}
+
 interface SummaryState {
   GAMES_TO_LOAD: number;
-  matches: any[]; // Replace 'any' with a proper Match interface if you have one
-  stats: Record<string, any>; // Replace 'any' with proper stats interface if you have one
+  matches: MatchData[]; // Update type from String[] to MatchData[]
+  stats: {
+    totalGames?: number;
+    wins?: number;
+    losses?: number;
+    winRate?: number;
+  };
   loaded: boolean;
   matchesLoading: boolean;
   moreMatchesToFetch: boolean;
@@ -95,7 +118,7 @@ export const useSummonerStore = defineStore("summoner", {
       tag: string
     ) {
       try {
-        console.log("Fecthing summoner data");
+        console.log("Fetching summoner data");
         const response = await instance.get(
           `summoners/${region}/${summoner}-${tag}`
         );
@@ -104,15 +127,22 @@ export const useSummonerStore = defineStore("summoner", {
           console.log("Error summoner details request");
           return;
         }
-        console.log("SUMMONER DETAILS: ", response.data);
-        this.summoner.loaded = true;
+
         const soloRank = response.data.ranked.find(
           (queue: RankedData) => queue.queueType === "RANKED_SOLO_5x5"
         );
         const flexRank = response.data.ranked.find(
           (queue: RankedData) => queue.queueType === "RANKED_FLEX_SR"
         );
-        console.log(response);
+
+        // Add rankUrl to each queue type
+        if (soloRank) {
+          soloRank.rankUrl = `https://res.cloudinary.com/kln/image/upload/v1693310423/${soloRank.tier}.png`;
+        }
+        if (flexRank) {
+          flexRank.rankUrl = `https://res.cloudinary.com/kln/image/upload/v1693310423/${flexRank.tier}.png`;
+        }
+
         this.summoner = {
           account: {
             name: response.data.summonerName,
@@ -138,29 +168,49 @@ export const useSummonerStore = defineStore("summoner", {
     async summaryRequest() {
       const settingsStore = useSettingsStore();
       console.log("Fetching summary data");
+      this.summary.matchesLoading = true;
+
       try {
+        const lastMatch = this.summary.matches[this.summary.matches.length - 1];
         const response = await instance.get(`summoners/summary`, {
           params: {
             puuid: this.summoner.account.puuid,
             region: settingsStore.region,
             lastMatchId:
               this.summary.matches.length > 0
-                ? this.summary.matches[this.summary.matches.length - 1].matchId
+                ? lastMatch?.metadata.matchId
                 : null,
             limit: this.summary.GAMES_TO_LOAD,
           },
         });
+
         console.log("---OVERVIEW---");
         console.log(response.data);
 
-        this.summary = {
-          ...this.summary,
-          matches: [...this.summary.matches, ...(response.data.matches || [])],
-          stats: response.data.stats || {},
-          loaded: true,
-          matchesLoading: false,
-          moreMatchesToFetch: response.data.matches?.length > 0,
-        };
+        if (response.data) {
+          // Store matches and stats
+          const newMatches = response.data.matchDetails || [];
+          const newStats = response.data.stats || {};
+
+          this.summary = {
+            ...this.summary,
+            matches: [...this.summary.matches, ...newMatches],
+            stats: {
+              totalGames: newStats.totalGames || 0,
+              wins: newStats.wins || 0,
+              losses: newStats.losses || 0,
+              winRate: newStats.winRate || 0,
+            },
+            loaded: true,
+            matchesLoading: false,
+            moreMatchesToFetch: true,
+          };
+
+          console.log("Summary updated:", {
+            stats: this.summary.stats,
+            matches: this.summary.matches,
+          });
+        }
       } catch (error) {
         console.error("Error fetching summary data:", error);
         this.summary = {
