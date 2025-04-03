@@ -22,16 +22,16 @@ Create your `.env` file inside `backend`, the `.env.example` shows how it should
 
 ## Backend Setup
 
-1. Navigate to the `backend` directory:
-
-   ```bash
-   cd backend
-   ```
-
-2. Compose docker:
+1. Compose docker:
 
    ```bash
    docker compose up -d
+   ```
+
+2. Navigate to the `backend` directory:
+
+   ```bash
+   cd backend
    ```
 
 3. Build the project:
