@@ -66,4 +66,4 @@ Create your `.env` file inside `backend`, the `.env.example` shows how it should
 
 ## Database access
 
-You can acces postgres using pgAdmin on http://localhost:5050/
+You can acces postgres using pgAdmin on http://localhost:5050/ with username and password defined in `application.yml`
