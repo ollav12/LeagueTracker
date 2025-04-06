@@ -19,7 +19,7 @@ export default {
 </script>
 <style>
 .home {
-  background-color: #5383e9;
+  background-color: #1b5850;
   position: fixed;
   width: 100%;
   height: 100%;

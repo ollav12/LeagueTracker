@@ -1,51 +1,29 @@
 <template>
   <header>
     <nav>
-      <!-- Back to Home Button -->
-      <button class="home-button" @click="goHome">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          height="24px"
-          viewBox="0 -960 960 960"
-          width="24px"
-          fill="#5f6368"
-        >
-          <path
-            d="M160-120v-375l-72 55-48-64 440-336 440 336-48 63-72-54v375H160Zm160-240q-17 0-28.5-11.5T280-400q0-17 11.5-28.5T320-440q17 0 28.5 11.5T360-400q0 17-11.5 28.5T320-360Zm160 0q-17 0-28.5-11.5T440-400q0-17 11.5-28.5T480-440q17 0 28.5 11.5T520-400q0 17-11.5 28.5T480-360Zm160 0q-17 0-28.5-11.5T600-400q0-17 11.5-28.5T640-440q17 0 28.5 11.5T680-400q0 17-11.5 28.5T640-360Z"
-          />
-        </svg>
-      </button>
-
-      <!-- Search Form -->
-      <div class="searchForm">
-        <SearchForm @formSubmit="handleFormSubmit" />
+      <!-- Left-aligned group -->
+      <div class="nav-group nav-left">
+        <button class="nav-button home-button" @click="goHome">
+          LeagueIndex.GG
+        </button>
+        <button class="nav-button" @click="goToChampions">Champions</button>
       </div>
 
-      <!-- Dark Mode Toggle Button -->
-      <button id="theme-switch" @click="toggleDarkMode">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          height="24px"
-          viewBox="0 -960 960 960"
-          width="24px"
-          fill="#5f6368"
-        >
-          <path
-            d="M480-280q-83 0-141.5-58.5T280-480q0-83 58.5-141.5T480-680q83 0 141.5 58.5T680-480q0 83-58.5 141.5T480-280ZM200-440H40v-80h160v80Zm720 0H760v-80h160v80ZM440-760v-160h80v160h-80Zm0 720v-160h80v160h-80ZM256-650l-101-97 57-59 96 100-52 56Zm492 496-97-101 53-55 101 97-57 59Zm-98-550 97-101 59 57-100 96-56-52ZM154-212l101-97 55 53-97 101-59-57Z"
-          />
-        </svg>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          height="24px"
-          viewBox="0 -960 960 960"
-          width="24px"
-          fill="#5f6368"
-        >
-          <path
-            d="M480-120q-150 0-255-105T120-480q0-150 105-255t255-105q14 0 27.5 1t26.5 3q-41 29-65.5 75.5T444-660q0 90 63 153t153 63q55 0 101-24.5t75-65.5q2 13 3 26.5t1 27.5q0 150-105 255T480-120Z"
-          />
-        </svg>
-      </button>
+      <!-- Middle-aligned group (Search Form) -->
+      <div class="nav-group nav-middle">
+        <div class="searchForm">
+          <SearchForm :layout="'Default'" @formSubmit="handleFormSubmit" />
+        </div>
+      </div>
+
+      <!-- Right-aligned group -->
+      <div class="nav-group nav-right">
+        <button class="nav-button" @click="goToLeaderboards">
+          Leaderboards
+        </button>
+        <button class="nav-button" @click="goToStats">Stats</button>
+        <button class="nav-button" @click="goToAbout">About</button>
+      </div>
     </nav>
   </header>
 </template>
@@ -61,6 +39,18 @@ export default {
   methods: {
     goHome() {
       this.$router.push("/");
+    },
+    goToChampions() {
+      this.$router.push("/champions");
+    },
+    goToLeaderboards() {
+      this.$router.push("/leaderboards");
+    },
+    goToStats() {
+      this.$router.push("/stats");
+    },
+    goToAbout() {
+      this.$router.push("/about");
     },
     toggleDarkMode() {
       this.toggle = !this.toggle;
@@ -149,31 +139,67 @@ body {
 }
 
 nav {
-  position: relative !important; /* Force fixed positioning */
+  position: relative !important;
   width: 100%;
   height: 60px;
-  background-color: #5383e9;
+  background-color: #1b5850;
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 0px 30px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* Home Button */
-.home-button svg {
-  background: none;
-  border: none;
-  cursor: pointer;
+.nav-group {
   display: flex;
   align-items: center;
-  color: var(--button-color);
-  background-color: #5383e9;
+}
+
+.nav-left {
+  justify-content: flex-start;
+  gap: 20px;
+  width: 25%;
+}
+
+.nav-middle {
+  justify-content: center;
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.nav-right {
+  justify-content: flex-end;
+  gap: 20px;
+  width: 25%;
+}
+
+.searchForm {
+  width: 400px;
+  margin: 0 auto; /* Centers horizontally */
+  display: flex;
+  justify-content: center;
+}
+
+.nav-button {
+  background: transparent;
   border: none;
-  fill: var(--button-color);
+  cursor: pointer;
+  font-size: 30px;
+  font-family: "Roboto";
+  color: white;
+  font-weight: 500;
+  padding: 8px 12px;
+  transition: all 0.2s ease;
+  position: relative;
+  border-bottom: 3px solid transparent;
+}
+
+.nav-button:hover {
+  opacity: 0.9;
+  border-bottom: 3px solid #43b49b;
 }
 
 .home-button {
-  border: none;
+  font-weight: 600;
 }
 </style>
