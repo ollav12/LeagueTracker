@@ -362,7 +362,7 @@ export default {
   font-size: 14px;
   font-weight: 700;
   line-height: 20px;
-  color: rgb(195, 203, 209);
+  color: white;
   text-align: right;
   padding-left: 173px;
 }
@@ -384,7 +384,7 @@ export default {
   text-align: center;
   padding: 0;
   width: 332px;
-  border-top: 1px solid #edeef2;
+  border-top: 1px solid #34333B;
   margin: 0;
   /* Add this to match the table's left margin */
   margin-left: -16px;
@@ -393,9 +393,9 @@ export default {
 /* Update button styles */
 .view-all-button {
   font-family: "Roboto";
-  color: rgb(117, 133, 146);
+  color: white;
   font-size: 12px;
-  background-color: #f7f7f9; /* Light gray background */
+  background-color: #34333B; /* Light gray background */
   border: none;
   cursor: pointer;
   padding: 0;
@@ -430,7 +430,7 @@ export default {
   font-size: 11px;
   line-height: 16px;
   font-weight: 400;
-  color: rgb(32, 45, 55);
+  color: white;
 }
 
 /* Center the icon column */
@@ -463,9 +463,9 @@ export default {
   font-weight: 700;
   font-size: 11px;
   line-height: 14px;
-  color: rgb(154, 164, 175); /* Slightly darker for better contrast on grey */
+  color: white; /* Slightly darker for better contrast on grey */
   padding: 0px 4px; /* Padding inside the box */
-  background-color: #eceff4; /* Light grey background */
+  background-color: #34333B; /* Light grey background */
   border-radius: 2px; /* Rounded corners */
   display: inline-block; /* Ensure the background only wraps the text */
   margin-left: 8px; /* Space from the left edge */
@@ -476,14 +476,14 @@ export default {
 .ranks-table th.title-tier,
 .ranks-table th.title-lp {
   font-size: 12px;
-  color: rgb(32, 45, 55);
+  color: white;
   font-weight: 400;
   line-height: 16px;
   padding-bottom: 5px;
 }
 
 .ranks-table thead {
-  border-bottom: 1px solid #edeef2;
+  border-bottom: 1px solid #34333B;
 }
 
 .tier-row {
@@ -491,7 +491,7 @@ export default {
   font-weight: 400;
   font-size: 12px;
   line-height: 16px;
-  color: rgb(117, 133, 146);
+  color: white;
   text-align: left;
   padding-left: 20px;
 }
@@ -501,7 +501,7 @@ export default {
   font-weight: 400px;
   font-size: 12px;
   line-height: 16px;
-  color: rgb(117, 133, 146);
+  color: white;
   text-align: right;
   padding-right: 10px;
 }
@@ -530,7 +530,7 @@ export default {
   position: relative;
   margin-left: -16px;
   margin-bottom: 0px;
-  background-color: white;
+  background-color: #34333B;
   margin-top: -5px;
 }
 
@@ -547,25 +547,13 @@ export default {
   object-fit: contain;
 }
 
-.queue-nav {
-  display: flex;
-  background-color: white;
-  border-radius: 8px;
-  margin-bottom: 0;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  position: relative;
-  height: 44px;
-  width: 1080px;
-  margin-bottom: 8px;
-  margin-top: -17px;
-}
 
 .queue-nav-item {
   background: none;
   border: none;
   padding: 0 12px;
   font-size: 14px;
-  color: #777;
+  color: black;
   cursor: pointer;
   height: 100%;
   position: relative;
@@ -585,11 +573,11 @@ export default {
   left: 0;
   width: 100%;
   height: 2px;
-  background-color: #ddd;
+  background-color: black;
 }
 
 .queue-nav-item.active {
-  color: #4f84ea;
+  color: black;
   font-weight: 700;
 }
 
@@ -600,7 +588,7 @@ export default {
   left: 0;
   width: 100%;
   height: 2px;
-  background-color: #4f84ea;
+  background-color: black;
 }
 
 .queue-dropdown {
@@ -625,17 +613,6 @@ export default {
   left: 0;
 }
 
-.dropdown-content a {
-  color: #777;
-  padding: 12px 16px;
-  text-decoration: none;
-  display: block;
-  font-size: 14px;
-}
-
-.dropdown-content a:hover {
-  background-color: #f7f7f9;
-}
 
 .queue-dropdown:hover .dropdown-content {
   display: block;
@@ -704,7 +681,7 @@ export default {
 
 .win-percent {
   font-size: 12px;
-  color: rgb(154, 164, 175);
+  color: white;
   margin: 0 0 4px 0;
   font-weight: 400;
   line-height: 16px;
@@ -712,14 +689,14 @@ export default {
 
 .win-loss-text {
   font-size: 12px;
-  color: rgb(154, 164, 175);
+  color: white;
   font-weight: 400;
   line-height: 26px;
 }
 
 .lp-text {
   font-family: "Roboto";
-  color: rgb(117, 133, 146);
+  color: white;
   font-size: 12px;
   line-height: 16px;
   font-weight: 400;
@@ -728,7 +705,6 @@ export default {
 .rank-history-container {
   width: auto;
   height: auto;
-  background-color: #edeef2; /* Grey background */
   border-radius: 0px;
   margin-bottom: 20px;
   padding: 24px;
@@ -746,8 +722,8 @@ export default {
   margin-bottom: 1px;
   font-size: 14px;
   font-weight: 400;
-  color: rgb(32, 45, 55);
-  background-color: white;
+  color: white;
+  background-color: #34333B;
   width: 332px;
   height: 30px;
   border-radius: 4px 4px 0 0;
@@ -766,10 +742,9 @@ export default {
   align-items: flex-start;
   margin-bottom: 16px;
   font-weight: 700;
-  background-color: white;
+  background-color: #34333B;
   border-radius: 0px;
   padding: 16px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   width: 332px;
   height: auto; /* Change from fixed height to auto */
 }
@@ -793,7 +768,7 @@ export default {
   border-radius: 50%;
   overflow: hidden;
   margin-right: 20px;
-  background-color: #f7f7f9;
+  background-color: #1B5850;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -817,7 +792,7 @@ export default {
   line-height: 28px;
   margin: 0;
   font-weight: 700;
-  color: #202a38;
+  color: white;
   white-space: nowrap;
   margin-right: 50px;
   flex-shrink: 0;

@@ -1,13 +1,33 @@
 <template>
   <div class="match-history">
-    <!-- Header section -->
+    <!-- Header section with integrated queue filter -->
     <div class="match-history-header">
-      <h3 class="history-title">Recent Games</h3>
-      <div class="match-stats" v-if="summary.stats">
-        <span class="total-games">{{ filteredMatches.length }}G</span>
-        <span class="wins">{{ stats.wins }}W</span>
-        <span class="losses">{{ stats.losses }}L</span>
-        <span class="win-rate">{{ stats.winRate }}% WR</span>
+      <div class="header-left">
+        <h3 class="history-title">Recent Games</h3>
+        <div class="match-stats" v-if="summary.stats">
+          <span class="total-games">{{ filteredMatches.length }}G</span>
+          <span class="wins">{{ stats.wins }}W</span>
+          <span class="losses">{{ stats.losses }}L</span>
+          <span class="win-rate">{{ stats.winRate }}% WR</span>
+        </div>
+      </div>
+
+      <!-- Add queue filter dropdown -->
+      <div class="queue-filter">
+        <div class="queue-selector" @click="toggleDropdown">
+          {{ getActiveQueueName() }} <span class="dropdown-arrow">▼</span>
+        </div>
+        <div class="queue-dropdown" v-if="dropdownOpen">
+          <div
+            v-for="queue in queueTypes"
+            :key="queue.id"
+            class="queue-option"
+            :class="{ active: activeQueue === queue.id }"
+            @click="selectQueue(queue.id)"
+          >
+            {{ queue.name }}
+          </div>
+        </div>
       </div>
     </div>
 
@@ -39,51 +59,74 @@
             </div>
           </div>
 
-          <!-- Middle - Players -->
-          <div class="teams-preview">
-            <div class="team-column">
-              <!-- Blue team -->
-              <div
-                v-for="role in ['TOP', 'JUNGLE', 'MIDDLE', 'BOTTOM', 'UTILITY']"
-                :key="role"
-                class="player-preview"
-              >
+          <!-- Middle section - can add additional info here if needed -->
+          <div class="match-middle-info">
+            <!-- Player champion and stats could go here -->
+            <div class="champion-info">
+              <img
+                :src="getChampionIcon(getPlayerStats(match).championId)"
+                class="champion-icon"
+                :alt="getChampionName(getPlayerStats(match).championId)"
+              />
+              <div class="player-stats-summary">
+                <div class="kda-text">
+                  {{ getPlayerStats(match).kills }}/{{
+                    getPlayerStats(match).deaths
+                  }}/{{ getPlayerStats(match).assists }}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right side - Modified Champion Icons Layout -->
+          <div class="teams-icons-container">
+            <!-- Both teams side by side -->
+            <div class="teams-icons-row">
+              <!-- Blue team icons -->
+              <div class="team-icons blue-team">
                 <img
+                  v-for="role in [
+                    'TOP',
+                    'JUNGLE',
+                    'MIDDLE',
+                    'BOTTOM',
+                    'UTILITY',
+                  ]"
+                  :key="'blue-' + role"
                   :src="
                     getChampionIcon(
                       getPlayerByRole(match, 100, role).championId
                     )
                   "
                   class="preview-champion-icon"
+                  :alt="role"
                 />
-                <span class="preview-name">{{
-                  getPlayerByRole(match, 100, role).summonerName
-                }}</span>
               </div>
-            </div>
-            <div class="team-column">
-              <!-- Red team -->
-              <div
-                v-for="role in ['TOP', 'JUNGLE', 'MIDDLE', 'BOTTOM', 'UTILITY']"
-                :key="role"
-                class="player-preview"
-              >
+
+              <!-- Red team icons -->
+              <div class="team-icons red-team">
                 <img
+                  v-for="role in [
+                    'TOP',
+                    'JUNGLE',
+                    'MIDDLE',
+                    'BOTTOM',
+                    'UTILITY',
+                  ]"
+                  :key="'red-' + role"
                   :src="
                     getChampionIcon(
                       getPlayerByRole(match, 200, role).championId
                     )
                   "
                   class="preview-champion-icon"
+                  :alt="role"
                 />
-                <span class="preview-name">{{
-                  getPlayerByRole(match, 200, role).summonerName
-                }}</span>
               </div>
             </div>
           </div>
 
-          <!-- Right side - Expand button -->
+          <!-- Expand button -->
           <button
             class="expand-button"
             :class="{
@@ -200,6 +243,15 @@ export default {
     return {
       displayLimit: 20,
       expandedMatches: new Set(), // Track which matches are expanded
+      dropdownOpen: false, // Add this for dropdown state
+      queueTypes: [
+        { id: "all", name: "All Games" },
+        { id: "solo", name: "Solo/Duo" },
+        { id: "flex", name: "Flex 5v5" },
+        { id: "aram", name: "ARAM" },
+        { id: "normal-draft", name: "Normal Draft" },
+        { id: "normal-blind", name: "Normal Blind" },
+      ],
     };
   },
 
@@ -396,6 +448,37 @@ export default {
         }
       );
     },
+
+    // Add these new methods for the queue filter
+    toggleDropdown() {
+      this.dropdownOpen = !this.dropdownOpen;
+    },
+
+    selectQueue(queueId) {
+      const queueFilterStore = useQueueFilterStore();
+      queueFilterStore.setActiveQueue(queueId);
+      this.dropdownOpen = false;
+    },
+
+    getActiveQueueName() {
+      const queue = this.queueTypes.find((q) => q.id === this.activeQueue);
+      return queue ? queue.name : "All Games";
+    },
+
+    // Close dropdown when clicking elsewhere
+    closeDropdownOutside(event) {
+      if (!this.$el.querySelector(".queue-filter")?.contains(event.target)) {
+        this.dropdownOpen = false;
+      }
+    },
+  },
+
+  // Add mounted/unmounted hooks to handle dropdown clicks outside
+  mounted() {
+    document.addEventListener("click", this.closeDropdownOutside);
+  },
+  beforeUnmount() {
+    document.removeEventListener("click", this.closeDropdownOutside);
   },
 };
 </script>
@@ -419,7 +502,7 @@ export default {
 .champion-name {
   font-size: 14px;
   font-weight: 500;
-  color: #202d37;
+  color: white;
 }
 
 .match-history {
@@ -429,28 +512,89 @@ export default {
 
 .match-history-header {
   display: flex;
-  align-items: left;
-  background-color: white;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #34333b;
   border-radius: 4px;
   padding: 10px 16px;
   margin-bottom: 5px;
-  height: 170px;
+  height: auto; /* Changed from fixed height */
   width: 740px;
+  color: white;
 }
 
-.history-title {
-  font-size: 14px;
-  font-weight: 400;
-  color: #202a38;
-  margin: 0;
-  padding-right: 100px;
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 95px;
+}
+
+/* Queue filter styles */
+.queue-filter {
+  position: relative;
+}
+
+.queue-selector {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  padding: 4px 8px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  font-size: 12px;
+  color: white;
+  transition: all 0.2s ease;
+  min-width: 120px;
+}
+
+.queue-selector:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.dropdown-arrow {
+  font-size: 8px;
+  color: white;
+  margin-left: auto;
+}
+
+.queue-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  width: 160px;
+  background-color: white;
+  border-radius: 4px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+  margin-top: 4px;
+  overflow: hidden;
+}
+
+.queue-option {
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-size: 12px;
+  color: #34333b;
+}
+
+.queue-option:hover {
+  background-color: rgba(67, 180, 155, 0.1);
+}
+
+.queue-option.active {
+  background-color: #43b49b;
+  color: white;
 }
 
 .match-stats {
   display: flex;
   gap: 10px;
   font-size: 12px;
-  color: #758592;
+  color: white;
+  margin-top: -8px;
+  margin-left: -8px;
 }
 
 .wins {
@@ -469,18 +613,18 @@ export default {
 
 .match-card {
   border-radius: 4px;
-  margin-bottom: 8px;
+  margin-bottom: 2px;
   background-color: white;
 }
 
 .match-card.win {
-  border-left: 6px solid #5782ea;
-  background-color: #ecf2ff;
+  border-left: 6px solid #43b49b;
+  background-color: #43b49b;
 }
 
 .match-card.loss {
-  border-left: 6px solid #ea4156;
-  background-color: #fff0f3;
+  border-left: 6px solid #e15656;
+  background-color: #e15656;
 }
 
 .match-card.expanded {
@@ -497,19 +641,28 @@ export default {
 .match-info {
   width: 130px;
   padding-right: 12px;
-  border-right: 1px solid rgba(0, 0, 0, 0.1);
+  border-right: 1px solid white;
 }
 
-.game-type {
+.win .game-type {
   font-size: 12px;
-  color: #758592;
+  color: #1b5850;
   margin-bottom: 4px;
+  font-weight: 700;
+}
+
+.loss .game-type {
+  font-size: 12px;
+  color: #5e3838;
+  margin-bottom: 4px;
+  font-weight: 700;
 }
 
 .time-ago {
   font-size: 11px;
-  color: #9aa4af;
+  color: white;
   margin-top: 2px;
+  font-weight: 400;
 }
 
 .game-result {
@@ -519,17 +672,56 @@ export default {
 }
 
 .win .game-result {
-  color: #5383e8;
+  color: #1b5850;
 }
 
 .loss .game-result {
-  color: #e84057;
+  color: #5e3838;
 }
 
 .game-duration {
   font-size: 11px;
-  color: #9aa4af;
+  color: white;
   margin-top: 2px;
+}
+
+/* Middle section style */
+.match-middle-info {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  padding-left: 15px;
+}
+
+/* Champion icon styles */
+.champion-icon {
+  width: 40px;
+  height: 40px;
+  border: 1px solid #d2d2d2;
+}
+
+/* New styles for the teams icons section */
+.teams-icons-container {
+  margin-right: 50px; /* 50px padding from right */
+  padding: 5px; /* 5px padding overall */
+}
+
+.teams-icons-row {
+  display: flex;
+  gap: 2px; /* 2px padding between teams */
+}
+
+.team-icons {
+  display: flex;
+  flex-direction: column;
+  gap: 2px; /* 2px padding between icons */
+}
+
+.preview-champion-icon {
+  width: 20px;
+  height: 20px;
+  /* Border radius removed to make icons square */
+  object-fit: cover;
 }
 
 .teams-preview {
@@ -559,7 +751,7 @@ export default {
 
 .preview-name {
   font-size: 12px;
-  color: #758592;
+  color: white;
 }
 
 .expand-button {
@@ -579,11 +771,11 @@ export default {
 }
 
 .expand-button.win {
-  background-color: #4b73d6;
+  background-color: #34333b;
 }
 
 .expand-button.loss {
-  background-color: #d63d52;
+  background-color: #34333b;
 }
 
 /* Remove the hover effect */
@@ -593,7 +785,7 @@ export default {
 
 .match-details {
   border-top: 1px solid rgba(0, 0, 0, 0.1);
-  padding: 16px;
+  padding: 12px;
 }
 
 .teams-container {
@@ -604,7 +796,7 @@ export default {
 
 .team h4 {
   margin: 0 0 8px 0;
-  color: #758592;
+  color: white;
   font-size: 14px;
 }
 
@@ -636,7 +828,7 @@ export default {
 .player-name {
   font-size: 12px;
   font-weight: 500;
-  color: #202d37;
+  color: white;
 }
 
 .player-stats {
@@ -645,7 +837,7 @@ export default {
   gap: 12px;
   margin-left: auto;
   font-size: 12px;
-  color: #758592;
+  color: white;
 }
 
 .player-items {
@@ -661,26 +853,8 @@ export default {
   margin-right: 2px;
 }
 
-.show-more-button {
-  width: 740px; /* Match your other elements for now */
-  /* Later you can change to 100% when other elements are fixed */
-  height: 40px;
-  margin-top: 10px;
-  background-color: white;
-  color: rgb(32, 45, 55);
-  font-family: "Roboto";
-  font-size: 14px;
-  line-height: 20px;
-  border: 1px solid #e0e0e2;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: 400;
-  text-align: center;
-  display: block;
-}
-
 .placeholder {
-  background-color: #eaeaea;
+  background-color: white;
   border-radius: 50%;
   width: 32px;
   height: 32px;
@@ -689,13 +863,25 @@ export default {
 /* Add this new style */
 .kda {
   margin-left: auto;
-  color: #666;
+  color: white;
   font-size: 14px;
 }
 
 .queue-type {
   font-size: 12px;
-  color: #758592;
+  color: white;
   margin-left: 8px;
+}
+
+.player-stats-summary {
+  display: flex;
+  flex-direction: column;
+  margin-left: 10px;
+}
+
+.kda-text {
+  font-size: 14px;
+  color: white;
+  font-weight: 600;
 }
 </style>

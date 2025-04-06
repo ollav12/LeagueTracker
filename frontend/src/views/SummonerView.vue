@@ -145,16 +145,8 @@ export default {
 </script>
 
 <style scoped>
-.background-all {
-  background-color: #edeef2; /* Changed from white to match the theme */
-  width: 100%;
-  height: 100%;
-  margin: 0 auto;
-  position: relative;
-}
-
 .profile-header {
-  background-color: white; /* Add white background to header */
+  background-color: #43b49b; /* Add white background to header */
   display: flex;
   align-items: top;
   margin-bottom: 0; /* Changed from 50px to 0 */
@@ -208,27 +200,28 @@ export default {
   font-weight: 700;
   line-height: 28px;
   padding-bottom: 2px;
-  color: rgb(32, 45, 55);
+  font-family: "roboto";
+  color: white;
 }
 
 .tag {
   font-size: 24px;
   line-height: 28px;
   font-weight: 400;
-  color: rgb(117, 133, 146);
+  color: #1b5850;
 }
 
 .ladder-rank {
   margin: 0;
   font-size: 12px;
   line-height: 16px;
-  color: rgb(117, 133, 146);
+  color: white;
   font-weight: 400;
 }
 
 .update-button {
   margin-top: 8px;
-  background-color: #5383e9;
+  background-color: #1b5850;
   color: white;
   border: none;
   border-radius: 3px;
@@ -262,12 +255,11 @@ export default {
 }
 
 .profile-nav {
-  background-color: white; /* Add white background to nav */
+  background-color: #43b49b; /* Add white background to nav */
   position: relative;
   z-index: 1;
   padding: 4px 0 4px 400px;
-  border-top: 1px solid #e9e9e9;
-  border-bottom: 1px solid #e9e9e9;
+  border-top: 1px solid #1b5850;
   display: flex;
   flex-wrap: nowrap;
   margin-top: 0; /* Ensure no gap */
@@ -321,7 +313,7 @@ export default {
 }
 
 .tab-content {
-  background-color: #edeef2;
+  background-color: #1b5850;
   padding-top: 0;
   width: 100%;
   min-height: calc(100vh - 200px); /* Ensure background extends to bottom */

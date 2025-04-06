@@ -1,32 +1,5 @@
 <template>
   <div class="summary-container">
-    <div class="queue-nav">
-      <button
-        v-for="queue in queueTypes"
-        :key="queue.id"
-        class="queue-nav-item"
-        :class="{ active: activeQueue === queue.id }"
-        @click="setQueue(queue.id)"
-      >
-        {{ queue.name }}
-      </button>
-      <div class="queue-dropdown">
-        <button class="queue-nav-item">
-          QueueType <span class="dropdown-arrow">▼</span>
-        </button>
-        <div class="dropdown-content">
-          <a
-            v-for="queue in dropdownQueues"
-            :key="queue.id"
-            href="#"
-            @click.prevent="setQueue(queue.id)"
-          >
-            {{ queue.name }}
-          </a>
-        </div>
-      </div>
-    </div>
-
     <div class="content-container">
       <div class="rank-container">
         <RankHistory v-if="summonerLoaded" />
@@ -42,7 +15,6 @@
 <script>
 import { storeToRefs } from "pinia";
 import { useSummonerStore } from "@/stores/modules/summoner";
-import { useQueueFilterStore } from "@/stores/modules/queueFilter";
 import RankHistory from "@/components/Summoner/RankHistory.vue";
 import MatchHistory from "@/components/Summoner/MatchHistory.vue";
 import { watch, onMounted } from "vue";
@@ -53,10 +25,7 @@ export default {
 
   setup() {
     const summonerStore = useSummonerStore();
-    const queueFilterStore = useQueueFilterStore();
-
     const { summonerLoaded } = storeToRefs(summonerStore);
-    const { activeQueue } = storeToRefs(queueFilterStore);
 
     // Watch for changes in summonerLoaded
     watch(
@@ -70,30 +39,9 @@ export default {
       { immediate: true }
     ); // Add immediate: true to run on component mount
 
-    const queueTypes = [
-      { id: "all", name: "All" },
-      { id: "solo", name: "Ranked Solo/Duo" },
-      { id: "flex", name: "Ranked Flex" },
-      { id: "aram", name: "Aram" },
-    ];
-
-    const dropdownQueues = [
-      { id: "normal-draft", name: "Normal Draft" },
-      { id: "normal-blind", name: "Normal Blind" },
-      { id: "clash", name: "Clash" },
-    ];
-
-    const setQueue = (queueId) => {
-      queueFilterStore.setActiveQueue(queueId);
-    };
-
     return {
       summonerStore, // Return the whole store
       summonerLoaded,
-      activeQueue,
-      queueTypes,
-      dropdownQueues,
-      setQueue,
     };
   },
 };

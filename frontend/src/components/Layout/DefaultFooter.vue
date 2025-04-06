@@ -20,8 +20,8 @@ export default {
 .policy-text {
   position: relative;
   font-size: small;
-  color: #b1b6bc;
+  color: #FFFF;
   text-align: center;
-  background-color: #edeef2;
+  background-color: #1b5850;
 }
 </style>
