@@ -2,7 +2,7 @@ package com.leaguetracker.app.service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.deser.DataFormatReaders.Match;
 import com.leaguetracker.app.config.EnvConfig;
 import com.leaguetracker.app.dto.MatchDto;
 import com.leaguetracker.app.dto.MatchListDto;
@@ -85,10 +86,74 @@ public class MatchService {
         }
     }
 
+    /**
+     * Get matches by matchIds, retrieving from database first when available
+     * 
+     * @param region   Region of the matches
+     * @param matchIds List of match IDs to retrieve
+     * @return List of match data
+     */
     public List<MatchDto> getMatches(String region, List<String> matchIds) {
-        return matchIds.stream()
-                .map(matchId -> riotService.Match.findByMatchId(matchId, region))
-                .collect(Collectors.toList());
+        List<MatchDto> matches = new ArrayList<>();
+
+        for (String matchId : matchIds) {
+            // Try to find match in local repository first
+            SummonerMatch existingMatch = matchRepository.findByMatchId(matchId);
+
+            if (existingMatch != null) {
+                // Match exists in database, convert entity to DTO
+                try {
+                    // Create a JSON structure that maps to MatchDto
+                    StringBuilder jsonBuilder = new StringBuilder();
+                    jsonBuilder.append("{");
+                    jsonBuilder.append("\"metadata\": ").append(existingMatch.getMetadataJson()).append(",");
+                    jsonBuilder.append("\"info\": ").append(existingMatch.getInfoJson());
+                    jsonBuilder.append("}");
+
+                    // Convert the combined JSON to MatchDto
+                    MatchDto matchDto = objectMapper.readValue(jsonBuilder.toString(), MatchDto.class);
+                    matches.add(matchDto);
+                    System.out.println("Retrieved match from database: " + matchId);
+                } catch (Exception e) {
+                    System.err.println("Error parsing match data from database: " + e.getMessage());
+                    // If parsing fails, fetch from API as fallback
+                    fetchAndSaveMatch(matchId, region, matches);
+                }
+            } else {
+                // Match not in database, fetch from API and save
+                fetchAndSaveMatch(matchId, region, matches);
+            }
+        }
+
+        return matches;
+    }
+
+    /**
+     * Helper method to fetch match from API and save to database
+     */
+    private void fetchAndSaveMatch(String matchId, String region, List<MatchDto> matches) {
+        try {
+            MatchDto matchDto = riotService.Match.findByMatchId(matchId, region);
+            if (matchDto != null) {
+                matches.add(matchDto);
+
+                // Save to database for future requests
+                SummonerMatch matchEntity = new SummonerMatch();
+                matchEntity.setMatchId(matchId);
+
+                // Extract metadata and info separately
+                String metadataJson = objectMapper.writeValueAsString(matchDto.metadata());
+                String infoJson = objectMapper.writeValueAsString(matchDto.info());
+
+                matchEntity.setMetadataJson(metadataJson);
+                matchEntity.setInfoJson(infoJson);
+
+                matchRepository.save(matchEntity);
+                System.out.println("Fetched and saved match to database: " + matchId);
+            }
+        } catch (Exception e) {
+            System.err.println("Error fetching match from API: " + matchId + ", " + e.getMessage());
+        }
     }
 
     /**

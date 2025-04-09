@@ -129,7 +129,6 @@ export const useSummonerStore = defineStore("summoner", {
         this.summary.moreMatchesToFetch = true;
 
         this.summoner.loaded = false;
-
         const response = await instance.get(
           `summoners/${region}/${summoner}-${tag}`
         );

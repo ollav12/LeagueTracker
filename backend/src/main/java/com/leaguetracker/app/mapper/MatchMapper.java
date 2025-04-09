@@ -62,7 +62,7 @@ public class MatchMapper implements Function<String, MatchDto> {
                     infoNode.path("platformId").asText(),
                     infoNode.path("queueId").asInt(),
                     parseTeams(infoNode.path("teams")),
-                    Optional.ofNullable(infoNode.path("tournamentCode").asText(null)));
+                    null);
 
             return new MatchDto(metadataDto, infoDto);
         } catch (Exception e) {
