@@ -1,8 +1,9 @@
-# LeagueTracker
+# LeagueIndex
 
-LeagueTracker is a website that can be used to gather insightful data & statistics about a user's league of legends account. By accessing the riot games api, we can get tons of useful data, that we can convert into presentable and usefull data for the end user.
+LeagueIndex is a website that can be used to gather insightful data & statistics about a user's league of legends account. By accessing the riot games api, we can get tons of useful data, that we can convert into presentable and usefull data for the end user.
 
-![image](https://github.com/user-attachments/assets/98380adf-8ebb-44fb-9f1a-9dc1945565a1)
+![image](https://github.com/user-attachments/assets/edea9259-b927-419b-9473-fe3d17d8a873)
+
 
 
 ## Table of Contents
