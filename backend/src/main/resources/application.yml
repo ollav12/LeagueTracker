@@ -12,14 +12,21 @@ spring:
     url: jdbc:postgresql://prod-db:5432/prod_database
     username: user
     password: password
-    driver-class-name: org.postgresql.Driver # Correct driver class
+    driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
       ddl-auto: validate
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect # Correct dialect for PostgreSQL
+        dialect: org.hibernate.dialect.PostgreSQLDialect
         "[format_sql]": true
+  data:
+    redis:
+      host: redis-prod
+      port: 6379
+      password: your-prod-password
+      timeout: 2000
+      connect-timeout: 2000
 logging:
   level:
     "[org.springframework]": INFO
@@ -34,7 +41,7 @@ spring:
     url: jdbc:postgresql://localhost:5432/leaguetracker
     username: user
     password: password
-    driver-class-name: org.postgresql.Driver # Correct driver class
+    driver-class-name: org.postgresql.Driver
   jpa:
     show-sql: true
     hibernate:
@@ -42,7 +49,14 @@ spring:
     properties:
       hibernate:
         "[format_sql]": true
-        dialect: org.hibernate.dialect.PostgreSQLDialect # Correct dialect for PostgreSQL
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      # No password for local development
+      timeout: 2000
+      connect-timeout: 2000
 logging:
   level:
     "[org.springframework]": INFO
@@ -63,6 +77,12 @@ spring:
   jpa:
     hibernate:
       ddl-auto: create-drop
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      # Using test containers for Redis in test environment
+      timeout: 1000
 logging:
   level:
     "[org.springframework]": INFO
