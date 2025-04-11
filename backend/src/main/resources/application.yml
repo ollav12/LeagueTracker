@@ -43,7 +43,7 @@ spring:
     password: password
     driver-class-name: org.postgresql.Driver
   jpa:
-    show-sql: true
+    show-sql: false
     hibernate:
       ddl-auto: create-drop
     properties:
@@ -57,12 +57,24 @@ spring:
       # No password for local development
       timeout: 2000
       connect-timeout: 2000
+  # Enable cache debugging
+  cache:
+    type: redis
+    redis:
+      time-to-live: 86400000 # 24 hours in milliseconds
+      cache-null-values: false
+
 logging:
   level:
-    "[org.springframework]": INFO
     root: INFO
-    "[org.hibernate.SQL]": DEBUG
-    "[org.hibernate.type.descriptor.sql.BasicBinder]": TRACE
+    "[org.hibernate.SQL]": OFF
+    "[org.hibernate.type.descriptor.sql.BasicBinder]": WARN
+    # Redis and cache logging
+    "[org.springframework.data.redis]": DEBUG
+    "[org.springframework.cache]": TRACE
+    "[io.lettuce.core]": DEBUG
+    "[com.leaguetracker.app]": DEBUG
+    "[org.springframework.boot.autoconfigure.cache]": DEBUG
 
 ---
 spring:

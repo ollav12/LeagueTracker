@@ -205,7 +205,6 @@ public class MatchService {
         while (shouldContinueFetching) {
             List<MatchListDto> newMatchList = riotService.Match.findByPuuid(puuid, region, start, count);
             System.out.println("FETCHES MATCHES");
-            System.out.println(newMatchList);
             // Proper null and empty checks for List
             if (newMatchList == null || newMatchList.isEmpty()) {
                 saveMatchList(matchList, puuid);

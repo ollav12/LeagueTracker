@@ -3,8 +3,11 @@ package com.leaguetracker.app.service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import com.leaguetracker.app.dto.AccountDto;
@@ -24,19 +27,20 @@ import com.leaguetracker.app.service.riot.RiotService;
 @Service
 public class SummonerService {
     private final SummonerRepository summonerRepository;
-
     private final RiotService riotService;
     private final RankService rankService;
     private final MatchService matchService;
     private final StatsService statsService;
+    private final AccountService accountService;
 
     public SummonerService(SummonerRepository summonerRepository, RiotService riotService, RankService rankService,
-            MatchService matchService, StatsService statsService) {
+            MatchService matchService, StatsService statsService, AccountService accountService) {
         this.summonerRepository = summonerRepository;
         this.rankService = rankService;
         this.riotService = riotService;
         this.matchService = matchService;
         this.statsService = statsService;
+        this.accountService = accountService;
     }
 
     /**
@@ -46,26 +50,25 @@ public class SummonerService {
      * @return summoner response
      */
     public SummonerResponse getSummonerDetails(String summonerName, String region, String tag) {
-        AccountDto account = this.getAccount(region, summonerName, tag);
-        System.out.println("Fetched account form riot api: " + account);
+        AccountDto account = accountService.getAccount(region, summonerName, tag);
 
         if (account != null) {
             SummonerDto summoner = this.getSummoner(account.puuid());
             if (summoner != null) {
-                System.out.println("Retrieved summoner from database: " + summoner);
+                System.out.println("Retrieved summoner from database: ");
 
                 List<LeagueDto> ranked = this.getRanked(summoner.puuid(), region);
 
-                System.out.println("Retrieved ranked data from database: " + ranked);
+                System.out.println("Retrieved ranked data from database: ");
 
                 return SummonerMapper.toResponse(summonerName, tag, summoner, ranked);
             }
             SummonerDto summonerDto = riotService.Summoner.findByPuuid(account.puuid(), region);
-            System.out.println("Fetched summoner from riot api: " + summonerDto);
+            System.out.println("Fetched summoner from riot api: ");
 
             List<LeagueDto> ranked = riotService.League.findBySummonerId(summonerDto.id(), region);
             rankService.saveLeagueDto(ranked);
-            System.out.println("Fetched ranked data from riot api: " + ranked);
+            System.out.println("Fetched ranked data from riot api: ");
 
             // Fetch first 100 matches
             matchService.updateMatchList(account.puuid(), region, MatchListMode.LIGHT);
@@ -111,15 +114,6 @@ public class SummonerService {
     }
 
     /**
-     * Get account by region, summonerName, tag
-     * 
-     * @return AccountDto
-     */
-    public AccountDto getAccount(String region, String summonerName, String tag) {
-        return riotService.Account.findByRiotId(region, summonerName, tag);
-    }
-
-    /**
      * Get summoner ranked data from database
      * 
      * @param summoner
@@ -127,7 +121,7 @@ public class SummonerService {
      */
     public List<LeagueDto> getRanked(String puuid, String region) {
         List<SummonerRank> ranked = rankService.getRankByPuuid(puuid);
-        System.out.println("RANKED: " + ranked);
+        // System.out.println("RANKED: " + ranked);
         return ranked.stream()
                 .map(rank -> new LeagueDto(
                         rank.getLeagueId(),
