@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
-@RequestMapping("/matches")
+@RequestMapping("/api/v1/matches")
 public class MatchesController {
 
     private MatchService matchService;

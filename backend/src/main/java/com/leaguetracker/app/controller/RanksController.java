@@ -18,7 +18,7 @@ import com.leaguetracker.app.service.UpdateService;
 import com.leaguetracker.app.service.UpdateService.UpdateType;
 
 @RestController
-@RequestMapping("/ranks")
+@RequestMapping("/api/v1/ranks")
 public class RanksController {
 
     @Autowired

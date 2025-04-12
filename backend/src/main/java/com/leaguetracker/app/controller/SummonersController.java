@@ -16,13 +16,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.leaguetracker.app.dto.response.SummonerResponse;
-import com.leaguetracker.app.model.MatchList;
 import com.leaguetracker.app.model.Summoner;
 import com.leaguetracker.app.repository.MatchListRepository;
 import com.leaguetracker.app.service.SummonerService;
 
 @RestController
-@RequestMapping("/summoners")
+@RequestMapping("/api/v1/summoners")
 public class SummonersController {
 
     private final SummonerService summonerService;

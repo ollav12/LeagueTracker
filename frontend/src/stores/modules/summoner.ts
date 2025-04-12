@@ -130,7 +130,7 @@ export const useSummonerStore = defineStore("summoner", {
 
         this.summoner.loaded = false;
         const response = await instance.get(
-          `summoners/${region}/${summoner}-${tag}`
+          `/api/v1/summoners/${region}/${summoner}-${tag}`
         );
 
         if (!response.data) {
@@ -178,7 +178,7 @@ export const useSummonerStore = defineStore("summoner", {
       this.summary.matchesLoading = true;
 
       try {
-        const response = await instance.get(`summoners/summary`, {
+        const response = await instance.get(`/api/v1/summoners/summary`, {
           params: {
             puuid: this.summoner.account.puuid,
             region: settingsStore.region,
@@ -219,7 +219,7 @@ export const useSummonerStore = defineStore("summoner", {
 
       try {
         const lastMatch = this.summary.matches[this.summary.matches.length - 1];
-        const response = await instance.get(`summoners/summary`, {
+        const response = await instance.get(`/api/v1/summoners/summary`, {
           params: {
             puuid: this.summoner.account.puuid,
             region: settingsStore.region,
