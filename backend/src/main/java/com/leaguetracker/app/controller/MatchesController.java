@@ -2,11 +2,13 @@ package com.leaguetracker.app.controller;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import com.leaguetracker.app.dto.MatchDto;
 import com.leaguetracker.app.dto.MatchListDto;
@@ -15,26 +17,19 @@ import com.leaguetracker.app.model.SummonerMatch;
 import com.leaguetracker.app.repository.MatchListRepository;
 import com.leaguetracker.app.service.MatchService;
 import com.leaguetracker.app.service.MatchService.MatchListMode;
-import com.leaguetracker.app.service.UpdateService;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
+@Slf4j
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/v1/matches")
 public class MatchesController {
 
-    private MatchService matchService;
-    @Autowired
-    private UpdateService updateService;
-
-    @Autowired
-    private MatchListRepository matchListRepository;
-
-    public MatchesController(MatchService matchService) {
-        this.matchService = matchService;
-    }
+    private final MatchService matchService;
+    private final MatchListRepository matchListRepository;
 
     /**
      * Get a match by matchId
@@ -55,7 +50,7 @@ public class MatchesController {
      * 
      * @return list of matches
      */
-    @GetMapping()
+    @GetMapping
     public ResponseEntity<MatchDto> getMatche(@RequestBody String matchId, @RequestBody String region) {
         return ResponseEntity.ok(matchService.getMatch(matchId, region));
     }

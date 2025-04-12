@@ -2,16 +2,14 @@ package com.leaguetracker.app.service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import lombok.NoArgsConstructor;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.deser.DataFormatReaders.Match;
 import com.leaguetracker.app.config.EnvConfig;
 import com.leaguetracker.app.dto.MatchDto;
 import com.leaguetracker.app.dto.MatchListDto;
@@ -26,11 +24,7 @@ import org.springframework.data.domain.PageRequest;
 @Service
 public class MatchService {
 
-    private final String apiKey;
-    private final RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper objectMapper = new ObjectMapper();
-
-    private static final Logger logger = LoggerFactory.getLogger(MatchService.class);
 
     private final MatchRepository matchRepository;
     private final MatchListRepository matchListRepository;
@@ -41,7 +35,6 @@ public class MatchService {
         this.matchRepository = matchRepository;
         this.riotService = riotService;
         this.matchListRepository = matchListRepository;
-        this.apiKey = envConfig.getApiKey();
     }
 
     /**
@@ -169,7 +162,10 @@ public class MatchService {
         for (MatchListDto match : matchList) {
             try {
                 if (!matchListRepository.existsByPuuidAndMatchId(puuid, match.matchId())) {
-                    MatchList newMatch = new MatchList(puuid, match.matchId());
+                    MatchList newMatch = MatchList.builder()
+                            .puuid(puuid)
+                            .matchId(match.matchId())
+                            .build();
                     matchListRepository.save(newMatch);
                 } else {
                     System.out.println("Match already exists for puuid: " + puuid + ", matchId: " + match.matchId());
@@ -195,7 +191,7 @@ public class MatchService {
         List<MatchList> matchListTemp = matchListRepository.findByPuuid(puuid);
         List<MatchListDto> matchList = new ArrayList<MatchListDto>();
         for (MatchList match : matchListTemp) {
-            matchList.add(new MatchListDto(match.getPuuid(), match.getMatchid()));
+            matchList.add(new MatchListDto(match.getPuuid(), match.getMatchId()));
         }
 
         int start = 0;
@@ -229,7 +225,10 @@ public class MatchService {
 
     public void saveMatches(List<MatchListDto> matchList, String puuid) {
         for (MatchListDto match : matchList) {
-            MatchList newMatch = new MatchList(puuid, match.matchId());
+            MatchList newMatch = MatchList.builder()
+                    .puuid(puuid)
+                    .matchId(match.matchId())
+                    .build();
             matchListRepository.save(newMatch);
         }
     }

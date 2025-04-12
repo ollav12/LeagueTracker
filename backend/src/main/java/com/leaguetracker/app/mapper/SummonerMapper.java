@@ -1,5 +1,6 @@
 package com.leaguetracker.app.mapper;
 
+import java.util.Date;
 import java.util.List;
 import java.util.function.Function;
 
@@ -49,15 +50,17 @@ public class SummonerMapper implements Function<String, SummonerDto> {
     }
 
     public static Summoner toEntity(String region, SummonerResponse summoner) {
-        return new Summoner(
-                summoner.puuid(),
-                summoner.summonerName(),
-                region,
-                summoner.profileIconId(),
-                summoner.summonerLevel(),
-                summoner.revisionDate(),
-                summoner.accountId(),
-                summoner.id(),
-                summoner.tagLine());
+        return Summoner.builder()
+                .puuid(summoner.puuid())
+                .summonerName(summoner.summonerName())
+                .region(region)
+                .profileIconId(summoner.profileIconId())
+                .summonerLevel(summoner.summonerLevel())
+                .revisionDate(summoner.revisionDate())
+                .accountId(summoner.accountId())
+                .id(summoner.id())
+                .tagLine(summoner.tagLine())
+                .lastUpdated(new Date()) // Now explicitly setting the current date
+                .build();
     }
 }

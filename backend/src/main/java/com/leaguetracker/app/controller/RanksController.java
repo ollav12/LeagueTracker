@@ -6,27 +6,30 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import com.leaguetracker.app.model.SummonerRank;
 import com.leaguetracker.app.service.RankService;
 import com.leaguetracker.app.service.UpdateService;
 import com.leaguetracker.app.service.UpdateService.UpdateType;
 
+@Slf4j
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/v1/ranks")
 public class RanksController {
 
-    @Autowired
-    private RankService rankService;
-    @Autowired
-    private UpdateService updateService;
+    private final RankService rankService;
+    private final UpdateService updateService;
 
-    @GetMapping()
+    @GetMapping
     public ResponseEntity<List<SummonerRank>> getRanks() {
         return ResponseEntity.ok(rankService.getRanks());
     }

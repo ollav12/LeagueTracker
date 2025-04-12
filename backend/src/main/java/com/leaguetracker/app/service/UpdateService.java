@@ -37,7 +37,7 @@ public class UpdateService {
 
     public void updateLastUpdatedTime(String puuid, UpdateType type) {
         SummonerUpdate update = summonerUpdateRepository.findById(puuid)
-                .orElse(new SummonerUpdate(puuid));
+                .orElse(SummonerUpdate.builder().puuid(puuid).build());
 
         LocalDateTime now = LocalDateTime.now();
 

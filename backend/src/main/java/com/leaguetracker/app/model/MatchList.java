@@ -7,48 +7,25 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "summoner_matchlist", indexes = {
-        @Index(name = "idx_puuid", columnList = "puuid")
-}, uniqueConstraints = {
-        @UniqueConstraint(name = "uk_puuid_match", columnNames = { "puuid", "match_id" })
-})
+        @Index(name = "idx_puuid", columnList = "puuid") }, uniqueConstraints = {
+                @UniqueConstraint(name = "uk_puuid_match", columnNames = { "puuid", "match_id" })
+        })
 public class MatchList {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String puuid;
-
     private String matchId;
-
-    public MatchList(String puuid, String matchId) {
-        this.puuid = puuid;
-        this.matchId = matchId;
-    }
-
-    public MatchList() {
-
-    }
-
-    public String getPuuid() {
-        return puuid;
-    }
-
-    public String getMatchid() {
-        return matchId;
-    }
-
-    public void setPuuid(String puuid) {
-        this.puuid = puuid;
-    }
-
-    public void setMatchId(String matchId) {
-        this.matchId = matchId;
-    }
-
 }
