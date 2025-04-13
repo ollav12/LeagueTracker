@@ -1,33 +1,30 @@
 package com.leaguetracker.app.service.riot.endpoint;
 
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 
+import lombok.RequiredArgsConstructor;
+
+import com.leaguetracker.app.config.WebClientConfig;
 import com.leaguetracker.app.dto.response.RiotSummonerResponse;
 import com.leaguetracker.app.mapper.RiotSummonerMapper;
 import com.leaguetracker.app.service.riot.RiotRequest;
 
 @Service
+@RequiredArgsConstructor
 public class SummonerEndpoint {
 
-    private final String apiKey;
+    private final WebClient webClient;
+    private final WebClientConfig webClientConfig;
 
-    public SummonerEndpoint(String apiKey) {
-        this.apiKey = apiKey;
-    }
-
-    /**
-     * Fetch summoner by puuid
-     * 
-     * @param puuid
-     * @return
-     */
     public RiotSummonerResponse findByPuuid(String puuid, String region) {
-        String endpoint = "lol/summoner/v4/summoners/by-puuid/" + puuid + "?api_key=";
         RiotRequest<RiotSummonerResponse> request = new RiotRequest<>(
+                RiotEndpoint.SUMMONER_BY_PUUID,
                 region,
-                endpoint,
-                apiKey,
-                RiotSummonerMapper.INSTANCE::toSummonerDto);
+                RiotSummonerMapper.INSTANCE::toSummonerDto,
+                webClientConfig,
+                webClient,
+                puuid);
         return request.execute();
     }
 }

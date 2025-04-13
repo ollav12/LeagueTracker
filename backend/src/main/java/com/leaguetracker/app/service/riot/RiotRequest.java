@@ -1,30 +1,44 @@
 package com.leaguetracker.app.service.riot;
 
 import java.time.Duration;
-import java.util.concurrent.TimeUnit;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.util.retry.Retry;
 
 import java.util.function.Function;
 
+import com.leaguetracker.app.config.WebClientConfig;
+import com.leaguetracker.app.service.riot.endpoint.RiotEndpoint;
+
 public class RiotRequest<T> {
     private static final int MAX_RETRIES = 3;
     private static final int RATE_LIMIT_STATUS = 429;
 
+    private final WebClientConfig webClientConfig;
     private final WebClient webClient;
-    private final String url;
+    private final RiotEndpoint endpoint;
+    private final String region;
     private final Function<String, T> responseMapper;
+    private final Object[] params;
 
-    public RiotRequest(String region, String endpoint, String apiKey, Function<String, T> responseMapper) {
-        this.url = "https://" + region + ".api.riotgames.com/" + endpoint + apiKey;
-        this.webClient = WebClient.create();
+    public RiotRequest(
+            RiotEndpoint endpoint,
+            String region,
+            Function<String, T> responseMapper,
+            WebClientConfig webClientConfig,
+            WebClient webClient,
+            Object... params) {
+        this.endpoint = endpoint;
+        this.region = region;
         this.responseMapper = responseMapper;
+        this.webClientConfig = webClientConfig;
+        this.webClient = webClient;
+        this.params = params;
     }
 
     public T execute() {
         return webClient.get()
-                .uri(url)
+                .uri(webClientConfig.createUrl(endpoint, region, params))
                 .retrieve()
                 .bodyToMono(String.class)
                 .retryWhen(Retry.backoff(MAX_RETRIES, Duration.ofSeconds(1))

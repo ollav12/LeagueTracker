@@ -1,15 +1,13 @@
 package com.leaguetracker.app.service;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
-import com.leaguetracker.app.dto.RiotLeagueEntry;
-import com.leaguetracker.app.dto.RiotLeagueEntry.MiniSeriesDto;
+import lombok.RequiredArgsConstructor;
+
 import com.leaguetracker.app.dto.request.SummonerLookupRequest;
 import com.leaguetracker.app.dto.request.SummonerSummaryRequest;
 import com.leaguetracker.app.dto.MatchDto;
@@ -21,12 +19,12 @@ import com.leaguetracker.app.dto.response.SummonerSummaryResponse;
 import com.leaguetracker.app.mapper.RiotSummonerMapper;
 import com.leaguetracker.app.model.MatchList;
 import com.leaguetracker.app.model.Summoner;
-import com.leaguetracker.app.model.SummonerRank;
 import com.leaguetracker.app.repository.SummonerRepository;
 import com.leaguetracker.app.service.MatchService.MatchListMode;
 import com.leaguetracker.app.service.riot.RiotService;
 
 @Service
+@RequiredArgsConstructor
 public class SummonerService {
     private final SummonerRepository summonerRepository;
     private final RiotService riotService;
@@ -35,22 +33,6 @@ public class SummonerService {
     private final StatsService statsService;
     private final AccountService accountService;
 
-    public SummonerService(SummonerRepository summonerRepository, RiotService riotService, RankService rankService,
-            MatchService matchService, StatsService statsService, AccountService accountService) {
-        this.summonerRepository = summonerRepository;
-        this.rankService = rankService;
-        this.riotService = riotService;
-        this.matchService = matchService;
-        this.statsService = statsService;
-        this.accountService = accountService;
-    }
-
-    /**
-     * Get a summoner
-     * 
-     * @param puuid
-     * @return summoner response
-     */
     public SummonerLookupResponse getSummonerDetails(SummonerLookupRequest request) {
         RiotAccountResponse account = accountService.getAccount(
                 request.region(),
@@ -105,21 +87,10 @@ public class SummonerService {
         return riotSummoner;
     }
 
-    /**
-     * Get account by puuid
-     * 
-     * @return AccountDto
-     */
     public RiotAccountResponse getAccountByPuuid(String puuid, String region) {
         return riotService.Account.findByPuuid(puuid, region);
     }
 
-    /**
-     * Get summary
-     * 
-     * @param summoner
-     * @return
-     */
     public List<MatchList> getSummary(String puuid, String accountId, String region) {
         return matchService.getMatchListByPuuid(puuid);
     }

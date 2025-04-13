@@ -1,40 +1,41 @@
 package com.leaguetracker.app.service.riot.endpoint;
 
-import java.util.List;
-
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 
-import com.leaguetracker.app.dto.RiotLeagueEntry;
+import lombok.RequiredArgsConstructor;
+
+import com.leaguetracker.app.config.WebClientConfig;
 import com.leaguetracker.app.dto.response.RiotLeagueResponse;
 import com.leaguetracker.app.mapper.RiotLeagueMapper;
 import com.leaguetracker.app.service.riot.RiotRequest;
 
 @Service
+@RequiredArgsConstructor
 public class LeagueEndpoint {
 
-    private final String apiKey;
-
-    public LeagueEndpoint(String apiKey) {
-        this.apiKey = apiKey;
-    }
+    private final WebClient webClient;
+    private final WebClientConfig webClientConfig;
 
     public RiotLeagueResponse findByPuuid(String puuid, String region) {
-        String endpoint = "lol/league/v4/entries/by-puuid/" + puuid + "?api_key=";
         RiotRequest<RiotLeagueResponse> request = new RiotRequest<>(
+                RiotEndpoint.LEAGUE_BY_PUUID,
                 region,
-                endpoint,
-                apiKey,
-                RiotLeagueMapper.INSTANCE::toRiotLeagueResponse);
+                RiotLeagueMapper.INSTANCE::toRiotLeagueResponse,
+                webClientConfig,
+                webClient,
+                puuid);
         return request.execute();
     }
 
     public RiotLeagueResponse findBySummonerId(String summonerId, String region) {
-        String endpoint = "lol/league/v4/entries/by-summoner/" + summonerId + "?api_key=";
         RiotRequest<RiotLeagueResponse> request = new RiotRequest<>(
+                RiotEndpoint.LEAGUE_BY_SUMMONER,
                 region,
-                endpoint,
-                apiKey,
-                RiotLeagueMapper.INSTANCE::toRiotLeagueResponse);
+                RiotLeagueMapper.INSTANCE::toRiotLeagueResponse,
+                webClientConfig,
+                webClient,
+                summonerId);
         return request.execute();
     }
 
