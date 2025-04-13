@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import com.leaguetracker.app.dto.response.RiotLeagueResponse;
 import com.leaguetracker.app.model.SummonerRank;
 import com.leaguetracker.app.service.RankService;
 import com.leaguetracker.app.service.UpdateService;
@@ -34,12 +35,10 @@ public class RanksController {
         return ResponseEntity.ok(rankService.getRanks());
     }
 
-    @GetMapping("/{puuid}")
-    public ResponseEntity<?> getRankByPuuid(@PathVariable String puuid) {
-        // Get existing ranks from database
+    @GetMapping("/{puuid}/region/{region}")
+    public ResponseEntity<?> getRankByPuuid(@PathVariable String puuid, @PathVariable String region) {
         List<SummonerRank> existingRanks = rankService.getRankByPuuid(puuid);
 
-        // Check rate limiting
         LocalDateTime lastUpdate = updateService.getLastUpdatedTime(puuid, UpdateType.RANKS);
         LocalDateTime now = LocalDateTime.now();
 
@@ -60,7 +59,7 @@ public class RanksController {
 
         // If no rate limiting applies, fetch fresh data
         try {
-            List<SummonerRank> freshRanks = rankService.fetchRanks(puuid);
+            RiotLeagueResponse freshRanks = rankService.fetchSummonerLeague(puuid, region);
 
             // Update the last updated time
             updateService.updateLastUpdatedTime(puuid, UpdateType.RANKS);

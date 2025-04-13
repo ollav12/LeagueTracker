@@ -1,11 +1,14 @@
 package com.leaguetracker.app.service;
 
-import com.leaguetracker.app.dto.AccountDto;
+import com.leaguetracker.app.dto.response.RiotAccountResponse;
 import com.leaguetracker.app.service.riot.RiotService;
 
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
 public class AccountService {
     private final RiotService riotService;
@@ -15,10 +18,8 @@ public class AccountService {
     }
 
     @Cacheable(value = "accounts", key = "'account:' + #region + ':' + #summonerName + ':' + #tag")
-    public AccountDto getAccount(String region, String summonerName, String tag) {
-        System.out.println("🔍 Cache MISS - Calling Riot API for " + region + ":" + summonerName + "#" + tag);
-        AccountDto result = riotService.Account.findByRiotId(region, summonerName, tag);
-        System.out.println("📦 API Result: " + result);
-        return result;
+    public RiotAccountResponse getAccount(String region, String summonerName, String tag) {
+        log.info("Cache MISS - Calling Riot API for \" + region + \":\" + summonerName + \"#\" + tag");
+        return riotService.Account.findByRiotId(region, summonerName, tag);
     }
 }

@@ -1,6 +1,6 @@
 package com.leaguetracker.app.dto;
 
-public record MatchListDto(
+public record RiotMatchIdEntry(
                 String puuid,
                 String matchId) {
 

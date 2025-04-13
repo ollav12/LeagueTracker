@@ -1,41 +1,29 @@
 package com.leaguetracker.app.service;
 
 import com.leaguetracker.app.repository.RankRepository;
+import com.leaguetracker.app.service.riot.RiotService;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.leaguetracker.app.config.EnvConfig;
-import com.leaguetracker.app.dto.LeagueDto;
+import lombok.RequiredArgsConstructor;
+
+import com.leaguetracker.app.dto.RiotLeagueEntry;
+import com.leaguetracker.app.dto.response.RiotLeagueResponse;
+import com.leaguetracker.app.mapper.RiotLeagueMapper;
 import com.leaguetracker.app.model.SummonerRank;
 import com.leaguetracker.app.model.SummonerRank.MiniSeries;
 
 @Service
+@RequiredArgsConstructor
 public class RankService {
 
-    private final EnvConfig envConfig;
+    private final RankRepository rankRepository;
+    private final RiotService riotService;
 
-    @Autowired
-    private RankRepository rankRepository;
-    private final RestTemplate restTemplate = new RestTemplate();
-    private final ObjectMapper objectMapper = new ObjectMapper();
-
-    private final String apiKey;
-
-    public RankService(EnvConfig envConfig) {
-        this.apiKey = envConfig.getApiKey();
-        this.envConfig = envConfig;
-    }
-
-    public void saveLeagueDto(List<LeagueDto> ranks) {
-        for (LeagueDto rank : ranks) {
+    public void saveLeagueDto(RiotLeagueResponse ranks) {
+        for (RiotLeagueEntry rank : ranks.leagues()) {
             MiniSeries miniSeries;
             if (rank.miniSeries() == null) {
                 miniSeries = new MiniSeries(0, "", 0, 0);
@@ -75,31 +63,22 @@ public class RankService {
         return rankRepository.findAllByPuuid(puuid);
     }
 
-    // Riot api calls
-    public List<SummonerRank> fetchRanks(String puuid) {
-        try {
-            String region = "euw1";
-            String rankUrl = "https://" + region + ".api.riotgames.com/lol/league/v4/entries/by-puuid/" + puuid
-                    + "?api_key=" + apiKey;
-            ResponseEntity<String> response = restTemplate.getForEntity(rankUrl, String.class);
+    public RiotLeagueResponse getRanked(String puuid, String region) {
+        List<SummonerRank> leaguesDb = rankRepository.findAllByPuuid(puuid);
 
-            if (response.getStatusCode().is2xxSuccessful()) {
-                List<SummonerRank> list = new ArrayList<>();
-                String responseBody = response.getBody();
-                if (responseBody != null) {
-                    List<SummonerRank> ranks = objectMapper.readValue(responseBody,
-                            new TypeReference<List<SummonerRank>>() {
-                            });
-                    for (SummonerRank rank : ranks) {
-                        rankRepository.save(rank);
-                        list.add(rank);
-                    }
-                }
-                return list;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (leaguesDb != null && !leaguesDb.isEmpty()) {
+            System.out.println("Retrieved ranked data from database: " + leaguesDb.size() + " entries");
+            return RiotLeagueMapper.INSTANCE.toResponse(leaguesDb);
         }
-        return new ArrayList<>();
+
+        RiotLeagueResponse leaguesFetched = riotService.League.findByPuuid(puuid, region);
+        System.out.println("Fetched ranked data from Riot API entries");
+
+        saveLeagueDto(leaguesFetched);
+        return leaguesFetched;
+    }
+
+    public RiotLeagueResponse fetchSummonerLeague(String puuid, String region) {
+        return riotService.League.findByPuuid(puuid, region);
     }
 }

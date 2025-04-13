@@ -15,8 +15,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import com.leaguetracker.app.dto.request.SummonerLookupRequest;
 import com.leaguetracker.app.dto.request.SummonerSummaryRequest;
-import com.leaguetracker.app.dto.response.SummonerResponse;
-import com.leaguetracker.app.model.Summoner;
+import com.leaguetracker.app.dto.response.SummonerLookupResponse;
+import com.leaguetracker.app.dto.response.SummonerSummaryResponse;
 import com.leaguetracker.app.service.SummonerService;
 
 @Slf4j
@@ -27,24 +27,19 @@ public class SummonersController {
 
     private final SummonerService summonerService;
 
-    @GetMapping
-    public ResponseEntity<List<Summoner>> getAllSummoners() {
-        return ResponseEntity.ok(summonerService.getAllSummoners());
-    }
-
     @GetMapping("/{region}/{summonerName}-{tag}")
-    public ResponseEntity<SummonerResponse> getSummoner(@PathVariable String region,
+    public ResponseEntity<SummonerLookupResponse> getSummoner(@PathVariable String region,
             @PathVariable String summonerName,
             @PathVariable String tag) {
 
         SummonerLookupRequest request = new SummonerLookupRequest(region, summonerName, tag);
-        SummonerResponse summoner = summonerService.getSummonerDetails(request);
+        SummonerLookupResponse summoner = summonerService.getSummonerDetails(request);
         return ResponseEntity.ok(summoner);
 
     }
 
     @GetMapping("/summary")
-    public ResponseEntity<Map<String, Object>> getSummary(@Valid SummonerSummaryRequest request) {
+    public ResponseEntity<SummonerSummaryResponse> getSummary(@Valid SummonerSummaryRequest request) {
         return ResponseEntity.ok(summonerService.getSummary(request));
     }
 }

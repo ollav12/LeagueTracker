@@ -134,7 +134,7 @@ public record MatchDto(
         public static record TeamDto(
                         BanDto[] bans,
                         ObjectivesDto objectives,
-                        int teamid,
+                        int teamId,
                         boolean win) {
         }
 
@@ -168,7 +168,7 @@ public record MatchDto(
 
         public static record BanDto(
                         int championId,
-                        int pickturn) {
+                        int pickTurn) {
         }
 
         public static enum RoleDto {

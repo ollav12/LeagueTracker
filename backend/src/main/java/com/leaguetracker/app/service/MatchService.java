@@ -2,17 +2,14 @@ package com.leaguetracker.app.service;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.leaguetracker.app.config.EnvConfig;
 import com.leaguetracker.app.dto.MatchDto;
-import com.leaguetracker.app.dto.MatchListDto;
+import com.leaguetracker.app.dto.RiotMatchIdEntry;
+import com.leaguetracker.app.dto.response.RiotMatchListResponse;
 import com.leaguetracker.app.model.MatchList;
 import com.leaguetracker.app.model.SummonerMatch;
 import com.leaguetracker.app.repository.MatchListRepository;
@@ -22,6 +19,7 @@ import com.leaguetracker.app.service.riot.RiotService;
 import org.springframework.data.domain.PageRequest;
 
 @Service
+@RequiredArgsConstructor
 public class MatchService {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -29,13 +27,6 @@ public class MatchService {
     private final MatchRepository matchRepository;
     private final MatchListRepository matchListRepository;
     private final RiotService riotService;
-
-    public MatchService(MatchRepository matchRepository, EnvConfig envConfig, RiotService riotService,
-            MatchListRepository matchListRepository) {
-        this.matchRepository = matchRepository;
-        this.riotService = riotService;
-        this.matchListRepository = matchListRepository;
-    }
 
     /**
      * Get a match by matchId
@@ -158,8 +149,8 @@ public class MatchService {
         return null;
     }
 
-    public void saveMatchList(List<MatchListDto> matchList, String puuid) {
-        for (MatchListDto match : matchList) {
+    public void saveMatchList(List<RiotMatchIdEntry> matchList, String puuid) {
+        for (RiotMatchIdEntry match : matchList) {
             try {
                 if (!matchListRepository.existsByPuuidAndMatchId(puuid, match.matchId())) {
                     MatchList newMatch = MatchList.builder()
@@ -187,11 +178,11 @@ public class MatchService {
         LIGHT,
     }
 
-    public List<MatchListDto> updateMatchList(String puuid, String region, MatchListMode mode) {
+    public List<RiotMatchIdEntry> updateMatchList(String puuid, String region, MatchListMode mode) {
         List<MatchList> matchListTemp = matchListRepository.findByPuuid(puuid);
-        List<MatchListDto> matchList = new ArrayList<MatchListDto>();
+        List<RiotMatchIdEntry> matchList = new ArrayList<RiotMatchIdEntry>();
         for (MatchList match : matchListTemp) {
-            matchList.add(new MatchListDto(match.getPuuid(), match.getMatchId()));
+            matchList.add(new RiotMatchIdEntry(match.getPuuid(), match.getMatchId()));
         }
 
         int start = 0;
@@ -199,16 +190,16 @@ public class MatchService {
         boolean shouldContinueFetching = true;
 
         while (shouldContinueFetching) {
-            List<MatchListDto> newMatchList = riotService.Match.findByPuuid(puuid, region, start, count);
+            RiotMatchListResponse newMatchList = riotService.Match.findByPuuid(puuid, region, start, count);
             System.out.println("FETCHES MATCHES");
             // Proper null and empty checks for List
-            if (newMatchList == null || newMatchList.isEmpty()) {
+            if (newMatchList == null || newMatchList.matchIds().isEmpty()) {
                 saveMatchList(matchList, puuid);
                 return matchList;
             }
 
             // Use addAll instead of spread operator (which is not available in Java)
-            matchList.addAll(newMatchList);
+            matchList.addAll(newMatchList.matchIds());
 
             // Update start index for next batch
             start += count;
@@ -223,8 +214,8 @@ public class MatchService {
         return matchList;
     }
 
-    public void saveMatches(List<MatchListDto> matchList, String puuid) {
-        for (MatchListDto match : matchList) {
+    public void saveMatches(List<RiotMatchIdEntry> matchList, String puuid) {
+        for (RiotMatchIdEntry match : matchList) {
             MatchList newMatch = MatchList.builder()
                     .puuid(puuid)
                     .matchId(match.matchId())

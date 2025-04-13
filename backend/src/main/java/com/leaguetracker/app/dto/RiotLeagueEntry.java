@@ -1,6 +1,9 @@
 package com.leaguetracker.app.dto;
 
-public record LeagueDto(
+import lombok.Builder;
+
+@Builder
+public record RiotLeagueEntry(
                 String leagueId,
                 String queueType,
                 String tier,
@@ -16,11 +19,11 @@ public record LeagueDto(
                 boolean hotStreak,
                 MiniSeriesDto miniSeries) {
 
+        @Builder
         public static record MiniSeriesDto(
                         int losses,
                         String progress,
                         int target,
                         int wins) {
-
         }
 }
