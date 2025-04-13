@@ -3,13 +3,21 @@ package com.leaguetracker.app.dto;
 import java.util.List;
 import java.util.Optional;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import lombok.Builder;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+@Builder
 public record MatchDto(
                 MatchDto.MetadataDto metadata,
                 MatchDto.InfoDto info) {
 
+        @JsonIgnoreProperties(ignoreUnknown = true)
         public static record MetadataDto(String dataVersion, String matchId, String[] participants) {
         }
 
+        @JsonIgnoreProperties(ignoreUnknown = true)
         public static record InfoDto(
                         String endOfGameResult,
                         long gameCreation,
@@ -29,6 +37,7 @@ public record MatchDto(
                         Optional<String> tournamentCode) {
         }
 
+        @JsonIgnoreProperties(ignoreUnknown = true)
         public static record ParticipantDto(
                         int assists,
                         int baronKills,
@@ -131,6 +140,7 @@ public record MatchDto(
 
         }
 
+        @JsonIgnoreProperties(ignoreUnknown = true)
         public static record TeamDto(
                         BanDto[] bans,
                         ObjectivesDto objectives,
@@ -138,6 +148,7 @@ public record MatchDto(
                         boolean win) {
         }
 
+        @JsonIgnoreProperties(ignoreUnknown = true)
         public static record ObjectivesDto(
                         ObjectiveDto baron,
                         ObjectiveDto champion,
@@ -147,17 +158,20 @@ public record MatchDto(
                         ObjectiveDto tower) {
         }
 
+        @JsonIgnoreProperties(ignoreUnknown = true)
         public static record ObjectiveDto(
                         boolean first,
                         int kills) {
         }
 
+        @JsonIgnoreProperties(ignoreUnknown = true)
         public static enum ChampionTransformDto {
                 None,
                 Slayer,
                 Asassin
         }
 
+        @JsonIgnoreProperties(ignoreUnknown = true)
         public static enum TeamPositionDto {
                 TOP,
                 JUNGLE,
@@ -166,11 +180,13 @@ public record MatchDto(
                 UTILITY
         }
 
+        @JsonIgnoreProperties(ignoreUnknown = true)
         public static record BanDto(
                         int championId,
                         int pickTurn) {
         }
 
+        @JsonIgnoreProperties(ignoreUnknown = true)
         public static enum RoleDto {
                 NONE,
                 DUO,
@@ -179,23 +195,27 @@ public record MatchDto(
                 SUPPORT
         }
 
+        @JsonIgnoreProperties(ignoreUnknown = true)
         public static record PerksDto(
                         PerkStatsDto statPerks,
                         PerkStyleDto[] styles) {
         }
 
+        @JsonIgnoreProperties(ignoreUnknown = true)
         public static record PerkStatsDto(
                         int defense,
                         int flex,
                         int offense) {
         }
 
+        @JsonIgnoreProperties(ignoreUnknown = true)
         public static record PerkStyleDto(
                         String description,
                         List<PerkStyleSelectionDto> selections,
                         int style) {
         }
 
+        @JsonIgnoreProperties(ignoreUnknown = true)
         public static record PerkStyleSelectionDto(
                         int perk,
                         int var1,
@@ -203,6 +223,7 @@ public record MatchDto(
                         int var3) {
         }
 
+        @JsonIgnoreProperties(ignoreUnknown = true)
         public static enum LaneDto {
                 TOP,
                 JUNGLE,

@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import com.leaguetracker.app.dto.MatchDto;
-import com.leaguetracker.app.dto.RiotMatchIdEntry;
 import com.leaguetracker.app.model.MatchList;
 import com.leaguetracker.app.model.SummonerMatch;
 import com.leaguetracker.app.repository.MatchListRepository;
@@ -67,7 +66,7 @@ public class MatchesController {
     }
 
     @GetMapping("/matchlist")
-    public ResponseEntity<List<RiotMatchIdEntry>> updateMatchList(@RequestParam String puuid, @RequestParam String region,
+    public ResponseEntity<List<String>> updateMatchList(@RequestParam String puuid, @RequestParam String region,
             @RequestParam MatchListMode mode) {
         return ResponseEntity.ok(matchService.updateMatchList(puuid, region, mode));
     }

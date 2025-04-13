@@ -1,16 +1,22 @@
 package com.leaguetracker.app.config;
 
-import org.springframework.context.annotation.Bean;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
-import io.github.cdimascio.dotenv.Dotenv;
+import org.springframework.validation.annotation.Validated;
+
+import jakarta.validation.constraints.NotBlank;
+import lombok.Getter;
 
 @Configuration
+@ConfigurationProperties(prefix = "riot")
+@Validated
+@Getter
 public class EnvConfig {
 
-    private final Dotenv dotenv = Dotenv.load();
+    @NotBlank
+    private String apiKey;
 
-    @Bean
-    public String getApiKey() {
-        return dotenv.get("RIOT_KEY");
+    public void setApiKey(String apiKey) {
+        this.apiKey = apiKey;
     }
 }

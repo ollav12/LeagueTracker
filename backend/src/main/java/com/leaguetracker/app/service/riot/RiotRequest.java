@@ -5,8 +5,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.util.retry.Retry;
 
-import java.util.function.Function;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.leaguetracker.app.config.WebClientConfig;
 import com.leaguetracker.app.service.riot.endpoint.RiotEndpoint;
 
@@ -18,19 +18,22 @@ public class RiotRequest<T> {
     private final WebClient webClient;
     private final RiotEndpoint endpoint;
     private final String region;
-    private final Function<String, T> responseMapper;
+    private final ObjectMapper mapper;
+    private final Class<T> responseType;
     private final Object[] params;
 
     public RiotRequest(
             RiotEndpoint endpoint,
             String region,
-            Function<String, T> responseMapper,
+            ObjectMapper mapper,
+            Class<T> responseType,
             WebClientConfig webClientConfig,
             WebClient webClient,
             Object... params) {
         this.endpoint = endpoint;
         this.region = region;
-        this.responseMapper = responseMapper;
+        this.mapper = mapper;
+        this.responseType = responseType;
         this.webClientConfig = webClientConfig;
         this.webClient = webClient;
         this.params = params;
@@ -50,7 +53,12 @@ public class RiotRequest<T> {
                         }))
                 .map(response -> {
                     System.out.println("Response Recieve");
-                    return responseMapper.apply(response);
+                    try {
+                        return mapper.readValue(response, responseType);
+                    } catch (JsonProcessingException e) {
+                        e.printStackTrace();
+                    }
+                    return null;
                 })
                 .block();
     }

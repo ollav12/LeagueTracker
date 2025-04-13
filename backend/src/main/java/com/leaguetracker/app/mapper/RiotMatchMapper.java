@@ -12,7 +12,6 @@ import com.leaguetracker.app.dto.MatchDto.PerkStyleDto;
 import com.leaguetracker.app.dto.MatchDto.PerkStyleSelectionDto;
 import com.leaguetracker.app.dto.MatchDto.PerksDto;
 import com.leaguetracker.app.dto.MatchDto.TeamDto;
-import com.leaguetracker.app.dto.RiotMatchIdEntry;
 import com.leaguetracker.app.dto.response.RiotMatchListResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -29,9 +28,7 @@ public interface RiotMatchMapper {
     ObjectMapper objectMapper = new ObjectMapper();
 
     // Map JsonNode to RiotMatchIdEntry
-    @Mapping(target = "puuid", expression = "java(\"\")")
-    @Mapping(target = "matchId", expression = "java(jsonNode.asText())")
-    RiotMatchIdEntry toRiotMatchIdEntry(JsonNode jsonNode);
+    String toRiotMatchIdEntry(JsonNode jsonNode);
 
     // Map JSON string to RiotMatchListResponse
     default RiotMatchListResponse toRiotMatchListResponse(String response) {
@@ -40,7 +37,7 @@ public interface RiotMatchMapper {
             if (!rootNode.isArray()) {
                 return new RiotMatchListResponse(List.of());
             }
-            List<RiotMatchIdEntry> matches = StreamSupport.stream(rootNode.spliterator(), false)
+            List<String> matches = StreamSupport.stream(rootNode.spliterator(), false)
                     .map(this::toRiotMatchIdEntry)
                     .filter(dto -> dto != null)
                     .distinct()

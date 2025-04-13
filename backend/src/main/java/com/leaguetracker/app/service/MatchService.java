@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.leaguetracker.app.dto.MatchDto;
-import com.leaguetracker.app.dto.RiotMatchIdEntry;
 import com.leaguetracker.app.dto.response.RiotMatchListResponse;
 import com.leaguetracker.app.model.MatchList;
 import com.leaguetracker.app.model.SummonerMatch;
@@ -149,17 +148,17 @@ public class MatchService {
         return null;
     }
 
-    public void saveMatchList(List<RiotMatchIdEntry> matchList, String puuid) {
-        for (RiotMatchIdEntry match : matchList) {
+    public void saveMatchList(List<String> matchList, String puuid) {
+        for (String match : matchList) {
             try {
-                if (!matchListRepository.existsByPuuidAndMatchId(puuid, match.matchId())) {
+                if (!matchListRepository.existsByPuuidAndMatchId(puuid, match)) {
                     MatchList newMatch = MatchList.builder()
                             .puuid(puuid)
-                            .matchId(match.matchId())
+                            .matchId(match)
                             .build();
                     matchListRepository.save(newMatch);
                 } else {
-                    System.out.println("Match already exists for puuid: " + puuid + ", matchId: " + match.matchId());
+                    System.out.println("Match already exists for puuid: " + puuid + ", matchId: " + match);
                 }
             } catch (Exception e) {
                 System.err.println("Error saving match: " + e.getMessage());
@@ -178,11 +177,11 @@ public class MatchService {
         LIGHT,
     }
 
-    public List<RiotMatchIdEntry> updateMatchList(String puuid, String region, MatchListMode mode) {
+    public List<String> updateMatchList(String puuid, String region, MatchListMode mode) {
         List<MatchList> matchListTemp = matchListRepository.findByPuuid(puuid);
-        List<RiotMatchIdEntry> matchList = new ArrayList<RiotMatchIdEntry>();
+        List<String> matchList = new ArrayList<String>();
         for (MatchList match : matchListTemp) {
-            matchList.add(new RiotMatchIdEntry(match.getPuuid(), match.getMatchId()));
+            matchList.add(match.getMatchId());
         }
 
         int start = 0;
@@ -214,11 +213,11 @@ public class MatchService {
         return matchList;
     }
 
-    public void saveMatches(List<RiotMatchIdEntry> matchList, String puuid) {
-        for (RiotMatchIdEntry match : matchList) {
+    public void saveMatches(List<String> matchList, String puuid) {
+        for (String match : matchList) {
             MatchList newMatch = MatchList.builder()
                     .puuid(puuid)
-                    .matchId(match.matchId())
+                    .matchId(match)
                     .build();
             matchListRepository.save(newMatch);
         }

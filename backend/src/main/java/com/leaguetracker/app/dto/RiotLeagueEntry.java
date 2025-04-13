@@ -1,7 +1,10 @@
 package com.leaguetracker.app.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import lombok.Builder;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 @Builder
 public record RiotLeagueEntry(
                 String leagueId,
@@ -19,6 +22,7 @@ public record RiotLeagueEntry(
                 boolean hotStreak,
                 MiniSeriesDto miniSeries) {
 
+        @JsonIgnoreProperties(ignoreUnknown = true)
         @Builder
         public static record MiniSeriesDto(
                         int losses,

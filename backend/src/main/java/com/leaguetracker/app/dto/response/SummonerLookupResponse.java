@@ -2,8 +2,13 @@ package com.leaguetracker.app.dto.response;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.leaguetracker.app.dto.RiotLeagueEntry;
 
+import lombok.Builder;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+@Builder
 public record SummonerLookupResponse(
         String summonerName,
         String tagLine,

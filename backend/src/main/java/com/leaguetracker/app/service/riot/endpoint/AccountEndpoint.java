@@ -5,10 +5,10 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import lombok.RequiredArgsConstructor;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.leaguetracker.app.config.WebClientConfig;
 import com.leaguetracker.app.dto.response.RiotAccountResponse;
 import com.leaguetracker.app.helper.Helper;
-import com.leaguetracker.app.mapper.RiotAccountMapper;
 import com.leaguetracker.app.service.riot.RiotRequest;
 
 @Service
@@ -17,6 +17,7 @@ public class AccountEndpoint {
 
     private final WebClient webClient;
     private final WebClientConfig webClientConfig;
+    private final ObjectMapper objectMapper;
 
     enum Account {
         findByRiotId,
@@ -27,7 +28,8 @@ public class AccountEndpoint {
         RiotRequest<RiotAccountResponse> request = new RiotRequest<>(
                 RiotEndpoint.ACCOUNT_BY_RIOT_ID,
                 Helper.getRiotApiRegion(region),
-                RiotAccountMapper.INSTANCE::toRiotAccountResponse,
+                objectMapper,
+                RiotAccountResponse.class,
                 webClientConfig,
                 webClient,
                 summonerName,
@@ -39,7 +41,8 @@ public class AccountEndpoint {
         RiotRequest<RiotAccountResponse> request = new RiotRequest<>(
                 RiotEndpoint.ACCOUNT_BY_PUUID,
                 Helper.getRiotApiRegion(region),
-                RiotAccountMapper.INSTANCE::toRiotAccountResponse,
+                objectMapper,
+                RiotAccountResponse.class,
                 webClientConfig,
                 webClient,
                 puuid);

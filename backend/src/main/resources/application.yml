@@ -35,6 +35,7 @@ logging:
 ---
 spring:
   config:
+    import: optional:file:.env[.properties]
     activate:
       on-profile: dev
   datasource:
@@ -63,7 +64,8 @@ spring:
     redis:
       time-to-live: 86400000 # 24 hours in milliseconds
       cache-null-values: false
-
+riot:
+  api-key: ${RIOT_API_KEY}
 logging:
   level:
     root: INFO
@@ -95,6 +97,7 @@ spring:
       port: 6379
       # Using test containers for Redis in test environment
       timeout: 1000
+
 logging:
   level:
     "[org.springframework]": INFO

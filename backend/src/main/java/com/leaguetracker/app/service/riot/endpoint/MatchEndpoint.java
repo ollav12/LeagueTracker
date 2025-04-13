@@ -5,11 +5,11 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import lombok.RequiredArgsConstructor;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.leaguetracker.app.config.WebClientConfig;
 import com.leaguetracker.app.dto.MatchDto;
 import com.leaguetracker.app.dto.response.RiotMatchListResponse;
 import com.leaguetracker.app.helper.Helper;
-import com.leaguetracker.app.mapper.RiotMatchMapper;
 import com.leaguetracker.app.service.riot.RiotRequest;
 
 @Service
@@ -18,12 +18,14 @@ public class MatchEndpoint {
 
     private final WebClient webClient;
     private final WebClientConfig webClientConfig;
+    private final ObjectMapper objectMapper;
 
     public MatchDto findByMatchId(String matchId, String region) {
         RiotRequest<MatchDto> request = new RiotRequest<>(
                 RiotEndpoint.MATCH_BY_ID,
                 Helper.getRiotApiRegion(region),
-                RiotMatchMapper.INSTANCE::apply,
+                objectMapper,
+                MatchDto.class,
                 webClientConfig,
                 webClient,
                 matchId);
@@ -34,7 +36,8 @@ public class MatchEndpoint {
         RiotRequest<RiotMatchListResponse> request = new RiotRequest<>(
                 RiotEndpoint.MATCH_LIST_BY_PUUID,
                 Helper.getRiotApiRegion(region),
-                RiotMatchMapper.INSTANCE::toRiotMatchListResponse,
+                objectMapper,
+                RiotMatchListResponse.class,
                 webClientConfig,
                 webClient,
                 puuid,
