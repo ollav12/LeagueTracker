@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import com.leaguetracker.app.dto.MatchDto;
+import com.leaguetracker.app.dto.response.RiotMatchResponse;
 import com.leaguetracker.app.model.MatchList;
 import com.leaguetracker.app.model.SummonerMatch;
 import com.leaguetracker.app.repository.MatchListRepository;
@@ -37,7 +37,7 @@ public class MatchesController {
      * @return match
      */
     @GetMapping("/match/{matchId}/by-puuid/{puuid}/region/{region}")
-    public ResponseEntity<MatchDto> getMatch(
+    public ResponseEntity<RiotMatchResponse> getMatch(
             @PathVariable String matchId,
             @PathVariable String puuid,
             @PathVariable String region) {
@@ -50,7 +50,7 @@ public class MatchesController {
      * @return list of matches
      */
     @GetMapping
-    public ResponseEntity<MatchDto> getMatche(@RequestBody String matchId, @RequestBody String region) {
+    public ResponseEntity<RiotMatchResponse> getMatche(@RequestBody String matchId, @RequestBody String region) {
         return ResponseEntity.ok(matchService.getMatch(matchId, region));
     }
 

@@ -5,10 +5,12 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.leaguetracker.app.dto.MatchDto;
 import com.leaguetracker.app.dto.response.RiotMatchListResponse;
+import com.leaguetracker.app.dto.response.RiotMatchResponse;
+import com.leaguetracker.app.mapper.RiotMatchMapper;
 import com.leaguetracker.app.model.MatchList;
 import com.leaguetracker.app.model.SummonerMatch;
 import com.leaguetracker.app.repository.MatchListRepository;
@@ -17,6 +19,7 @@ import com.leaguetracker.app.service.riot.RiotService;
 
 import org.springframework.data.domain.PageRequest;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class MatchService {
@@ -27,14 +30,11 @@ public class MatchService {
     private final MatchListRepository matchListRepository;
     private final RiotService riotService;
 
-    /**
-     * Get a match by matchId
-     * 
-     * @param matchId
-     * @param region
-     * @return match
-     */
-    public MatchDto getMatch(String matchId, String region) {
+    public enum MatchListMode {
+        LIGHT,
+    }
+
+    public RiotMatchResponse getMatch(String matchId, String region) {
         return riotService.Match.findByMatchId(matchId, region);
     }
 
@@ -69,54 +69,31 @@ public class MatchService {
         }
     }
 
-    /**
-     * Get matches by matchIds, retrieving from database first when available
-     * 
-     * @param region   Region of the matches
-     * @param matchIds List of match IDs to retrieve
-     * @return List of match data
-     */
-    public List<MatchDto> getMatches(String region, List<String> matchIds) {
-        List<MatchDto> matches = new ArrayList<>();
+    public List<RiotMatchResponse> getMatches(String region, List<String> matchIds) {
+        List<RiotMatchResponse> matches = new ArrayList<>();
 
         for (String matchId : matchIds) {
-            // Try to find match in local repository first
             SummonerMatch existingMatch = matchRepository.findByMatchId(matchId);
 
             if (existingMatch != null) {
-                // Match exists in database, convert entity to DTO
-                try {
-                    // Create a JSON structure that maps to MatchDto
-                    StringBuilder jsonBuilder = new StringBuilder();
-                    jsonBuilder.append("{");
-                    jsonBuilder.append("\"metadata\": ").append(existingMatch.getMetadataJson()).append(",");
-                    jsonBuilder.append("\"info\": ").append(existingMatch.getInfoJson());
-                    jsonBuilder.append("}");
 
-                    // Convert the combined JSON to MatchDto
-                    MatchDto matchDto = objectMapper.readValue(jsonBuilder.toString(), MatchDto.class);
-                    matches.add(matchDto);
-                    System.out.println("Retrieved match from database: " + matchId);
-                } catch (Exception e) {
-                    System.err.println("Error parsing match data from database: " + e.getMessage());
-                    // If parsing fails, fetch from API as fallback
-                    fetchAndSaveMatch(matchId, region, matches);
-                }
+                RiotMatchResponse response = RiotMatchMapper.INSTANCE.toRiotMatchResponse(existingMatch);
+
+                matches.add(response);
+                System.out.println("Retrieved match from database: " + matchId);
             } else {
-                // Match not in database, fetch from API and save
                 fetchAndSaveMatch(matchId, region, matches);
             }
         }
-
         return matches;
     }
 
     /**
      * Helper method to fetch match from API and save to database
      */
-    private void fetchAndSaveMatch(String matchId, String region, List<MatchDto> matches) {
+    private void fetchAndSaveMatch(String matchId, String region, List<RiotMatchResponse> matches) {
         try {
-            MatchDto matchDto = riotService.Match.findByMatchId(matchId, region);
+            RiotMatchResponse matchDto = riotService.Match.findByMatchId(matchId, region);
             if (matchDto != null) {
                 matches.add(matchDto);
 
@@ -139,11 +116,6 @@ public class MatchService {
         }
     }
 
-    /**
-     * Get ranks of players from given match
-     * 
-     * @return list of ranks
-     */
     public List<SummonerMatch> getSummonersRanks(String matchId) {
         return null;
     }
@@ -171,10 +143,6 @@ public class MatchService {
         List<MatchList> matches = matchListRepository.findByPuuid(puuid);
         System.out.println("Found {} matches" + matches.size());
         return matches;
-    }
-
-    public enum MatchListMode {
-        LIGHT,
     }
 
     public List<String> updateMatchList(String puuid, String region, MatchListMode mode) {

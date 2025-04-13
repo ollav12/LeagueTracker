@@ -3,7 +3,7 @@ package com.leaguetracker.app.dto.response;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.leaguetracker.app.dto.RiotLeagueEntry;
+import com.leaguetracker.app.dto.response.RiotLeagueResponse.RiotLeagueEntry;
 
 import lombok.Builder;
 

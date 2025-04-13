@@ -1,17 +1,18 @@
-package com.leaguetracker.app.dto;
+package com.leaguetracker.app.dto.response;
 
 import java.util.List;
 import java.util.Optional;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import lombok.Builder;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Builder
-public record MatchDto(
-                MatchDto.MetadataDto metadata,
-                MatchDto.InfoDto info) {
+public record RiotMatchResponse(
+                MetadataDto metadata,
+                InfoDto info) {
 
         @JsonIgnoreProperties(ignoreUnknown = true)
         public static record MetadataDto(String dataVersion, String matchId, String[] participants) {
@@ -34,7 +35,7 @@ public record MatchDto(
                         String platformId,
                         int queueId,
                         List<TeamDto> teams,
-                        Optional<String> tournamentCode) {
+                        @JsonIgnore Optional<String> tournamentCode) {
         }
 
         @JsonIgnoreProperties(ignoreUnknown = true)

@@ -5,10 +5,12 @@ import java.time.LocalDateTime;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import com.leaguetracker.app.model.SummonerUpdate;
 import com.leaguetracker.app.repository.SummonerUpdateRepository;
 
+@Slf4j  
 @Service
 @RequiredArgsConstructor
 public class UpdateService {

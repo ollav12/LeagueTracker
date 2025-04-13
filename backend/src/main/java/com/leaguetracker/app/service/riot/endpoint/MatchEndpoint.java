@@ -7,8 +7,8 @@ import lombok.RequiredArgsConstructor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.leaguetracker.app.config.WebClientConfig;
-import com.leaguetracker.app.dto.MatchDto;
 import com.leaguetracker.app.dto.response.RiotMatchListResponse;
+import com.leaguetracker.app.dto.response.RiotMatchResponse;
 import com.leaguetracker.app.helper.Helper;
 import com.leaguetracker.app.service.riot.RiotRequest;
 
@@ -20,12 +20,12 @@ public class MatchEndpoint {
     private final WebClientConfig webClientConfig;
     private final ObjectMapper objectMapper;
 
-    public MatchDto findByMatchId(String matchId, String region) {
-        RiotRequest<MatchDto> request = new RiotRequest<>(
+    public RiotMatchResponse findByMatchId(String matchId, String region) {
+        RiotRequest<RiotMatchResponse> request = new RiotRequest<>(
                 RiotEndpoint.MATCH_BY_ID,
                 Helper.getRiotApiRegion(region),
                 objectMapper,
-                MatchDto.class,
+                RiotMatchResponse.class,
                 webClientConfig,
                 webClient,
                 matchId);

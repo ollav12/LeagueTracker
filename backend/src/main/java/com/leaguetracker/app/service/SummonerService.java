@@ -1,28 +1,28 @@
 package com.leaguetracker.app.service;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import com.leaguetracker.app.dto.request.SummonerLookupRequest;
 import com.leaguetracker.app.dto.request.SummonerSummaryRequest;
-import com.leaguetracker.app.dto.MatchDto;
 import com.leaguetracker.app.dto.response.RiotAccountResponse;
 import com.leaguetracker.app.dto.response.RiotLeagueResponse;
+import com.leaguetracker.app.dto.response.RiotMatchResponse;
 import com.leaguetracker.app.dto.response.RiotSummonerResponse;
 import com.leaguetracker.app.dto.response.SummonerLookupResponse;
 import com.leaguetracker.app.dto.response.SummonerSummaryResponse;
 import com.leaguetracker.app.mapper.RiotSummonerMapper;
-import com.leaguetracker.app.model.MatchList;
 import com.leaguetracker.app.model.Summoner;
 import com.leaguetracker.app.repository.SummonerRepository;
 import com.leaguetracker.app.service.MatchService.MatchListMode;
 import com.leaguetracker.app.service.riot.RiotService;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class SummonerService {
@@ -38,68 +38,31 @@ public class SummonerService {
                 request.region(),
                 request.summonerName(),
                 request.tag());
-        RiotSummonerResponse summoner = this.getSummoner(account.puuid(), account.gameName(), request.region());
-        RiotLeagueResponse league = rankService.getRanked(summoner.puuid(), request.region());
+        RiotSummonerResponse summoner = this.getSummoner(
+                account.puuid(),
+                account.gameName(),
+                request.region());
+        RiotLeagueResponse league = rankService.getRanked(
+                summoner.puuid(),
+                request.region());
 
         // Fetch first 100 matches
-        matchService.updateMatchList(account.puuid(), request.region(), MatchListMode.LIGHT);
+        matchService.updateMatchList(
+                account.puuid(),
+                request.region(),
+                MatchListMode.LIGHT);
 
-        return RiotSummonerMapper.INSTANCE.toResponse(
-                request.summonerName(),
-                request.tag(),
+        return RiotSummonerMapper.INSTANCE.toSummonerLookupResponse(
+                account,
                 summoner,
                 league);
-    }
-
-    public RiotSummonerResponse getSummoner(String puuid, String name, String tag) {
-        Summoner summoner = summonerRepository.findById(puuid).orElse(null);
-
-        if (summoner != null) {
-            System.out.println("Retrieved summoner from database: " + summoner.getSummonerName());
-            return RiotSummonerResponse.builder()
-                    .id(summoner.getId())
-                    .accountId(summoner.getAccountId())
-                    .puuid(summoner.getPuuid())
-                    .profileIconId(summoner.getProfileIconId())
-                    .revisionDate(summoner.getRevisionDate())
-                    .summonerLevel(summoner.getSummonerLevel())
-                    .build();
-        }
-        System.out.println("Summoner not found in database, fetching from Riot API");
-        RiotSummonerResponse riotSummoner = riotService.Summoner.findByPuuid(puuid, tag);
-
-        if (riotSummoner != null) {
-            Summoner newSummoner = Summoner.builder()
-                    .puuid(riotSummoner.puuid())
-                    .id(riotSummoner.id())
-                    .accountId(riotSummoner.accountId())
-                    .summonerName(name)
-                    .region(tag)
-                    .profileIconId(riotSummoner.profileIconId())
-                    .revisionDate(riotSummoner.revisionDate())
-                    .summonerLevel(riotSummoner.summonerLevel())
-                    .lastUpdated(new Date())
-                    .build();
-
-            summonerRepository.save(newSummoner);
-            System.out.println("Fetched summoner from Riot API and saved to database: " + name);
-        }
-        return riotSummoner;
-    }
-
-    public RiotAccountResponse getAccountByPuuid(String puuid, String region) {
-        return riotService.Account.findByPuuid(puuid, region);
-    }
-
-    public List<MatchList> getSummary(String puuid, String accountId, String region) {
-        return matchService.getMatchListByPuuid(puuid);
     }
 
     public SummonerSummaryResponse getSummary(SummonerSummaryRequest request) {
 
         List<String> matchIds = matchService.getNextMatchIds(request.puuid(), request.lastMatchId(), request.limit());
 
-        List<MatchDto> matchDetails = matchService.getMatches(request.region(), matchIds);
+        List<RiotMatchResponse> matchDetails = matchService.getMatches(request.region(), matchIds);
 
         Map<String, Object> stats = statsService.getSummonerStats(request.puuid());
 
@@ -110,11 +73,25 @@ public class SummonerService {
                 .build();
     }
 
-    public Summoner saveSummoner(Summoner summoner) {
-        return summonerRepository.save(summoner);
+    public RiotSummonerResponse getSummoner(String puuid, String name, String tag) {
+        Summoner summoner = summonerRepository.findById(puuid).orElse(null);
+
+        if (summoner != null) {
+            System.out.println("Retrieved summoner from database: " + summoner.getSummonerName());
+            return RiotSummonerMapper.INSTANCE.toRiotSummonerResponse(summoner);
+        }
+        System.out.println("Summoner not found in database, fetching from Riot API");
+        RiotSummonerResponse riotSummoner = riotService.Summoner.findByPuuid(puuid, tag);
+
+        if (riotSummoner != null) {
+            Summoner newSummoner = RiotSummonerMapper.INSTANCE.toSummoner(riotSummoner);
+            summonerRepository.save(newSummoner);
+            System.out.println("Fetched summoner from Riot API and saved to database: " + name);
+        }
+        return riotSummoner;
     }
 
-    public List<Summoner> getAllSummoners() {
-        return summonerRepository.findAll();
+    public Summoner saveSummoner(Summoner summoner) {
+        return summonerRepository.save(summoner);
     }
 }

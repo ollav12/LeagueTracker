@@ -38,7 +38,9 @@ public class SummonerRank {
     @Embedded
     @AttributeOverrides({
             @AttributeOverride(name = "losses", column = @Column(name = "mini_series_losses")),
-            @AttributeOverride(name = "wins", column = @Column(name = "mini_series_wins"))
+            @AttributeOverride(name = "wins", column = @Column(name = "mini_series_wins")),
+            @AttributeOverride(name = "progress", column = @Column(name = "mini_series_progress")),
+            @AttributeOverride(name = "target", column = @Column(name = "mini_series_target")),
     })
     private MiniSeries miniSeries;
 
