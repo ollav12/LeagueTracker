@@ -14,7 +14,7 @@ import com.leaguetracker.app.dto.request.SummonerLookupRequest;
 import com.leaguetracker.app.dto.request.SummonerSummaryRequest;
 import com.leaguetracker.app.dto.response.SummonerLookupResponse;
 import com.leaguetracker.app.dto.response.SummonerSummaryResponse;
-import com.leaguetracker.app.service.SummonerService;
+import com.leaguetracker.app.service.SummonerInfoService;
 
 @Slf4j
 @RestController
@@ -22,7 +22,7 @@ import com.leaguetracker.app.service.SummonerService;
 @RequestMapping("/api/v1/summoners")
 public class SummonersController {
 
-    private final SummonerService summonerService;
+    private final SummonerInfoService summonerInfoService;
 
     @GetMapping("/{region}/{summonerName}-{tag}")
     public ResponseEntity<SummonerLookupResponse> getSummoner(
@@ -35,13 +35,12 @@ public class SummonersController {
                 .summonerName(summonerName)
                 .tag(tag)
                 .build();
-        SummonerLookupResponse summoner = summonerService.getSummonerDetails(request);
+        SummonerLookupResponse summoner = summonerInfoService.getSummonerDetails(request);
         return ResponseEntity.ok(summoner);
-
     }
 
     @GetMapping("/summary")
     public ResponseEntity<SummonerSummaryResponse> getSummary(@Valid SummonerSummaryRequest request) {
-        return ResponseEntity.ok(summonerService.getSummary(request));
+        return ResponseEntity.ok(summonerInfoService.getSummary(request));
     }
 }
