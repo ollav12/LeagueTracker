@@ -1,10 +1,13 @@
 package com.leaguetracker.app.helper;
 
+import lombok.Getter;
+
 public class Helper {
 
     public Helper() {
     }
 
+    @Getter
     public enum LeagueRegion {
         BRAZIL("br1"),
         EUROPE_NORTHEAST("eun1"),
@@ -29,10 +32,6 @@ public class Helper {
             this.regionCode = regionCode;
         }
 
-        public String getRegionCode() {
-            return regionCode;
-        }
-
         // Helper method to find a LeagueRegion by its region code
         public static LeagueRegion fromRegionCode(String regionCode) {
             for (LeagueRegion region : LeagueRegion.values()) {
@@ -44,6 +43,7 @@ public class Helper {
         }
     }
 
+    @Getter
     public enum RiotRegion {
         AMERICAS("americas"),
         ASIA("asia"),
@@ -56,14 +56,11 @@ public class Helper {
             this.regionName = regionName;
         }
 
-        public String getRegionName() {
-            return regionName;
-        }
     }
 
     /**
      * Get Riot API region from a League region code (e.g., "euw1" -> "europe")
-     * 
+     *
      * @param regionCode The League region code (e.g., "euw1", "na1")
      * @return The corresponding Riot API region (e.g., "europe", "americas")
      */
@@ -72,29 +69,12 @@ public class Helper {
         LeagueRegion leagueRegion = LeagueRegion.fromRegionCode(regionCode);
 
         // Map LeagueRegion to RiotRegion
-        switch (leagueRegion) {
-            case NORTH_AMERICA:
-            case BRAZIL:
-            case LATIN_AMERICA_NORTH:
-            case LATIN_AMERICA_SOUTH:
-                return RiotRegion.AMERICAS.getRegionName();
-            case OCEANIA:
-            case PHILIPPINES:
-            case SINGAPORE:
-            case THAILAND:
-            case TAIWAN:
-            case VIETNAM:
-                return RiotRegion.SEA.getRegionName();
-            case KOREA:
-            case JAPAN:
-                return RiotRegion.ASIA.getRegionName();
-            case EUROPE_NORTHEAST:
-            case EUROPE_WEST:
-            case TURKEY:
-            case RUSSIA:
-                return RiotRegion.EUROPE.getRegionName();
-            default:
-                throw new IllegalArgumentException("Unknown LeagueRegion: " + leagueRegion);
-        }
+        return switch (leagueRegion) {
+            case NORTH_AMERICA, BRAZIL, LATIN_AMERICA_NORTH, LATIN_AMERICA_SOUTH -> RiotRegion.AMERICAS.getRegionName();
+            case OCEANIA, PHILIPPINES, SINGAPORE, THAILAND, TAIWAN, VIETNAM -> RiotRegion.SEA.getRegionName();
+            case KOREA, JAPAN -> RiotRegion.ASIA.getRegionName();
+            case EUROPE_NORTHEAST, EUROPE_WEST, TURKEY, RUSSIA -> RiotRegion.EUROPE.getRegionName();
+            default -> throw new IllegalArgumentException("Unknown LeagueRegion: " + leagueRegion);
+        };
     }
 }

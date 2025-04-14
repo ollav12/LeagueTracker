@@ -1,4 +1,4 @@
-package com.leaguetracker.app.Exception;
+package com.leaguetracker.app.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -44,6 +44,20 @@ public class DefaultExceptionHandler {
                 LocalDateTime.now()
         );
         return new ResponseEntity<>(apiError, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(SummonerRecentlyUpdatedException.class)
+    public ResponseEntity<ApiError> handleSummonerRecentlyUpdatedException(
+            SummonerRecentlyUpdatedException e,
+            HttpServletRequest request) {
+        log.warn("Summoner recently updated: {}", e.getMessage());
+        ApiError apiError = new ApiError(
+                request.getRequestURI(),
+                e.getMessage(),
+                HttpStatus.TOO_MANY_REQUESTS.value(),
+                LocalDateTime.now()
+        );
+        return new ResponseEntity<>(apiError, HttpStatus.TOO_MANY_REQUESTS);
     }
 
     @ExceptionHandler(Exception.class)

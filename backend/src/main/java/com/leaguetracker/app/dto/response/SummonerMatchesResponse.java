@@ -9,8 +9,8 @@ import lombok.Builder;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Builder
-public record SummonerSummaryResponse(
-                List<String> matchIds,
-                List<RiotMatchResponse> matchDetails,
-                Map<String, Object> stats) {
+public record SummonerMatchesResponse(
+        List<String> matchIds,
+        List<RiotMatchResponse> matchDetails,
+        Map<String, Object> stats) {
 }

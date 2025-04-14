@@ -1,4 +1,4 @@
-package com.leaguetracker.app.Exception;
+package com.leaguetracker.app.exception;
 
 public class MatchNotFoundException extends RuntimeException {
     public MatchNotFoundException(String message) {

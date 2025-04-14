@@ -2,6 +2,7 @@ package com.leaguetracker.app.service;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
@@ -130,7 +131,7 @@ public class MatchService {
                             .build();
                     matchListRepository.save(newMatch);
                 } else {
-                    System.out.println("Match already exists for puuid: " + puuid + ", matchId: " + match);
+                    //System.out.println("Match already exists for puuid: " + puuid + ", matchId: " + match);
                 }
             } catch (Exception e) {
                 System.err.println("Error saving match: " + e.getMessage());
@@ -158,25 +159,21 @@ public class MatchService {
 
         while (shouldContinueFetching) {
             RiotMatchListResponse newMatchList = riotService.Match.findByPuuid(puuid, region, start, count);
-            System.out.println("FETCHES MATCHES");
-            // Proper null and empty checks for List
+            System.out.println("Fetching matchlist");
             if (newMatchList == null || newMatchList.matchIds().isEmpty()) {
                 saveMatchList(matchList, puuid);
                 return matchList;
             }
 
-            // Use addAll instead of spread operator (which is not available in Java)
             matchList.addAll(newMatchList.matchIds());
 
-            // Update start index for next batch
             start += count;
 
-            // Add logic to determine if we should continue fetching
             if (mode == MatchListMode.LIGHT) {
                 shouldContinueFetching = false;
             }
         }
-        System.out.println("SAVING MATCHES");
+        System.out.println("Saving matchlist");
         saveMatchList(matchList, puuid);
         return matchList;
     }

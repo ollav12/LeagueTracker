@@ -1,19 +1,11 @@
 package com.leaguetracker.app.model;
 
-import jakarta.persistence.AttributeOverride;
-import jakarta.persistence.AttributeOverrides;
-import jakarta.persistence.Column;
-import jakarta.persistence.Embeddable;
-import jakarta.persistence.Embedded;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.persistence.*;
+import lombok.*;
 
-@Data
+@Getter
+@Setter
+@ToString
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -45,7 +37,9 @@ public class SummonerRank {
     private MiniSeries miniSeries;
 
     @Builder
-    @Data
+    @Getter
+    @Setter
+    @ToString
     @NoArgsConstructor
     @AllArgsConstructor
     @Embeddable
@@ -55,5 +49,4 @@ public class SummonerRank {
         private int target;
         private int losses;
     }
-
 }

@@ -1,6 +1,6 @@
 package com.leaguetracker.app.service.riot.endpoint;
 
-import com.leaguetracker.app.Exception.*;
+import com.leaguetracker.app.exception.*;
 
 public enum RiotEndpoint {
     ACCOUNT_BY_PUUID("riot/account/v1/accounts/by-puuid/%s") {

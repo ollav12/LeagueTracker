@@ -83,4 +83,10 @@ public class RankService {
     public RiotLeagueResponse fetchSummonerLeague(String puuid, String region) {
         return riotService.League.findByPuuid(puuid, region);
     }
+
+    public RiotLeagueResponse updateRanked(String puuid, String region) {
+        RiotLeagueResponse leagues = riotService.League.findByPuuid(puuid, region);
+        saveLeagueDto(leagues);
+        return leagues;
+    }
 }

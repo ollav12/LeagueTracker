@@ -2,7 +2,7 @@
   <div class="background-all">
     <div class="profile-header">
       <div class="icon-container">
-        <img :src="getProfileIconUrl" alt="Profile Icon" class="profile-icon" />
+        <img :src="getProfileIconUrl" alt="Profile Icon" class="profile-icon"/>
         <span class="level">{{ summoner.account?.summonerLevel || 0 }}</span>
       </div>
       <div class="name-container">
@@ -14,9 +14,9 @@
           {{ summoner.account?.region }} | Ladder Rank 77,321 (3.71% of top)
         </p>
         <button
-          class="update-button"
-          @click="updateSummoner"
-          :disabled="isUpdating || cooldownActive"
+            class="update-button"
+            @click="updateSummoner"
+            :disabled="isUpdating || cooldownActive"
         >
           {{ buttonText }}
         </button>
@@ -32,11 +32,11 @@
     <!-- Nav bar -->
     <div class="profile-nav">
       <button
-        v-for="tab in tabs"
-        :key="tab.name"
-        class="nav-item"
-        :class="{ active: activeTab === tab.id }"
-        @click="activeTab = tab.id"
+          v-for="tab in tabs"
+          :key="tab.name"
+          class="nav-item"
+          :class="{ active: activeTab === tab.id }"
+          @click="activeTab = tab.id"
       >
         {{ tab.name }}
         <span v-if="tab.badge" class="update-badge">U</span>
@@ -45,19 +45,19 @@
 
     <!-- Tab content -->
     <div class="tab-content">
-      <SummaryView v-if="activeTab === 'summary'" />
-      <ChampionsView v-else-if="activeTab === 'champions'" />
-      <MasteryView v-else-if="activeTab === 'mastery'" />
-      <LiveGameView v-else-if="activeTab === 'live'" />
+      <SummaryView v-if="activeTab === 'summary'"/>
+      <ChampionsView v-else-if="activeTab === 'champions'"/>
+      <MasteryView v-else-if="activeTab === 'mastery'"/>
+      <LiveGameView v-else-if="activeTab === 'live'"/>
     </div>
   </div>
 </template>
 
 <script>
-import { storeToRefs } from "pinia";
-import { useSummonerStore } from "@/stores/modules/summoner";
-import { useGlobalStore } from "@/stores/global";
-import { useSettingsStore } from "@/stores/modules/settings";
+import {storeToRefs} from "pinia";
+import {useSummonerStore} from "@/stores/modules/summoner";
+import {useGlobalStore} from "@/stores/global";
+import {useSettingsStore} from "@/stores/modules/settings";
 import SummaryView from "./Summoner/SummaryView.vue";
 import ChampionsView from "./Summoner/ChampionsView.vue";
 import MasteryView from "./Summoner/MasteryView.vue";
@@ -76,7 +76,7 @@ export default {
     const summonerStore = useSummonerStore();
     const globalStore = useGlobalStore();
     const settingsStore = useSettingsStore();
-    const { summoner, isUpdating } = storeToRefs(summonerStore);
+    const {summoner, isUpdating} = storeToRefs(summonerStore);
 
     return {
       summoner,
@@ -94,11 +94,12 @@ export default {
       cooldownSeconds: 0,
       hasBeenUpdated: false,
       lastUpdatedText: "",
+      lastUpdateTimestamp: 0,
       tabs: [
-        { id: "summary", name: "Summary" },
-        { id: "champions", name: "Champions", badge: true },
-        { id: "mastery", name: "Mastery" },
-        { id: "live", name: "Live Game" },
+        {id: "summary", name: "Summary"},
+        {id: "champions", name: "Champions", badge: true},
+        {id: "mastery", name: "Mastery"},
+        {id: "live", name: "Live Game"},
       ],
     };
   },
@@ -122,17 +123,56 @@ export default {
     async fetchSummonerData(region, summoner, tag) {
       await this.summonerStore.summonerDetailsRequest(summoner, region, tag);
     },
+
+    async updateSummoner() {
+      try {
+        this.isUpdating = true;
+        const timestamp = await this.summonerStore.updateSummoner();
+        this.lastUpdateTimestamp = timestamp;
+        this.hasBeenUpdated = true;
+        this.cooldownActive = true;
+        this.cooldownSeconds = 600; // 10 minutes
+
+        // Start cooldown timer
+        const interval = setInterval(() => {
+          this.cooldownSeconds--;
+          if (this.cooldownSeconds <= 0) {
+            this.cooldownActive = false;
+            clearInterval(interval);
+          }
+        }, 1000);
+
+        // Update last updated text
+        const now = new Date(timestamp);
+        this.lastUpdatedText = now.toLocaleTimeString();
+      } catch (error) {
+        console.error("Update failed:", error);
+        if (error.message.includes("recently updated")) {
+          this.cooldownActive = true;
+          this.cooldownSeconds = 600; // Assume full cooldown on 429
+          const interval = setInterval(() => {
+            this.cooldownSeconds--;
+            if (this.cooldownSeconds <= 0) {
+              this.cooldownActive = false;
+              clearInterval(interval);
+            }
+          }, 1000);
+        }
+      } finally {
+        this.isUpdating = false;
+      }
+    },
   },
 
   watch: {
     $route: {
       handler(to, from) {
         if (
-          !from ||
-          from.params.region !== to.params.region ||
-          from.params.summoner !== to.params.summoner
+            !from ||
+            from.params.region !== to.params.region ||
+            from.params.summoner !== to.params.summoner
         ) {
-          const { region, summoner, tag } = to.params;
+          const {region, summoner, tag} = to.params;
           let newRegion = this.globalStore.regionsList[region.toLowerCase()];
           this.settingsStore.setRegion(newRegion);
           this.fetchSummonerData(newRegion, summoner, tag);
@@ -146,10 +186,10 @@ export default {
 
 <style scoped>
 .profile-header {
-  background-color: #43b49b; /* Add white background to header */
+  background-color: #43b49b;
   display: flex;
   align-items: top;
-  margin-bottom: 0; /* Changed from 50px to 0 */
+  margin-bottom: 0;
   height: 200px;
   padding: 40px 20px 20px 400px;
   position: relative;
@@ -255,14 +295,14 @@ export default {
 }
 
 .profile-nav {
-  background-color: #43b49b; /* Add white background to nav */
+  background-color: #43b49b;
   position: relative;
   z-index: 1;
   padding: 4px 0 4px 400px;
   border-top: 1px solid #1b5850;
   display: flex;
   flex-wrap: nowrap;
-  margin-top: 0; /* Ensure no gap */
+  margin-top: 0;
 }
 
 .nav-item {
@@ -316,7 +356,7 @@ export default {
   background-color: #1b5850;
   padding-top: 0;
   width: 100%;
-  min-height: calc(100vh - 200px); /* Ensure background extends to bottom */
+  min-height: calc(100vh - 200px);
 }
 
 @media screen and (max-width: 720px) {

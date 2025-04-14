@@ -1,19 +1,13 @@
 package com.leaguetracker.app.model;
 
+import jakarta.persistence.*;
+import lombok.*;
+
 import java.util.List;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-@Data
+@Getter
+@Setter
+@ToString
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -34,14 +28,20 @@ public class SummonerMatch {
     @Column(columnDefinition = "TEXT")
     private String infoJson;
 
-    @Data
+    @Getter
+    @Setter
+    @ToString
+    @Builder
     public static class Metadata {
         private String dataVersion;
         private String matchId;
         private List<String> participants;
     }
 
-    @Data
+    @Getter
+    @Setter
+    @ToString
+    @Builder
     public static class MatchInfo {
         private String endOfGameResult;
         private Long gameCreation;
@@ -57,4 +57,32 @@ public class SummonerMatch {
         private List<Participant> participants;
     }
 
+    @Getter
+    @Setter
+    @ToString
+    @Builder
+    public static class Participant {
+        private String puuid;
+        private String summonerId;
+        private String summonerName;
+        private Integer teamId;
+
+        private Integer championId;
+        private String championName;
+
+        private Integer kills;
+        private Integer deaths;
+        private Integer assists;
+        private Boolean win;
+        private String teamPosition;
+        private Integer totalDamageDealtToChampions;
+        private Integer goldEarned;
+        private Integer totalMinionsKilled;
+        private Integer visionScore;
+
+        private Integer allInPings;
+        private Integer assistMePings;
+
+        private Object challenges;
+    }
 }

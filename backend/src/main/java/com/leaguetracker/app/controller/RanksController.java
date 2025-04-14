@@ -19,7 +19,6 @@ import com.leaguetracker.app.dto.response.RiotLeagueResponse;
 import com.leaguetracker.app.model.SummonerRank;
 import com.leaguetracker.app.service.RankService;
 import com.leaguetracker.app.service.UpdateService;
-import com.leaguetracker.app.service.UpdateService.UpdateType;
 
 @Slf4j
 @RestController
@@ -37,48 +36,9 @@ public class RanksController {
 
     @GetMapping("/{puuid}/region/{region}")
     public ResponseEntity<?> getRankByPuuid(@PathVariable String puuid, @PathVariable String region) {
-        List<SummonerRank> existingRanks = rankService.getRankByPuuid(puuid);
+        //List<SummonerRank> existingRanks = rankService.getRankByPuuid(puuid);
+        return ResponseEntity.ok(rankService.fetchSummonerLeague(puuid, region));
 
-        LocalDateTime lastUpdate = updateService.getLastUpdatedTime(puuid, UpdateType.RANKS);
-        LocalDateTime now = LocalDateTime.now();
 
-        // If we have existing data and last update was less than 5 minutes ago
-        if (lastUpdate != null && ChronoUnit.SECONDS.between(lastUpdate, now) < 300) {
-            // Calculate remaining cooldown
-            long remainingSeconds = 300 - ChronoUnit.SECONDS.between(lastUpdate, now);
-
-            // Return existing data with rate limit info
-            Map<String, Object> response = new HashMap<>();
-            response.put("ranks", existingRanks);
-            response.put("cooldownSeconds", remainingSeconds);
-            response.put("isRateLimited", true);
-            response.put("message", "Using cached data. Refresh available in " + remainingSeconds + " seconds");
-
-            return ResponseEntity.ok(response);
-        }
-
-        // If no rate limiting applies, fetch fresh data
-        try {
-            RiotLeagueResponse freshRanks = rankService.fetchSummonerLeague(puuid, region);
-
-            // Update the last updated time
-            updateService.updateLastUpdatedTime(puuid, UpdateType.RANKS);
-
-            // Return fresh data
-            Map<String, Object> response = new HashMap<>();
-            response.put("ranks", freshRanks);
-            response.put("isRateLimited", false);
-            response.put("message", "Data refreshed successfully");
-
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            // If fetch fails, return existing data with an error message
-            Map<String, Object> response = new HashMap<>();
-            response.put("ranks", existingRanks);
-            response.put("isRateLimited", false);
-            response.put("error", "Failed to refresh data: " + e.getMessage());
-
-            return ResponseEntity.ok(response);
-        }
     }
 }

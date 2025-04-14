@@ -17,7 +17,7 @@ public class AccountService {
 
     @Cacheable(value = "accounts", key = "'account:' + #region + ':' + #summonerName + ':' + #tag")
     public RiotAccountResponse getAccount(String region, String summonerName, String tag) {
-        log.info("Cache MISS - Calling Riot API for \" + region + \":\" + summonerName + \"#\" + tag");
+        log.info("Account not in cache, fetching from Riot API: {}/{}#{}", region, summonerName, tag);
         return riotService.Account.findByRiotId(region, summonerName, tag);
     }
 }

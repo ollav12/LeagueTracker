@@ -1,4 +1,4 @@
-package com.leaguetracker.app.Exception;
+package com.leaguetracker.app.exception;
 
 import java.time.LocalDateTime;
 

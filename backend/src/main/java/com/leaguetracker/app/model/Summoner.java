@@ -1,21 +1,21 @@
 package com.leaguetracker.app.model;
 
-import java.util.Date;
+import jakarta.persistence.*;
+import lombok.*;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import java.time.LocalDateTime;
 
-@Data
+@Getter
+@Setter
+@ToString
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "summoner")
+@EntityListeners(AuditingEntityListener.class)
 public class Summoner {
 
     @Id
@@ -28,5 +28,8 @@ public class Summoner {
     private String accountId;
     private String id;
     private String tagLine;
-    private Date lastUpdated;
+
+    @LastModifiedDate
+    @Column(name = "last_modified_date")
+    private LocalDateTime lastModifiedDate;
 }
