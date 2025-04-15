@@ -3,26 +3,19 @@ import instance from "@/plugins/axios";
 import {useSettingsStore} from "./settings";
 
 interface RankedData {
-    leagueId: string;
     queueType: string;
-    tier: string;
-    rank: string;
-    summonerId: string;
-    puuid: string;
-    leaguePoints: number;
+    currentRank: string;
+    peakRank: string;
+    lowestRank: string;
     wins: number;
     losses: number;
     veteran: boolean;
     inactive: boolean;
     freshBlood: boolean;
     hotStreak: boolean;
-    rankUrl: String;
-    miniSeries: {
-        losses: number;
-        progress: string;
-        target: number;
-        wins: number;
-    };
+    currentRankUrl: string;
+    peakRankUrl: string;
+    lowestRankUrl: string;
 }
 
 // Add MatchData interface
@@ -139,24 +132,32 @@ export const useSummonerStore = defineStore("summoner", {
                     console.log("Error summoner details request");
                     return;
                 }
-
                 const soloRank = response.data.ranked.find(
                     (queue: RankedData) => queue.queueType === "RANKED_SOLO_5x5"
                 );
                 const flexRank = response.data.ranked.find(
                     (queue: RankedData) => queue.queueType === "RANKED_FLEX_SR"
                 );
-
                 // Add rankUrl to each queue type
                 if (soloRank) {
-                    soloRank.rankUrl = `https://res.cloudinary.com/kln/image/upload/v1693310423/${soloRank.tier}.png`;
+                    const current = (soloRank.currentRank).split(" ");
+                    const peak = (soloRank.currentRank).split(" ");
+                    const lowest = (soloRank.currentRank).split(" ");
+                    soloRank.currentRankUrl = `https://res.cloudinary.com/kln/image/upload/v1693310423/${current[0]}.png`;
+                    soloRank.peakRankUrl = `https://res.cloudinary.com/kln/image/upload/v1693310423/${lowest[0]}.png`;
+                    soloRank.lowestRankUrl = `https://res.cloudinary.com/kln/image/upload/v1693310423/${peak[0]}.png`;
                 }
                 if (flexRank) {
-                    flexRank.rankUrl = `https://res.cloudinary.com/kln/image/upload/v1693310423/${flexRank.tier}.png`;
+                    const current = (flexRank.currentRank).split(" ");
+                    const peak = (flexRank.currentRank).split(" ");
+                    const lowest = (flexRank.currentRank).split(" ");
+                    flexRank.currentRankUrl = `https://res.cloudinary.com/kln/image/upload/v1693310423/${current[0]}.png`;
+                    flexRank.peakRankUrl = `https://res.cloudinary.com/kln/image/upload/v1693310423/${lowest[0]}.png`;
+                    flexRank.lowestRankUrl = `https://res.cloudinary.com/kln/image/upload/v1693310423/${peak[0]}.png`;
                 }
 
-                this.summoner.account.name = response.data.summonerName;
-                this.summoner.account.tagLine = response.data.tagLine;
+                this.summoner.account.name = summoner;
+                this.summoner.account.tagLine = tag;
                 this.summoner.account.id = response.data.id;
                 this.summoner.account.accountId = response.data.accountId;
                 this.summoner.account.puuid = response.data.puuid;

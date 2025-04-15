@@ -11,9 +11,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import com.leaguetracker.app.dto.response.RiotMatchResponse;
-import com.leaguetracker.app.model.MatchList;
-import com.leaguetracker.app.model.SummonerMatch;
-import com.leaguetracker.app.repository.MatchListRepository;
+import com.leaguetracker.app.model.Match;
+import com.leaguetracker.app.model.MatchDetails;
+import com.leaguetracker.app.repository.MatchRepository;
 import com.leaguetracker.app.service.MatchService;
 import com.leaguetracker.app.service.MatchService.MatchListMode;
 
@@ -28,11 +28,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 public class MatchesController {
 
     private final MatchService matchService;
-    private final MatchListRepository matchListRepository;
+    private final MatchRepository matchListRepository;
 
     /**
      * Get a match by matchId
-     * 
+     *
      * @param matchId
      * @return match
      */
@@ -46,7 +46,7 @@ public class MatchesController {
 
     /**
      * Get matches from matchId
-     * 
+     *
      * @return list of matches
      */
     @GetMapping
@@ -56,23 +56,23 @@ public class MatchesController {
 
     /**
      * Get ranks of players from given match
-     * 
+     *
      * @param puuid
      * @return list of ranks
      */
     @GetMapping("{matchId}/ranks")
-    public ResponseEntity<List<SummonerMatch>> getSummonersRanks(@PathVariable String matchId) {
+    public ResponseEntity<List<MatchDetails>> getSummonersRanks(@PathVariable String matchId) {
         return ResponseEntity.ok(matchService.getSummonersRanks(matchId));
     }
 
     @GetMapping("/matchlist")
     public ResponseEntity<List<String>> updateMatchList(@RequestParam String puuid, @RequestParam String region,
-            @RequestParam MatchListMode mode) {
+                                                        @RequestParam MatchListMode mode) {
         return ResponseEntity.ok(matchService.updateMatchList(puuid, region, mode));
     }
 
     @GetMapping("/list/{puuid}")
-    public ResponseEntity<List<MatchList>> getMatches(@PathVariable String puuid) {
+    public ResponseEntity<List<Match>> getMatches(@PathVariable String puuid) {
         return ResponseEntity.ok(matchListRepository.findByPuuid(puuid));
     }
 }

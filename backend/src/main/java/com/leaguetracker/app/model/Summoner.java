@@ -6,6 +6,8 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -21,13 +23,11 @@ public class Summoner {
     @Id
     private String puuid;
     private String summonerName;
+    private String tagLine;
     private String region;
     private int profileIconId;
     private int summonerLevel;
     private long revisionDate;
-    private String accountId;
-    private String id;
-    private String tagLine;
 
     @LastModifiedDate
     @Column(name = "last_modified_date")

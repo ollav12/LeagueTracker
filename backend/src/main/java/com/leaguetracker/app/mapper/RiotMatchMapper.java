@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.leaguetracker.app.dto.response.RiotMatchResponse;
 import com.leaguetracker.app.dto.response.RiotMatchResponse.InfoDto;
 import com.leaguetracker.app.dto.response.RiotMatchResponse.MetadataDto;
-import com.leaguetracker.app.model.SummonerMatch;
+import com.leaguetracker.app.model.MatchDetails;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -18,7 +18,7 @@ public interface RiotMatchMapper {
 
     @Mapping(target = "info", source = "infoJson", qualifiedByName = "jsonToInfoDto")
     @Mapping(target = "metadata", source = "metadataJson", qualifiedByName = "jsonToMetadataDto")
-    RiotMatchResponse toRiotMatchResponse(SummonerMatch match);
+    RiotMatchResponse toRiotMatchResponse(MatchDetails match);
 
     @Named("jsonToInfoDto")
     default InfoDto jsonToInfoDto(String infoJson) {

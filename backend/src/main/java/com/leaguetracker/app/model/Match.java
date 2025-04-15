@@ -10,15 +10,16 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "summoner_matchlist", indexes = {
+@Table(name = "match", indexes = {
         @Index(name = "idx_puuid", columnList = "puuid")}, uniqueConstraints = {
         @UniqueConstraint(name = "uk_puuid_match", columnNames = {"puuid", "match_id"})
 })
-public class MatchList {
+public class Match {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    private String puuid;
+    @Column(name = "match_id")
     private String matchId;
+
+    @Column(name = "puuid")
+    private String puuid;
 }

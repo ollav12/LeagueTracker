@@ -12,6 +12,7 @@ import com.leaguetracker.app.mapper.RiotSummonerMapper;
 import com.leaguetracker.app.model.Summoner;
 import com.leaguetracker.app.repository.SummonerRepository;
 import com.leaguetracker.app.service.riot.RiotService;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -48,6 +49,7 @@ public class SummonerService {
         return RiotSummonerMapper.INSTANCE.toRiotSummonerResponse(summoner);
     }
 
+    @Transactional(readOnly = true)
     public Summoner getSummoner(String puuid) {
         return summonerRepository.findById(puuid).orElse(null);
     }
@@ -62,6 +64,7 @@ public class SummonerService {
         return summonerRepository.save(summoner);
     }
 
+    @Transactional
     public Summoner saveSummoner(RiotSummonerResponse riotSummoner) {
         Summoner existingSummoner = summonerRepository.findById(riotSummoner.puuid()).orElse(null);
         existingSummoner.setLastModifiedDate(null);

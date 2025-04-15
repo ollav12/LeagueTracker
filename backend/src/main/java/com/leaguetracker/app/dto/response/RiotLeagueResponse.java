@@ -11,43 +11,32 @@ import lombok.Builder;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Builder
 public record RiotLeagueResponse(
-                List<RiotLeagueEntry> leagues) {
+        List<RiotLeagueEntry> leagues) {
 
-        @JsonCreator
-        public RiotLeagueResponse(List<RiotLeagueEntry> leagues) {
-                this.leagues = leagues != null ? leagues : List.of();
-        }
+    @JsonCreator
+    public RiotLeagueResponse(List<RiotLeagueEntry> leagues) {
+        this.leagues = leagues != null ? leagues : List.of();
+    }
 
-        @JsonValue
-        public List<RiotLeagueEntry> leagues() {
-                return leagues;
-        }
+    @JsonValue
+    public List<RiotLeagueEntry> leagues() {
+        return leagues;
+    }
 
-        @JsonIgnoreProperties(ignoreUnknown = true)
-        @Builder
-        public static record RiotLeagueEntry(
-                        String leagueId,
-                        String queueType,
-                        String tier,
-                        String rank,
-                        String summonerId,
-                        String puuid,
-                        int leaguePoints,
-                        int wins,
-                        int losses,
-                        boolean veteran,
-                        boolean inactive,
-                        boolean freshBlood,
-                        boolean hotStreak,
-                        MiniSeriesDto miniSeries) {
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    @Builder
+    public static record RiotLeagueEntry(
+            String queueType,
+            String tier,
+            String rank,
+            String puuid,
+            int leaguePoints,
+            int wins,
+            int losses,
+            boolean veteran,
+            boolean inactive,
+            boolean freshBlood,
+            boolean hotStreak) {
 
-                @JsonIgnoreProperties(ignoreUnknown = true)
-                @Builder
-                public static record MiniSeriesDto(
-                                int losses,
-                                String progress,
-                                int target,
-                                int wins) {
-                }
-        }
+    }
 }

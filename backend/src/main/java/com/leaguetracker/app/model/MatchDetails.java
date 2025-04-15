@@ -12,15 +12,12 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "summoner_matches")
-public class SummonerMatch {
+@Table(name = "match_details")
+public class MatchDetails {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
+    @Column(name = "match_id")
     private String matchId;
-    private String puuid;
 
     @Column(columnDefinition = "TEXT")
     private String metadataJson;

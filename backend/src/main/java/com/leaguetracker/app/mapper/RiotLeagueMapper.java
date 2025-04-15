@@ -1,32 +1,55 @@
 package com.leaguetracker.app.mapper;
 
 import com.leaguetracker.app.dto.response.RiotLeagueResponse.RiotLeagueEntry;
-import com.leaguetracker.app.dto.response.RiotLeagueResponse.RiotLeagueEntry.MiniSeriesDto;
 import com.leaguetracker.app.dto.response.RiotLeagueResponse;
-import com.leaguetracker.app.model.SummonerRank;
-import com.leaguetracker.app.model.SummonerRank.MiniSeries;
+import com.leaguetracker.app.model.Rank;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
+import java.util.Objects;
 
 @Mapper
 public interface RiotLeagueMapper {
 
     RiotLeagueMapper INSTANCE = Mappers.getMapper(RiotLeagueMapper.class);
 
-    RiotLeagueEntry toRiotLeagueEntry(SummonerRank summonerRank);
+    RiotLeagueEntry toRiotLeagueEntry(Rank rank);
 
-    MiniSeriesDto toMiniSeriesDto(MiniSeries miniSeries);
-
-    default RiotLeagueResponse toResponse(List<SummonerRank> summonerRanks) {
+    default RiotLeagueResponse toResponse(List<Rank> ranks) {
         return RiotLeagueResponse.builder()
-                .leagues(summonerRanks.stream()
+                .leagues(ranks.stream()
                         .map(this::toRiotLeagueEntry)
-                        .filter(dto -> dto != null)
+                        .filter(Objects::nonNull)
                         .distinct()
                         .toList())
                 .build();
+    }
+
+    default Rank toRank(RiotLeagueEntry rank) {
+        String currentRank = rank.tier() + " " + rank.rank() + " " + rank.leaguePoints();
+        return Rank.builder()
+                .currentRank(currentRank)
+                .lowestRank("")
+                .peakRank("")
+                .puuid(rank.puuid())
+                .wins(rank.wins())
+                .losses(rank.losses())
+                .freshBlood(rank.freshBlood())
+                .hotStreak(rank.hotStreak())
+                .inactive(rank.inactive())
+                .queueType(rank.queueType())
+                .build();
+    }
+
+    ;
+
+    default List<Rank> toRanks(RiotLeagueResponse ranks) {
+        return ranks.leagues().stream()
+                .map(this::toRank)
+                .filter(Objects::nonNull)
+                .distinct()
+                .toList();
     }
 }

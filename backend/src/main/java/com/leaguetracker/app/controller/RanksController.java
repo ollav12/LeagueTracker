@@ -1,10 +1,6 @@
 package com.leaguetracker.app.controller;
 
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,8 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import com.leaguetracker.app.dto.response.RiotLeagueResponse;
-import com.leaguetracker.app.model.SummonerRank;
+import com.leaguetracker.app.model.Rank;
 import com.leaguetracker.app.service.RankService;
 import com.leaguetracker.app.service.UpdateService;
 
@@ -30,7 +25,7 @@ public class RanksController {
     private final UpdateService updateService;
 
     @GetMapping
-    public ResponseEntity<List<SummonerRank>> getRanks() {
+    public ResponseEntity<List<Rank>> getRanks() {
         return ResponseEntity.ok(rankService.getRanks());
     }
 

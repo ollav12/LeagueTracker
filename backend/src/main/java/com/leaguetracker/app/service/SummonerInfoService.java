@@ -6,6 +6,7 @@ import com.leaguetracker.app.dto.request.SummonerUpdateRequest;
 import com.leaguetracker.app.dto.response.*;
 import com.leaguetracker.app.exception.SummonerRecentlyUpdatedException;
 import com.leaguetracker.app.mapper.RiotSummonerMapper;
+import com.leaguetracker.app.model.Rank;
 import com.leaguetracker.app.model.Summoner;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -33,7 +34,7 @@ public class SummonerInfoService {
         RiotSummonerResponse summoner = summonerService.getSummoner(
                 account,
                 request);
-        RiotLeagueResponse league = rankService.getRanked(
+        List<Rank> league = rankService.getRanked(
                 summoner.puuid(),
                 request.region());
 
@@ -90,7 +91,7 @@ public class SummonerInfoService {
         RiotSummonerResponse summoner = summonerService.updateSummoner(
                 request.puuid(),
                 request.region());
-        RiotLeagueResponse league = rankService.updateRanked(
+        List<Rank> league = rankService.updateRanked(
                 summoner.puuid(),
                 request.region());
 

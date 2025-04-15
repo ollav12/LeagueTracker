@@ -7,17 +7,17 @@
         <div class="rank-row">
           <div class="rank-entry">
             <div class="rank-icon-container">
-              <img :src="soloRankIconUrl" alt="Solo Rank" class="rank-icon" />
+              <img :src="currentSoloRankUrl" alt="Solo Rank" class="rank-icon"/>
             </div>
             <div class="rank-info">
               <div class="rank-status">
-                <span class="rankText">{{ formatRank(soloRank) }}</span>
+                <span class="rankText">{{ formatRank(this.summoner.ranked.solo.currentRank) }}</span>
                 <span class="win-loss-text"
-                  >{{ soloWins }}W {{ soloLosses }}L</span
+                >{{ soloWins }}W {{ soloLosses }}L</span
                 >
               </div>
               <div class="stats-row">
-                <span class="lp-text">{{ getSoloLP }} LP</span>
+                <span class="lp-text">{{ soloLp("current") }} LP</span>
                 <span class="win-percent">Win rate {{ getSoloWinRate }}%</span>
               </div>
             </div>
@@ -26,14 +26,14 @@
           <!-- Peak rank section -->
           <div class="rank-entry peak-rank">
             <div class="rank-icon-container">
-              <img :src="soloRankIconUrl" alt="Peak Rank" class="rank-icon" />
+              <img :src="peakSoloRankUrl" alt="Peak Rank" class="rank-icon"/>
             </div>
             <div class="rank-info">
               <div class="rank-status">
-                <span class="rankText">{{ formatRank(soloRank) }}</span>
+                <span class="rankText">{{ formatRank(this.summoner.ranked.solo.peakRank) }}</span>
               </div>
               <div class="peak-stats-row">
-                <span class="lp-text">{{ getSoloLP }} LP</span>
+                <span class="lp-text">{{ soloLp("peak") }} LP</span>
               </div>
             </div>
           </div>
@@ -43,34 +43,34 @@
           <div class="rank-row ranks-container">
             <table class="ranks-table">
               <thead>
-                <tr>
-                  <th class="title-season">Season</th>
-                  <th class="title-tier">Tier</th>
-                  <!-- Combined column -->
-                  <th class="title-lp">LP</th>
-                </tr>
+              <tr>
+                <th class="title-season">Season</th>
+                <th class="title-tier">Tier</th>
+                <!-- Combined column -->
+                <th class="title-lp">LP</th>
+              </tr>
               </thead>
               <tbody>
-                <tr v-for="(row, i) in displayedRows" :key="i">
-                  <td class="season-row">{{ row.season }}</td>
-                  <!-- Combined tier cell with both icon and text -->
+              <tr v-for="(row, i) in displayedRows" :key="i">
+                <td class="season-row">{{ row }}</td>
+                <!-- Combined tier cell with both icon and text -->
 
-                  <td class="tier-row">
-                    <div class="tier-content">
-                      <div class="mini-icon-container">
-                        <img
+                <td class="tier-row">
+                  <div class="tier-content">
+                    <div class="mini-icon-container">
+                      <img
                           :src="`https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/ux/fonts/texticons/lol/ranks/rank${getRankName(
-                            row.tier
+                            this.summoner.ranked.solo.currentRank
                           )}.png`"
-                          :alt="row.tier"
+                          :alt="null"
                           class="mini-rank-icon"
-                        />
-                      </div>
-                      <span class="tier-text">{{ formatRank(row.tier) }}</span>
+                      />
                     </div>
-                  </td>
-                  <td class="lp-row">{{ row.leaguePoints }}</td>
-                </tr>
+                    <span class="tier-text">{{ formatRank(this.summoner.ranked.solo.currentRank) }}</span>
+                  </div>
+                </td>
+                <td class="lp-row">{{ row.leaguePoints }}</td>
+              </tr>
               </tbody>
             </table>
 
@@ -78,8 +78,8 @@
               <button @click="toggleSeasonDisplay" class="view-all-button">
                 {{ showAllSeasons ? "Close" : "View all season tiers" }}
                 <span
-                  class="toggle-arrow"
-                  :class="{ 'arrow-up': showAllSeasons }"
+                    class="toggle-arrow"
+                    :class="{ 'arrow-up': showAllSeasons }"
                 >
                   ▼
                 </span>
@@ -93,27 +93,27 @@
       <template v-if="showFlexRank && summoner.ranked">
         <h3 class="rank-title rank-flex-title">
           Ranked Flex
-          <span v-if="flexRank === 'Unranked'" class="unranked-badge"
-            >Unranked</span
+          <span v-if="showFlexRank === 'Unranked'" class="unranked-badge"
+          >Unranked</span
           >
         </h3>
-        <div v-if="flexRank === 'Unranked'" class="unranked-spacer"></div>
-        <div v-if="flexRank !== 'Unranked'" class="rank-row">
+        <div v-if="showFlexRank === 'Unranked'" class="unranked-spacer"></div>
+        <div v-if="showFlexRank !== 'Unranked'" class="rank-row">
           <div class="rank-entry">
             <div class="rank-icon-container">
-              <img :src="flexRankIconUrl" alt="Flex Rank" class="rank-icon" />
+              <img :src="currentFlexRankUrl" alt="Flex Rank" class="rank-icon"/>
             </div>
             <div class="rank-info">
               <div class="rank-status">
-                <span class="rankText">{{ formatRank(flexRank) }}</span>
+                <span class="rankText">{{ formatRank(this.summoner.ranked.flex.currentRank) }}</span>
                 <span class="win-loss-text"
-                  >{{ flexWins }}W {{ flexLosses }}L</span
+                >{{ flexWins }}W {{ flexLosses }}L</span
                 >
               </div>
               <div class="stats-row">
-                <span class="lp-text">{{ flexLp }} LP</span>
+                <span class="lp-text"> {{ flexLp("current") }} LP</span>
                 <span class="win-percent"
-                  >Win rate {{ winPercentageFlex }}%</span
+                >Win rate {{ winPercentageFlex }}%</span
                 >
               </div>
             </div>
@@ -123,31 +123,31 @@
           <div class="rank-row ranks-container">
             <table class="ranks-table">
               <thead>
-                <tr>
-                  <th class="title-season">Season</th>
-                  <th class="title-tier">Tier</th>
-                  <th class="title-lp">LP</th>
-                </tr>
+              <tr>
+                <th class="title-season">Season</th>
+                <th class="title-tier">Tier</th>
+                <th class="title-lp">LP</th>
+              </tr>
               </thead>
               <tbody>
-                <tr v-for="(row, i) in displayedFlexRows" :key="i">
-                  <td class="season-row">{{ row.season }}</td>
-                  <td class="tier-row">
-                    <div class="tier-content">
-                      <div class="mini-icon-container">
-                        <img
+              <tr v-for="(row, i) in displayedFlexRows" :key="i">
+                <td class="season-row">{{ row }}</td>
+                <td class="tier-row">
+                  <div class="tier-content">
+                    <div class="mini-icon-container">
+                      <img
                           :src="`https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/ux/fonts/texticons/lol/ranks/rank${getRankName(
-                            row.tier
+                            this.summoner.ranked.flex.currentRank
                           )}.png`"
-                          :alt="row.tier"
+                          :alt="null"
                           class="mini-rank-icon"
-                        />
-                      </div>
-                      <span class="tier-text">{{ formatRank(row.tier) }}</span>
+                      />
                     </div>
-                  </td>
-                  <td class="lp-row">{{ row.leaguePoints }}</td>
-                </tr>
+                    <span class="tier-text">{{ formatRank(this.summoner.ranked.flex.currentRank) }}</span>
+                  </div>
+                </td>
+                <td class="lp-row">{{ flexLp("current") }}</td>
+              </tr>
               </tbody>
             </table>
 
@@ -155,8 +155,8 @@
               <button @click="toggleFlexSeasonDisplay" class="view-all-button">
                 {{ showAllFlexSeasons ? "Close" : "View all season tiers" }}
                 <span
-                  class="toggle-arrow"
-                  :class="{ 'arrow-up': showAllFlexSeasons }"
+                    class="toggle-arrow"
+                    :class="{ 'arrow-up': showAllFlexSeasons }"
                 >
                   ▼
                 </span>
@@ -174,10 +174,10 @@
   </div>
 </template>
 <script>
-import { storeToRefs } from "pinia";
-import { useSummonerStore } from "@/stores/modules/summoner";
-import { useQueueFilterStore } from "@/stores/modules/queueFilter";
-import { onMounted, onBeforeUnmount } from "vue";
+import {storeToRefs} from "pinia";
+import {useSummonerStore} from "@/stores/modules/summoner";
+import {useQueueFilterStore} from "@/stores/modules/queueFilter";
+import {onMounted, onBeforeUnmount} from "vue";
 
 export default {
   name: "RankHistory",
@@ -197,8 +197,8 @@ export default {
   setup() {
     const summonerStore = useSummonerStore();
     const queueFilterStore = useQueueFilterStore();
-    const { summoner } = storeToRefs(summonerStore);
-    const { activeQueue } = storeToRefs(queueFilterStore);
+    const {summoner} = storeToRefs(summonerStore);
+    const {activeQueue} = storeToRefs(queueFilterStore);
 
     // Cleanup function for component unmount
     onBeforeUnmount(() => {
@@ -212,27 +212,16 @@ export default {
   },
 
   computed: {
-    soloRank() {
-      if (!this.summoner.ranked.solo?.tier) return "Unranked";
-      return `${this.summoner.ranked.solo.tier} ${this.summoner.ranked.solo.rank}`;
-    },
     soloWins() {
       return this.summoner.ranked.solo?.wins || 0;
     },
     soloLosses() {
       return this.summoner.ranked.solo?.losses || 0;
     },
-    getSoloLP() {
-      return this.summoner.ranked.solo?.leaguePoints || 0;
-    },
     getSoloWinRate() {
       const wins = this.soloWins;
       const total = wins + this.soloLosses;
       return total > 0 ? Math.round((wins / total) * 100) : 0;
-    },
-    flexRank() {
-      if (!this.summoner.ranked.flex?.tier) return "Unranked";
-      return `${this.summoner.ranked.flex.tier} ${this.summoner.ranked.flex.rank} ${this.summoner.ranked.flex.leaguePoints} LP`;
     },
     flexWins() {
       return this.summoner.ranked.flex?.wins || 0;
@@ -240,17 +229,41 @@ export default {
     flexLosses() {
       return this.summoner.ranked.flex?.losses || 0;
     },
-    soloRankIconUrl() {
+    currentSoloRankUrl() {
       if (!this.summoner.ranked.solo) {
         return "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-iron.png";
       }
-      return this.summoner.ranked.solo.rankUrl;
+      return this.summoner.ranked.solo.currentRankUrl;
     },
-    flexRankIconUrl() {
+    peakSoloRankUrl() {
+      if (!this.summoner.ranked.solo) {
+        return "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-iron.png";
+      }
+      return this.summoner.ranked.solo.peakRankUrl;
+    },
+    lowestSoloRankUrl() {
+      if (!this.summoner.ranked.solo) {
+        return "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-iron.png";
+      }
+      return this.summoner.ranked.solo.lowestRankUrl;
+    },
+    currentFlexRankUrl() {
       if (!this.summoner.ranked.flex) {
         return "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-iron.png";
       }
-      return this.summoner.ranked.flex.rankUrl;
+      return this.summoner.ranked.flex.currentRankUrl;
+    },
+    peakFlexRankUrl() {
+      if (!this.summoner.ranked.flex) {
+        return "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-iron.png";
+      }
+      return this.summoner.ranked.flex.peakRankUrl;
+    },
+    lowestFlexRankUrl() {
+      if (!this.summoner.ranked.flex) {
+        return "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-iron.png";
+      }
+      return this.summoner.ranked.flex.lowestRankUrl;
     },
     displayedFlexRows() {
       if (this.showAllFlexSeasons) {
@@ -274,28 +287,53 @@ export default {
       }
       return Math.round((this.flexWins / totalGames) * 100);
     },
-    flexLp() {
-      return this.summoner.ranked.flex?.leaguePoints || 0;
-    },
     showSoloRank() {
       // Show for 'all', 'solo', and all dropdown queue types
       return (
-        this.activeQueue === "all" ||
-        this.activeQueue === "solo" ||
-        ["normal-draft", "normal-blind", "clash"].includes(this.activeQueue)
+          this.activeQueue === "all" ||
+          this.activeQueue === "solo" ||
+          ["normal-draft", "normal-blind", "clash"].includes(this.activeQueue)
       );
     },
     showFlexRank() {
       // Show for 'all', 'flex', and all dropdown queue types
       return (
-        this.activeQueue === "all" ||
-        this.activeQueue === "flex" ||
-        ["normal-draft", "normal-blind", "clash"].includes(this.activeQueue)
+          this.activeQueue === "all" ||
+          this.activeQueue === "flex" ||
+          ["normal-draft", "normal-blind", "clash"].includes(this.activeQueue)
       );
     },
   },
 
   methods: {
+    soloLp(rankType) {
+      if (rankType === "current") {
+        const lp = this.summoner.ranked.solo.currentRank.split(" ")
+        return lp[2];
+      } else if (rankType === "peak") {
+        const lp = this.summoner.ranked.solo.peakRank.split(" ")
+        return lp[2];
+      } else if (rankType === "lowest") {
+        const lp = this.summoner.ranked.solo.lowestRank.split(" ")
+        return lp[2];
+      } else {
+        return 0
+      }
+    },
+    flexLp(rankType) {
+      if (rankType === "current") {
+        const lp = this.summoner.ranked.flex.currentRank.split(" ")
+        return lp[2];
+      } else if (rankType === "peak") {
+        const lp = this.summoner.ranked.flex.peakRank.split(" ")
+        return lp[2];
+      } else if (rankType === "lowest") {
+        const lp = this.summoner.ranked.flex.lowestRank.split(" ")
+        return lp[2];
+      } else {
+        return 0
+      }
+    },
     toggleFlexSeasonDisplay() {
       this.showAllFlexSeasons = !this.showAllFlexSeasons;
     },
@@ -306,7 +344,7 @@ export default {
       if (!rank) return "Unranked";
 
       // Split the rank into tier and division
-      const [tier, division] = rank.split(" ");
+      const [name, division, lp] = rank.split(" ");
 
       // Convert roman numerals to numbers
       const romanToNumber = {
@@ -318,23 +356,23 @@ export default {
 
       // Capitalize first letter, lowercase rest
       const formattedTier =
-        tier.charAt(0).toUpperCase() + tier.slice(1).toLowerCase();
+          name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
 
       // Check if tier is one without divisions
       const noDivisionTiers = ["challenger", "grandmaster", "master"];
-      if (noDivisionTiers.includes(tier.toLowerCase())) {
+      if (noDivisionTiers.includes(name.toLowerCase())) {
         return formattedTier;
       }
 
       // For other tiers, include the division number
       const formattedDivision = romanToNumber[division] || "";
       return formattedDivision
-        ? `${formattedTier} ${formattedDivision}`
-        : formattedTier;
+          ? `${formattedTier} ${formattedDivision}`
+          : formattedTier;
     },
     getRankName(rank) {
       if (!rank) return "";
-      let [rankName, tier] = rank.split(" ");
+      let [rankName, tier, lp] = rank.split(" ");
       rankName = rankName.toLowerCase();
       return rankName;
     },
@@ -417,6 +455,7 @@ export default {
   align-items: center;
   gap: 6px; /* Space between icon and text */
 }
+
 .mini-icon-container {
   width: 14px;
   height: 14px;
@@ -633,6 +672,7 @@ export default {
   align-items: right;
   margin-left: 5px;
 }
+
 .peak-rank .rank-icon-container {
   height: 44px;
   width: 44px;
@@ -671,6 +711,7 @@ export default {
   width: 100%;
   margin-top: 0px;
 }
+
 .rank-status {
   display: flex;
   justify-content: space-between;

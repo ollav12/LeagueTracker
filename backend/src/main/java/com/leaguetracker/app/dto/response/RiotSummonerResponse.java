@@ -7,10 +7,8 @@ import lombok.Builder;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Builder
 public record RiotSummonerResponse(
-                String id,
-                String accountId,
-                String puuid,
-                int profileIconId,
-                long revisionDate,
-                int summonerLevel) {
+        String puuid,
+        int profileIconId,
+        int summonerLevel,
+        long revisionDate) {
 }
