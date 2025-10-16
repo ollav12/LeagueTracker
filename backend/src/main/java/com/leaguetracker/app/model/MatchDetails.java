@@ -5,13 +5,13 @@ import lombok.*;
 
 import java.util.List;
 
+@Entity
 @Getter
 @Setter
 @ToString
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity
+@Builder
 @Table(name = "match_details")
 public class MatchDetails {
 

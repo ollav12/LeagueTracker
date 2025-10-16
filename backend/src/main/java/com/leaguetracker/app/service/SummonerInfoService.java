@@ -68,8 +68,33 @@ public class SummonerInfoService {
                 .build();
     }
 
-    public SummonerMatchesResponse loadMatches(SummonerMatchesRequest request) {
-        return getMatchHistory(request);
+    public SummonerMatchesResponse loadMoreMatches(SummonerMatchesRequest request) {
+        List<String> matchIds = matchService.getNextMatchIds(
+                request.puuid(),
+                request.lastMatchId(),
+                request.limit());
+
+        if (matchIds.isEmpty()) {
+            matchService.updateMatchList(
+                    request.puuid(),
+                    request.region(),
+                    MatchService.MatchListMode.LIGHT);
+            matchIds = matchService.getNextMatchIds(
+                    request.puuid(),
+                    request.lastMatchId(),
+                    request.limit());
+        }
+
+        List<RiotMatchResponse> matchDetails = matchService.getMatches(
+                request.region(),
+                matchIds);
+        Map<String, Object> stats = statsService.getSummonerStats(request.puuid());
+
+        return SummonerMatchesResponse.builder()
+                .matchIds(matchIds)
+                .matchDetails(matchDetails)
+                .stats(stats)
+                .build();
     }
 
     public SummonerUpdateResponse updateSummoner(SummonerUpdateRequest request) {

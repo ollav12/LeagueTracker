@@ -89,6 +89,10 @@ public class MatchService {
         return matches;
     }
 
+    public List<RiotMatchResponse> loadMoreMatches(String region, List<String> matchIds) {
+        return getMatches(region, matchIds);
+    }
+
     /**
      * Helper method to fetch match from API and save to database
      */
@@ -142,7 +146,7 @@ public class MatchService {
             matchList.add(match.getMatchId());
         }
 
-        int start = 0;
+        int start = matchList.size();
         int count = 100;
         boolean shouldContinueFetching = true;
 

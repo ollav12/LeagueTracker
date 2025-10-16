@@ -3,13 +3,13 @@ package com.leaguetracker.app.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+@Entity
 @Getter
 @Setter
 @ToString
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity
+@Builder
 @Table(name = "rank", uniqueConstraints = {
         @UniqueConstraint(columnNames = {"puuid", "queueType", "season"})
 })

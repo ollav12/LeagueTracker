@@ -3,10 +3,7 @@ package com.leaguetracker.app.controller;
 import com.leaguetracker.app.dto.request.SummonerUpdateRequest;
 import com.leaguetracker.app.dto.response.SummonerUpdateResponse;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -50,7 +47,7 @@ public class SummonersController {
     public ResponseEntity<SummonerMatchesResponse> loadMoreMatches(
             @PathVariable String puuid,
             @Valid SummonerMatchesRequest request) {
-        return ResponseEntity.ok(summonerInfoService.loadMatches(request));
+        return ResponseEntity.ok(summonerInfoService.loadMoreMatches(request));
     }
 
     @GetMapping("/{puuid}/update")

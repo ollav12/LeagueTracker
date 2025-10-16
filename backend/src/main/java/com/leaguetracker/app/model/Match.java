@@ -3,13 +3,13 @@ package com.leaguetracker.app.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+@Entity
 @Getter
 @Setter
 @ToString
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity
+@Builder
 @Table(name = "match", indexes = {
         @Index(name = "idx_puuid", columnList = "puuid")}, uniqueConstraints = {
         @UniqueConstraint(name = "uk_puuid_match", columnNames = {"puuid", "match_id"})

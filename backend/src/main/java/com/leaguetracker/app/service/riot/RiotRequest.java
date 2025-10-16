@@ -47,7 +47,7 @@ public class RiotRequest<T> {
             return webClient.get()
                     .uri(webClientConfig.createUrl(endpoint, region, params))
                     .retrieve()
-                    .bodyToMono(String.class)
+                    .bodyToMono(responseType)
                     .retryWhen(Retry.backoff(MAX_RETRIES, Duration.ofSeconds(1))
                             .filter(this::shouldRetry)
                             .doBeforeRetry(retrySignal -> {
@@ -55,22 +55,12 @@ public class RiotRequest<T> {
                                         endpoint, retrySignal.totalRetries() + 1);
                                 handleRateLimit(retrySignal.failure());
                             }))
-                    .map(this::parseResponse)
                     .block();
         } catch (WebClientResponseException e) {
             throw endpoint.mapError(
                     e.getStatusCode().value(),
                     String.format("Error calling %s for region %s: %s",
                             endpoint, region, e.getResponseBodyAsString()));
-        }
-    }
-
-    private T parseResponse(String response) {
-        try {
-            return mapper.readValue(response, responseType);
-        } catch (JsonProcessingException e) {
-            log.error("Failed to parse API response for {}", endpoint, e);
-            throw new RuntimeException("Failed to parse API response", e);
         }
     }
 
