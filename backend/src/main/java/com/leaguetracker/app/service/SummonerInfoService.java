@@ -42,7 +42,7 @@ public class SummonerInfoService {
         matchService.updateMatchList(
                 account.puuid(),
                 request.region(),
-                MatchService.MatchListMode.LIGHT);
+                MatchService.MatchListMode.FIRST_LOAD);
 
         return RiotSummonerMapper.INSTANCE.toSummonerLookupResponse(
                 account,

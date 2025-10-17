@@ -32,7 +32,8 @@ public class MatchService {
     private final RiotService riotService;
 
     public enum MatchListMode {
-        LIGHT,
+        FIRST_LOAD,
+        LIGHT
     }
 
     public RiotMatchResponse getMatch(String matchId, String region) {
@@ -142,6 +143,15 @@ public class MatchService {
     public List<String> updateMatchList(String puuid, String region, MatchListMode mode) {
         List<Match> matchListTemp = matchRepository.findByPuuid(puuid);
         List<String> matchList = new ArrayList<String>();
+
+        if (!matchListTemp.isEmpty() && mode == MatchListMode.FIRST_LOAD) { // Don't load new matches if summoner matches are already present
+            System.out.println("Match list already exists for puuid: " + puuid + ", skipping first load update.");
+            for (Match match : matchListTemp) {
+                matchList.add(match.getMatchId());
+            }
+            return matchList;
+        }
+
         for (Match match : matchListTemp) {
             matchList.add(match.getMatchId());
         }
@@ -162,7 +172,7 @@ public class MatchService {
 
             start += count;
 
-            if (mode == MatchListMode.LIGHT) {
+            if (mode == MatchListMode.LIGHT || mode == MatchListMode.FIRST_LOAD) {
                 shouldContinueFetching = false;
             }
         }
