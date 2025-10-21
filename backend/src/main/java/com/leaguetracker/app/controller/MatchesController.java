@@ -50,7 +50,7 @@ public class MatchesController {
      * @return list of matches
      */
     @GetMapping
-    public ResponseEntity<RiotMatchResponse> getMatche(@RequestBody String matchId, @RequestBody String region) {
+    public ResponseEntity<RiotMatchResponse> getMatch(@RequestBody String matchId, @RequestBody String region) {
         return ResponseEntity.ok(matchService.getMatch(matchId, region));
     }
 

@@ -4,7 +4,7 @@
       <!-- Left-aligned group -->
       <div class="nav-group nav-left">
         <button class="nav-button home-button" @click="goHome">
-          LeagueIndex.GG
+          LeagueIndex.dev
         </button>
         <button class="nav-button" @click="goToChampions">Champions</button>
       </div>
@@ -12,7 +12,7 @@
       <!-- Middle-aligned group (Search Form) -->
       <div class="nav-group nav-middle">
         <div class="searchForm">
-          <SearchForm :layout="'Default'" @formSubmit="handleFormSubmit" />
+          <SearchForm :layout="'Default'" @formSubmit="handleFormSubmit"/>
         </div>
       </div>
 

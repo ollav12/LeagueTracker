@@ -4,7 +4,7 @@
       <!-- Left-aligned group -->
       <div class="nav-group nav-left">
         <button class="nav-button home-button" @click="goHome">
-          LeagueIndex.GG
+          LeagueIndex.dev
         </button>
         <button class="nav-button" @click="goToChampions">Champions</button>
       </div>
