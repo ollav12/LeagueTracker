@@ -78,13 +78,6 @@ export default {
 </script>
 
 <style scoped>
-/* Navigation Bar Styling */
-* {
-  margin: 0px;
-  padding: 0px;
-  box-sizing: border-box;
-}
-
 body {
   background-color: var(--background);
 }
@@ -97,45 +90,6 @@ body {
   --primary-color: #3a435d;
   --nav-bar: #5383e9;
   --grey-background: #edeef2; /* Fixed syntax error */
-}
-
-/* Dark Mode Toggle Button */
-.darkmode {
-  --background: #1c1c1e;
-  --base-variant: #101425;
-  --text-color: #9fabb9;
-  --button-color: #1c1c1e;
-  --primary-color: #3a435d;
-  --nav-bar: #5383e9;
-  --grey-background: #1a1c23; /* Add dark mode grey */
-}
-
-#theme-switch {
-  height: 50px;
-  width: 50px;
-  padding: 0;
-  border-radius: 50%;
-  background-color: var(--nav-bar);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border: none;
-}
-
-#theme-switch svg {
-  fill: var(--button-color);
-}
-
-#theme-switch svg:last-child {
-  display: none;
-}
-
-.darkmode #theme-switch svg:first-child {
-  display: none;
-}
-
-.darkmode #theme-switch svg:last-child {
-  display: block;
 }
 
 nav {
@@ -196,7 +150,6 @@ nav {
 
 .nav-button:hover {
   opacity: 0.9;
-  border-bottom: 3px solid #43b49b;
 }
 
 .home-button {

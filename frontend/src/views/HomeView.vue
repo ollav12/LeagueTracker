@@ -2,13 +2,13 @@
   <div class="homeview">
     <div class="logo-container">
       <img
-        src="@/assets/heimedinger.webp"
-        alt="Heimerdinger"
-        class="heimerdinger-logo"
+          src="@/assets/heimedinger.webp"
+          alt="Heimerdinger"
+          class="heimerdinger-logo"
       />
     </div>
     <div class="form">
-      <SearchForm @formSubmit="redirect" />
+      <SearchForm @formSubmit="redirect"/>
     </div>
 
     <!-- Added decorative rectangles -->
@@ -49,7 +49,7 @@ export default {
   justify-content: flex-start;
   align-items: center;
   text-align: center;
-  margin-top: -35px;
+  margin-top: 0px;
   height: 89%;
   position: relative;
 }

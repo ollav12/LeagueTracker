@@ -58,13 +58,6 @@ export default {
 </script>
 
 <style scoped>
-/* Navigation Bar Styling */
-* {
-  margin: 0px;
-  padding: 0px;
-  box-sizing: border-box;
-}
-
 body {
   background-color: var(--background);
 }
@@ -77,17 +70,6 @@ body {
   --primary-color: #3a435d;
   --nav-bar: #5383e9;
   --grey-background: #edeef2;
-}
-
-/* Dark Mode Toggle Button */
-.darkmode {
-  --background: #1c1c1e;
-  --base-variant: #101425;
-  --text-color: #9fabb9;
-  --button-color: #1c1c1e;
-  --primary-color: #3a435d;
-  --nav-bar: #5383e9;
-  --grey-background: #1a1c23;
 }
 
 nav {
@@ -125,12 +107,11 @@ nav {
   font-weight: 500;
   padding: 8px 12px;
   transition: all 0.2s ease;
-  position: relative; /* Added to position the underline */
-  border-bottom: 3px solid transparent; /* Transparent border initially */
+  position: relative;
+  border-bottom: 3px solid transparent;
 }
 
 .nav-button:hover {
   opacity: 0.9;
-  border-bottom: 3px solid #43b49b; /* Green underline on hover */
 }
 </style>
