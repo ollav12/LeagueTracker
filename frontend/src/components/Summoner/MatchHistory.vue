@@ -3,12 +3,14 @@
     <!-- Header section with integrated queue filter -->
     <div class="match-history-header">
       <div class="header-left">
-        <h3 class="history-title">Recent Games</h3>
+        <h3 class="history-title">Match History</h3>
         <div class="match-stats" v-if="summary.stats">
-          <span class="total-games">{{ filteredMatches.length }}G</span>
+          <span class="total-games">{{ filteredMatches.length }}G:  </span>
           <span class="wins">{{ stats.wins }}W</span>
+          <span class="separator"> - </span>
           <span class="losses">{{ stats.losses }}L</span>
-          <span class="win-rate">{{ stats.winRate }}% WR</span>
+          <span class="separator"> WR </span>
+          <span class="win-rate">{{ stats.winRate }}%</span>
         </div>
       </div>
 
@@ -19,11 +21,11 @@
         </div>
         <div class="queue-dropdown" v-if="dropdownOpen">
           <div
-            v-for="queue in queueTypes"
-            :key="queue.id"
-            class="queue-option"
-            :class="{ active: activeQueue === queue.id }"
-            @click="selectQueue(queue.id)"
+              v-for="queue in queueTypes"
+              :key="queue.id"
+              class="queue-option"
+              :class="{ active: activeQueue === queue.id }"
+              @click="selectQueue(queue.id)"
           >
             {{ queue.name }}
           </div>
@@ -34,10 +36,10 @@
     <!-- Match cards -->
     <div class="match-cards">
       <div
-        v-for="match in filteredMatches"
-        :key="match.metadata.matchId"
-        class="match-card"
-        :class="{
+          v-for="match in filteredMatches"
+          :key="match.metadata.matchId"
+          class="match-card"
+          :class="{
           win: getPlayerStats(match).win,
           loss: !getPlayerStats(match).win,
         }"
@@ -52,7 +54,7 @@
               </div>
             </div>
             <div class="game-result">
-              {{ getPlayerStats(match).win ? "Victory" : "Defeat" }}
+              {{ getPlayerStats(match).win ? "W" : "L" }}
               <div class="game-duration">
                 {{ formatGameDuration(match.info.gameDuration) }}
               </div>
@@ -64,9 +66,9 @@
             <!-- Player champion and stats could go here -->
             <div class="champion-info">
               <img
-                :src="getChampionIcon(getPlayerStats(match).championId)"
-                class="champion-icon"
-                :alt="getChampionName(getPlayerStats(match).championId)"
+                  :src="getChampionIcon(getPlayerStats(match).championId)"
+                  class="champion-icon"
+                  :alt="getChampionName(getPlayerStats(match).championId)"
               />
               <div class="player-stats-summary">
                 <div class="kda-text">
@@ -85,42 +87,42 @@
               <!-- Blue team icons -->
               <div class="team-icons blue-team">
                 <img
-                  v-for="role in [
+                    v-for="role in [
                     'TOP',
                     'JUNGLE',
                     'MIDDLE',
                     'BOTTOM',
                     'UTILITY',
                   ]"
-                  :key="'blue-' + role"
-                  :src="
+                    :key="'blue-' + role"
+                    :src="
                     getChampionIcon(
                       getPlayerByRole(match, 100, role).championId
                     )
                   "
-                  class="preview-champion-icon"
-                  :alt="role"
+                    class="preview-champion-icon"
+                    :alt="role"
                 />
               </div>
 
               <!-- Red team icons -->
               <div class="team-icons red-team">
                 <img
-                  v-for="role in [
+                    v-for="role in [
                     'TOP',
                     'JUNGLE',
                     'MIDDLE',
                     'BOTTOM',
                     'UTILITY',
                   ]"
-                  :key="'red-' + role"
-                  :src="
+                    :key="'red-' + role"
+                    :src="
                     getChampionIcon(
                       getPlayerByRole(match, 200, role).championId
                     )
                   "
-                  class="preview-champion-icon"
-                  :alt="role"
+                    class="preview-champion-icon"
+                    :alt="role"
                 />
               </div>
             </div>
@@ -128,12 +130,12 @@
 
           <!-- Expand button -->
           <button
-            class="expand-button"
-            :class="{
+              class="expand-button"
+              :class="{
               win: getPlayerStats(match).win,
               loss: !getPlayerStats(match).win,
             }"
-            @click="toggleMatchDetails(match.metadata.matchId)"
+              @click="toggleMatchDetails(match.metadata.matchId)"
           >
             ▼
           </button>
@@ -141,46 +143,46 @@
 
         <!-- Expanded details (your existing expanded view) -->
         <div
-          v-if="expandedMatches.has(match.metadata.matchId)"
-          class="match-details"
+            v-if="expandedMatches.has(match.metadata.matchId)"
+            class="match-details"
         >
           <div class="teams-container">
             <div class="team" v-for="team in [100, 200]" :key="team">
               <h4>{{ team === 100 ? "Blue Team" : "Red Team" }}</h4>
               <div class="players-list">
                 <div
-                  v-for="player in match.info.participants.filter(
+                    v-for="player in match.info.participants.filter(
                     (p) => p.teamId === team
                   )"
-                  :key="player.puuid"
-                  class="player-row"
-                  :class="{
+                    :key="player.puuid"
+                    class="player-row"
+                    :class="{
                     'current-player': player.puuid === summoner.account.puuid,
                   }"
                 >
                   <img
-                    :src="getChampionIcon(player.championId)"
-                    class="small-champion-icon"
+                      :src="getChampionIcon(player.championId)"
+                      class="small-champion-icon"
                   />
                   <span class="player-name">{{ player.summonerName }}</span>
                   <div class="player-stats">
                     <span class="player-kda"
-                      >{{ player.kills }}/{{ player.deaths }}/{{
+                    >{{ player.kills }}/{{ player.deaths }}/{{
                         player.assists
                       }}</span
                     >
                     <span class="player-cs"
-                      >{{
+                    >{{
                         player.totalMinionsKilled + player.neutralMinionsKilled
                       }}
                       CS</span
                     >
                     <span class="player-vision"
-                      >Vision: {{ player.visionScore }}</span
+                    >Vision: {{ player.visionScore }}</span
                     >
                     <div class="player-items">
                       <img
-                        v-for="itemId in [
+                          v-for="itemId in [
                           player.item0,
                           player.item1,
                           player.item2,
@@ -189,10 +191,10 @@
                           player.item5,
                           player.item6,
                         ]"
-                        :key="itemId"
-                        :src="getItemIcon(itemId)"
-                        class="item-icon"
-                        v-if="itemId !== 0"
+                          :key="itemId"
+                          :src="getItemIcon(itemId)"
+                          class="item-icon"
+                          v-if="itemId !== 0"
                       />
                     </div>
                   </div>
@@ -206,10 +208,10 @@
 
     <!-- Show more button -->
     <button
-      v-if="hasMoreMatchesToLoad"
-      @click="loadMoreMatches"
-      class="show-more-button"
-      :disabled="isLoading"
+        v-if="hasMoreMatchesToLoad"
+        @click="loadMoreMatches"
+        class="show-more-button"
+        :disabled="isLoading"
     >
       {{ isLoading ? "Loading..." : "Show more" }}
     </button>
@@ -217,10 +219,10 @@
 </template>
 
 <script>
-import { storeToRefs } from "pinia";
-import { useSummonerStore } from "@/stores/modules/summoner";
-import { useQueueFilterStore } from "@/stores/modules/queueFilter";
-import { QUEUE_MODES, QUEUE_FILTER_MAPPING } from "@/constants/queueModes";
+import {storeToRefs} from "pinia";
+import {useSummonerStore} from "@/stores/modules/summoner";
+import {useQueueFilterStore} from "@/stores/modules/queueFilter";
+import {QUEUE_MODES, QUEUE_FILTER_MAPPING} from "@/constants/queueModes";
 
 export default {
   name: "MatchHistory",
@@ -228,8 +230,8 @@ export default {
   setup() {
     const summonerStore = useSummonerStore();
     const queueFilterStore = useQueueFilterStore();
-    const { summary, summoner } = storeToRefs(summonerStore);
-    const { activeQueue } = storeToRefs(queueFilterStore);
+    const {summary, summoner} = storeToRefs(summonerStore);
+    const {activeQueue} = storeToRefs(queueFilterStore);
 
     return {
       summary,
@@ -245,12 +247,12 @@ export default {
       expandedMatches: new Set(), // Track which matches are expanded
       dropdownOpen: false, // Add this for dropdown state
       queueTypes: [
-        { id: "all", name: "All Games" },
-        { id: "solo", name: "Solo/Duo" },
-        { id: "flex", name: "Flex 5v5" },
-        { id: "aram", name: "ARAM" },
-        { id: "normal-draft", name: "Normal Draft" },
-        { id: "normal-blind", name: "Normal Blind" },
+        {id: "all", name: "All Games"},
+        {id: "solo", name: "Solo/Duo"},
+        {id: "flex", name: "Flex 5v5"},
+        {id: "aram", name: "ARAM"},
+        {id: "normal-draft", name: "Normal Draft"},
+        {id: "normal-blind", name: "Normal Blind"},
       ],
     };
   },
@@ -293,7 +295,7 @@ export default {
       if (!queueIds.length) return this.summary.matches; // Return all matches for 'all' filter
 
       return this.summary.matches.filter((match) =>
-        queueIds.includes(match.info.queueId)
+          queueIds.includes(match.info.queueId)
       );
     },
 
@@ -335,7 +337,7 @@ export default {
     },
     getPlayerStats(match) {
       const playerParticipant = match.info.participants.find(
-        (p) => p.puuid === this.summoner.account.puuid
+          (p) => p.puuid === this.summoner.account.puuid
       );
 
       if (!playerParticipant) {
@@ -432,20 +434,20 @@ export default {
 
       if (hours > 0) {
         return `${hours}h ${minutes.toString().padStart(2, "0")}m ${seconds
-          .toString()
-          .padStart(2, "0")}s`;
+            .toString()
+            .padStart(2, "0")}s`;
       }
       return `${minutes}m ${seconds.toString().padStart(2, "0")}s`;
     },
 
     getPlayerByRole(match, teamId, role) {
       return (
-        match.info.participants.find(
-          (p) => p.teamId === teamId && p.teamPosition === role
-        ) || {
-          championId: 0,
-          summonerName: "Unknown",
-        }
+          match.info.participants.find(
+              (p) => p.teamId === teamId && p.teamPosition === role
+          ) || {
+            championId: 0,
+            summonerName: "Unknown",
+          }
       );
     },
 
@@ -484,6 +486,12 @@ export default {
 </script>
 
 <style scoped>
+.separator {
+  color: white; /* Ensure "-" and "WR" remain white */
+  margin-right: 5px;
+  margin-left: 5px;
+}
+
 .champion-icon {
   width: 32px;
   height: 32px;
@@ -506,7 +514,7 @@ export default {
 }
 
 .match-history {
-  width: 100%;
+  width: 760px;
   margin-bottom: 20px;
 }
 
@@ -518,15 +526,14 @@ export default {
   border-radius: 4px;
   padding: 10px 16px;
   margin-bottom: 5px;
-  height: auto; /* Changed from fixed height */
-  width: 740px;
+  height: 30px;
+  width: 760px;
   color: white;
 }
 
 .header-left {
   display: flex;
   align-items: center;
-  gap: 95px;
 }
 
 /* Queue filter styles */
@@ -537,7 +544,6 @@ export default {
 .queue-selector {
   display: flex;
   align-items: center;
-  gap: 5px;
   cursor: pointer;
   padding: 4px 8px;
   background-color: rgba(255, 255, 255, 0.1);
@@ -545,7 +551,9 @@ export default {
   font-size: 12px;
   color: white;
   transition: all 0.2s ease;
-  min-width: 120px;
+  width: 100px;
+  height: 20px;
+  margin-right: -10px;
 }
 
 .queue-selector:hover {
@@ -560,9 +568,7 @@ export default {
 
 .queue-dropdown {
   position: absolute;
-  top: 100%;
-  right: 0;
-  width: 160px;
+  width: 100px;
   background-color: white;
   border-radius: 4px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -590,19 +596,23 @@ export default {
 
 .match-stats {
   display: flex;
-  gap: 10px;
   font-size: 12px;
   color: white;
-  margin-top: -8px;
-  margin-left: -8px;
+  font-weight: 400;
+  margin-left: 15px;
 }
 
 .wins {
-  color: #5383e9;
+  color: #43B49B;
 }
 
 .losses {
-  color: #e84057;
+  color: #E15656;
+}
+
+.total-games {
+  color: #999999;
+  margin-right: 5px;
 }
 
 .match-cards {
@@ -615,15 +625,17 @@ export default {
   border-radius: 4px;
   margin-bottom: 2px;
   background-color: white;
+  position: relative;
+  box-sizing: border-box;
 }
 
 .match-card.win {
-  border-left: 6px solid #43b49b;
+  padding-left: 6px;
   background-color: #43b49b;
 }
 
 .match-card.loss {
-  border-left: 6px solid #e15656;
+  padding-left: 6px;
   background-color: #e15656;
 }
 
@@ -632,8 +644,7 @@ export default {
 }
 
 .match-card-main {
-  height: 96px;
-  padding: 12px 0 12px 12px; /* Remove right padding */
+  height: 100px;
   display: flex;
   align-items: center;
 }
@@ -654,21 +665,21 @@ export default {
 .loss .game-type {
   font-size: 12px;
   color: #5e3838;
-  margin-bottom: 4px;
+  margin-bottom: 0px;
   font-weight: 700;
 }
 
 .time-ago {
   font-size: 11px;
   color: white;
-  margin-top: 2px;
   font-weight: 400;
+  margin-top: 20px;
 }
 
 .game-result {
-  font-size: 14px;
-  font-weight: 600;
-  margin-top: 8px;
+  font-size: 17px;
+  font-weight: 700;
+  display: inline;
 }
 
 .win .game-result {
@@ -682,7 +693,7 @@ export default {
 .game-duration {
   font-size: 11px;
   color: white;
-  margin-top: 2px;
+  display: inline;
 }
 
 /* Middle section style */
@@ -755,27 +766,13 @@ export default {
 }
 
 .expand-button {
-  width: 30px;
-  height: 96px;
-  border: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 12px;
-  margin-right: 0px; /* Pull button to edge */
-  margin-left: 12px; /* Add spacing from content */
-  border-top-right-radius: 4px; /* Add this */
-  border-bottom-right-radius: 4px; /* Add this */
-}
-
-.expand-button.win {
-  background-color: #34333b;
-}
-
-.expand-button.loss {
-  background-color: #34333b;
+  color: transparent;
 }
 
 /* Remove the hover effect */

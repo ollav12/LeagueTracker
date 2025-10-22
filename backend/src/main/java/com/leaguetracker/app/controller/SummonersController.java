@@ -2,6 +2,7 @@ package com.leaguetracker.app.controller;
 
 import com.leaguetracker.app.dto.request.SummonerUpdateRequest;
 import com.leaguetracker.app.dto.response.SummonerUpdateResponse;
+import lombok.NonNull;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,9 +26,9 @@ public class SummonersController {
 
     @GetMapping("/{region}/{summonerName}-{tag}")
     public ResponseEntity<SummonerLookupResponse> getSummoner(
-            @PathVariable String region,
-            @PathVariable String summonerName,
-            @PathVariable String tag) {
+            @NonNull @PathVariable String region,
+            @NonNull @PathVariable String summonerName,
+            @NonNull @PathVariable String tag) {
 
         SummonerLookupRequest request = SummonerLookupRequest.builder()
                 .region(region)
@@ -44,14 +45,12 @@ public class SummonersController {
     }
 
     @GetMapping("/{puuid}/match-history/load-more")
-    public ResponseEntity<SummonerMatchesResponse> loadMoreMatches(
-            @PathVariable String puuid,
-            @Valid SummonerMatchesRequest request) {
+    public ResponseEntity<SummonerMatchesResponse> loadMoreMatches(@Valid SummonerMatchesRequest request) {
         return ResponseEntity.ok(summonerInfoService.loadMoreMatches(request));
     }
 
     @GetMapping("/{puuid}/update")
-    public ResponseEntity<SummonerUpdateResponse> updateSummoner(@PathVariable String puuid, @Valid SummonerUpdateRequest request) {
+    public ResponseEntity<SummonerUpdateResponse> updateSummoner(@Valid SummonerUpdateRequest request) {
         return ResponseEntity.ok(summonerInfoService.updateSummoner(request));
     }
 }
