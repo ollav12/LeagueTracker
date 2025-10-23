@@ -4,16 +4,28 @@
       <div class="profile-header">
         <div class="icon-container">
           <img :src="getProfileIconUrl" alt="Profile Icon" class="profile-icon"/>
-          <span class="level">{{ summoner.account?.summonerLevel || 0 }}</span>
+          <span class="ladder-rank">Top 1%</span>
         </div>
         <div class="name-container">
           <h2 class="summoner-name">
             {{ summoner.account?.name }}
             <span class="tag">#{{ formatTag(summoner.account?.tagLine) }}</span>
           </h2>
-          <p class="ladder-rank">
-            {{ summoner.account?.region }} | Ladder Rank 77,321 (3.71% of top)
-          </p>
+          <div class="level">
+            <div class="square-container">
+              <div class="square"></div>
+              <div class="square"></div>
+              <div class="square"></div>
+              <div class="square"></div>
+              <div class="square"></div>
+              <div class="square"></div>
+              <div class="square"></div>
+              <div class="square"></div>
+              <div class="square"></div>
+              <div class="square"></div>
+            </div>
+            <span class="level-text">{{ summoner.account?.summonerLevel || 0 }}</span>
+          </div>
           <button
               class="update-button"
               @click="updateSummoner"
@@ -106,7 +118,7 @@ export default {
 
   computed: {
     buttonText() {
-      return this.isUpdating ? "Updating..." : "Update";
+      return this.isUpdating ? "Updating..." : "Refresh";
     },
 
     getProfileIconUrl() {
@@ -204,22 +216,60 @@ export default {
   display: inline-block;
   width: 100px;
   height: 100px;
-  margin-right: 20px;
+  margin-right: 5px;
 }
 
 .profile-icon {
   width: 100%;
   height: 100%;
-  border-radius: 20%;
+  border-radius: 2%;
   object-fit: cover;
+  border-color: #34333b;
+  border-width: 6px;
 }
 
 .level {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  background-color: #34333b;
+  color: white;
+  padding: 2px 8px;
+  font-size: 10px;
+  min-width: 320px;
+  max-width: 340px;
+  text-align: right;
+  margin-bottom: 5px;
+}
+
+.square-container {
+  display: flex;
+  gap: 3px;
+  margin-right: 5px;
+  margin-left: -4px;
+}
+
+.square {
+  width: 26px;
+  height: 11px;
+  background-color: white;
+  border-radius: 2%;
+}
+
+.level-text {
+  font-size: 12px;
+  line-height: 15px;
+  font-family: "system-ui";
+  font-style: normal;
+  font-weight: 400;
+}
+
+.ladder-rank {
   position: absolute;
   bottom: -8px;
   left: 50%;
   transform: translateX(-50%);
-  background-color: #202a38;
+  background-color: #34333b;
   color: white;
   border-radius: 50px;
   padding: 1px 8px;
@@ -235,51 +285,41 @@ export default {
   flex-direction: column;
   align-items: flex-start;
   position: relative;
-  padding-bottom: 20px;
+  margin-top: 1px;
 }
 
 .summoner-name {
-  margin: 0;
-  font-size: 24px;
-  font-weight: 700;
-  line-height: 28px;
-  padding-bottom: 2px;
-  font-family: "roboto";
+  font-size: 34px;
+  font-weight: 400;
+  line-height: 16px;
+  margin-bottom: 5px;
+  font-family: "Inter";
+  font-style: italic;
   color: white;
 }
 
 .tag {
-  font-size: 24px;
-  line-height: 28px;
+  font-size: 34px;
+  line-height: 34px;
   font-weight: 400;
   color: #1b5850;
 }
 
-.ladder-rank {
-  margin: 0;
-  font-size: 12px;
-  line-height: 16px;
-  color: white;
-  font-weight: 400;
-}
-
 .update-button {
-  margin-top: 8px;
   background-color: #1b5850;
   color: white;
-  border: none;
-  border-radius: 3px;
-  padding: 11px 15px;
-  font-size: 14px;
+  border-radius: 2px;
+  padding: 10px 30px;
+  font-size: 20px;
   cursor: pointer;
   transition: background-color 0.3s;
-  font-family: "Roboto";
+  font-family: "Inter";
   font-weight: 400;
-  line-height: 20px;
+  line-height: 16px;
 }
 
 .update-button:hover {
-  background-color: #496fd0;
+  background-color: #1b4642;
 }
 
 .update-button:disabled {
@@ -319,7 +359,7 @@ export default {
   transition: all 0.2s;
   font-weight: 400;
   border-radius: 3px;
-  font-family: "Roboto";
+  font-family: "Inter";
   display: flex;
   align-items: center;
   gap: 3px;
@@ -347,7 +387,7 @@ export default {
   margin-left: 3px;
   position: relative;
   top: -1px;
-  font-family: "Roboto";
+  font-family: "Inter";
 }
 
 .nav-item.active .update-badge {

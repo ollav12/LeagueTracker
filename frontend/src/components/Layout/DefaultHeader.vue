@@ -139,7 +139,7 @@ nav {
   border: none;
   cursor: pointer;
   font-size: 30px;
-  font-family: "Roboto";
+  font-family: "Inter";
   color: white;
   font-weight: 500;
   padding: 8px 12px;

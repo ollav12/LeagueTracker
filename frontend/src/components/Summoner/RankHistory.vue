@@ -396,7 +396,7 @@ export default {
 }
 
 .unranked-badge {
-  font-family: "Roboto";
+  font-family: "Inter";
   font-size: 14px;
   font-weight: 700;
   line-height: 20px;
@@ -430,7 +430,7 @@ export default {
 
 /* Update button styles */
 .view-all-button {
-  font-family: "Roboto";
+  font-family: "Inter";
   color: white;
   font-size: 12px;
   background-color: #34333B; /* Light gray background */
@@ -465,7 +465,7 @@ export default {
 }
 
 .title-season .title-tier .title-lp {
-  font-family: "Roboto";
+  font-family: "Inter";
   font-size: 11px;
   line-height: 16px;
   font-weight: 400;
@@ -498,7 +498,7 @@ export default {
 }
 
 .season-row {
-  font-family: "Roboto";
+  font-family: "Inter";
   font-weight: 700;
   font-size: 11px;
   line-height: 14px;
@@ -526,7 +526,7 @@ export default {
 }
 
 .tier-row {
-  font-family: "Roboto";
+  font-family: "Inter";
   font-weight: 400;
   font-size: 12px;
   line-height: 16px;
@@ -536,7 +536,7 @@ export default {
 }
 
 .lp-row {
-  font-family: "Roboto";
+  font-family: "Inter";
   font-weight: 400px;
   font-size: 12px;
   line-height: 16px;
@@ -649,7 +649,7 @@ export default {
 }
 
 .lp-text {
-  font-family: "Roboto";
+  font-family: "Inter";
   color: white;
   font-size: 12px;
   line-height: 16px;
@@ -679,7 +679,7 @@ export default {
   height: 30px;
   border-radius: 4px 4px 0 0;
   padding: 10px;
-  font-family: "roboto";
+  font-family: "Inter";
   align-items: center;
   display: flex;
   padding-left: 10px;
@@ -772,7 +772,7 @@ export default {
   text-align: center;
   width: 332px;
   color: rgb(117, 133, 146);
-  font-family: "Roboto";
+  font-family: "Inter";
   font-size: 14px;
 }
 </style>

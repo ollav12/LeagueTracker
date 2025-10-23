@@ -1,7 +1,7 @@
 <template>
   <form
-    @submit.prevent="formSubmit"
-    :class="[
+      @submit.prevent="formSubmit"
+      :class="[
       'search-form',
       layout === 'Home' ? 'home-search-form' : 'default-search-form',
     ]"
@@ -9,19 +9,19 @@
     <div :class="['text', layout === 'Home' ? 'text-home' : 'text-default']">
       <!-- Custom Region Selector for Home layout -->
       <div
-        v-if="layout === 'Home'"
-        class="custom-select"
-        @blur="dropdownOpen = false"
-        tabindex="0"
+          v-if="layout === 'Home'"
+          class="custom-select"
+          @blur="dropdownOpen = false"
+          tabindex="0"
       >
         <div class="selected" @click="toggleDropdown">{{ region }}</div>
         <div class="dropdown" v-if="dropdownOpen">
           <div
-            v-for="option in regionOptions"
-            :key="option"
-            class="option"
-            :class="{ active: region === option }"
-            @click="selectRegion(option)"
+              v-for="option in regionOptions"
+              :key="option"
+              class="option"
+              :class="{ active: region === option }"
+              @click="selectRegion(option)"
           >
             {{ option }}
           </div>
@@ -38,11 +38,11 @@
 
       <div class="input-wrapper">
         <input
-          ref="input"
-          v-model="summoner"
-          spellcheck="false"
-          type="text"
-          placeholder=""
+            ref="input"
+            v-model="summoner"
+            spellcheck="false"
+            type="text"
+            placeholder=""
         />
         <!-- Custom placeholder with styled region -->
         <div class="custom-placeholder" v-if="!summoner">
@@ -52,14 +52,14 @@
 
       <button ref="submit" class="button" type="submit">
         <svg
-          xmlns="http://www.w3.org/2000/svg"
-          height="24px"
-          viewBox="0 -960 960 960"
-          width="24px"
-          :fill="layout === 'Home' ? '#5f6368' : '#ffffff'"
+            xmlns="http://www.w3.org/2000/svg"
+            height="24px"
+            viewBox="0 -960 960 960"
+            width="24px"
+            :fill="layout === 'Home' ? '#5f6368' : '#ffffff'"
         >
           <path
-            d="M784-120 532-372q-30 24-69 38t-83 14q-109 0-184.5-75.5T120-580q0-109 75.5-184.5T380-840q109 0 184.5 75.5T640-580q0 44-14 83t-38 69l252 252-56 56ZM380-400q75 0 127.5-52.5T560-580q0-75-52.5-127.5T380-760q-75 0-127.5 52.5T200-580q0 75 52.5 127.5T380-400Z"
+              d="M784-120 532-372q-30 24-69 38t-83 14q-109 0-184.5-75.5T120-580q0-109 75.5-184.5T380-840q109 0 184.5 75.5T640-580q0 44-14 83t-38 69l252 252-56 56ZM380-400q75 0 127.5-52.5T560-580q0-75-52.5-127.5T380-760q-75 0-127.5 52.5T200-580q0 75 52.5 127.5T380-400Z"
           />
         </svg>
       </button>
@@ -153,7 +153,7 @@ select {
   outline: none;
   background-color: transparent;
   cursor: pointer;
-  font-family: "Roboto";
+  font-family: "Inter";
   background-color: #eef1ff;
   border-radius: 4px 0px 0px 4px;
   padding-right: 0px;
@@ -176,7 +176,7 @@ input {
   line-height: 16px;
   padding: 0px 8px;
   color: #1b5850;
-  font-family: "Roboto";
+  font-family: "Inter";
   font-weight: 400;
   outline: none;
   background: transparent;
@@ -191,7 +191,7 @@ input {
   font-size: 12px;
   line-height: 16px;
   padding-top: 10px;
-  font-family: "Roboto";
+  font-family: "Inter";
   font-weight: 400;
   background: transparent;
 }
@@ -204,7 +204,7 @@ input {
   color: #1b5850;
   font-size: 12px;
   pointer-events: none;
-  font-family: "Roboto";
+  font-family: "Inter";
 }
 
 .default-search-form .custom-placeholder {
@@ -314,7 +314,7 @@ input::placeholder {
 .custom-select {
   position: relative;
   width: fit-content;
-  font-family: "Roboto";
+  font-family: "Inter";
   outline: none;
 }
 
