@@ -18,7 +18,6 @@ export default {
 
 <style scoped>
 .policy-text {
-  position: static;
   font-size: small;
   color: white;
   text-align: center;

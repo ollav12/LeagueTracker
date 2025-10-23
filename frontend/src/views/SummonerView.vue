@@ -1,54 +1,54 @@
 <template>
-  <div class="background-all">
-    <div class="profile-header">
-      <div class="icon-container">
-        <img :src="getProfileIconUrl" alt="Profile Icon" class="profile-icon"/>
-        <span class="level">{{ summoner.account?.summonerLevel || 0 }}</span>
+  <div class="summoner-view">
+    <div class="banner">
+      <div class="profile-header">
+        <div class="icon-container">
+          <img :src="getProfileIconUrl" alt="Profile Icon" class="profile-icon"/>
+          <span class="level">{{ summoner.account?.summonerLevel || 0 }}</span>
+        </div>
+        <div class="name-container">
+          <h2 class="summoner-name">
+            {{ summoner.account?.name }}
+            <span class="tag">#{{ formatTag(summoner.account?.tagLine) }}</span>
+          </h2>
+          <p class="ladder-rank">
+            {{ summoner.account?.region }} | Ladder Rank 77,321 (3.71% of top)
+          </p>
+          <button
+              class="update-button"
+              @click="updateSummoner"
+              :disabled="isUpdating || cooldownActive"
+          >
+            {{ buttonText }}
+          </button>
+          <p v-if="cooldownActive" class="cooldown-text">
+            Refresh available in: {{ cooldownSeconds }} seconds
+          </p>
+          <p v-else-if="hasBeenUpdated" class="cooldown-text">
+            Last updated: {{ lastUpdatedText }}
+          </p>
+        </div>
       </div>
-      <div class="name-container">
-        <h2 class="summoner-name">
-          {{ summoner.account?.name }}
-          <span class="tag">#{{ formatTag(summoner.account?.tagLine) }}</span>
-        </h2>
-        <p class="ladder-rank">
-          {{ summoner.account?.region }} | Ladder Rank 77,321 (3.71% of top)
-        </p>
+
+      <div class="profile-nav">
         <button
-            class="update-button"
-            @click="updateSummoner"
-            :disabled="isUpdating || cooldownActive"
+            v-for="tab in tabs"
+            :key="tab.name"
+            class="nav-item"
+            :class="{ active: activeTab === tab.id }"
+            @click="activeTab = tab.id"
         >
-          {{ buttonText }}
+          {{ tab.name }}
+          <span v-if="tab.badge" class="update-badge">U</span>
         </button>
-        <p v-if="cooldownActive" class="cooldown-text">
-          Refresh available in: {{ cooldownSeconds }} seconds
-        </p>
-        <p v-else-if="hasBeenUpdated" class="cooldown-text">
-          Last updated: {{ lastUpdatedText }}
-        </p>
       </div>
-    </div>
 
-    <!-- Nav bar -->
-    <div class="profile-nav">
-      <button
-          v-for="tab in tabs"
-          :key="tab.name"
-          class="nav-item"
-          :class="{ active: activeTab === tab.id }"
-          @click="activeTab = tab.id"
-      >
-        {{ tab.name }}
-        <span v-if="tab.badge" class="update-badge">U</span>
-      </button>
-    </div>
-
-    <!-- Tab content -->
-    <div class="tab-content">
-      <SummaryView v-if="activeTab === 'summary'"/>
-      <ChampionsView v-else-if="activeTab === 'champions'"/>
-      <MasteryView v-else-if="activeTab === 'mastery'"/>
-      <LiveGameView v-else-if="activeTab === 'live'"/>
+      <div class="tab-content">
+        <SummaryView v-if="activeTab === 'summary'"/>
+        <ChampionsView v-else-if="activeTab === 'champions'"/>
+        <MasteryView v-else-if="activeTab === 'mastery'"/>
+        <LiveGameView v-else-if="activeTab === 'live'"/>
+      </div>
     </div>
   </div>
 </template>
@@ -185,14 +185,18 @@ export default {
 </script>
 
 <style scoped>
-.profile-header {
+.banner {
   background-color: #43b49b;
+}
+
+.profile-header {
   display: flex;
-  align-items: top;
-  margin-bottom: 0;
-  height: 200px;
-  padding: 40px 20px 20px 400px;
+  align-items: flex-start;
   position: relative;
+  width: 1200px;
+  margin: 0 auto;
+  height: 150px;
+  padding-top: 20px
 }
 
 .icon-container {
@@ -295,14 +299,12 @@ export default {
 }
 
 .profile-nav {
-  background-color: #43b49b;
   position: relative;
   z-index: 1;
-  padding: 4px 0 4px 400px;
-  border-top: 1px solid #1b5850;
+  width: 1200px;
+  margin: 0 auto;
   display: flex;
   flex-wrap: nowrap;
-  margin-top: 0;
 }
 
 .nav-item {
@@ -357,26 +359,5 @@ export default {
   padding-top: 0;
   width: 100%;
   min-height: calc(100vh - 200px);
-}
-
-@media screen and (max-width: 720px) {
-  .level {
-    bottom: -2px;
-    left: 25px;
-    padding: 1px 6px;
-    font-size: 9px;
-  }
-
-  .profile-icon {
-    width: 50px;
-    height: 50px;
-    border-radius: 25%;
-    margin-right: 15px;
-  }
-
-  .summoner-name {
-    font-size: 14px;
-    font-weight: 550;
-  }
 }
 </style>

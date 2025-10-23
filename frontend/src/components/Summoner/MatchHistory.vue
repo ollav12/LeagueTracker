@@ -515,7 +515,7 @@ export default {
 
 .match-history {
   width: 760px;
-  margin-bottom: 20px;
+  margin-top: 5px
 }
 
 .match-history-header {

@@ -586,93 +586,6 @@ export default {
   object-fit: contain;
 }
 
-
-.queue-nav-item {
-  background: none;
-  border: none;
-  padding: 0 12px;
-  font-size: 14px;
-  color: black;
-  cursor: pointer;
-  height: 100%;
-  position: relative;
-  font-weight: 500;
-  transition: color 0.2s;
-  white-space: nowrap;
-}
-
-.queue-nav-item:hover {
-  color: #333;
-}
-
-.queue-nav-item:hover::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  background-color: black;
-}
-
-.queue-nav-item.active {
-  color: black;
-  font-weight: 700;
-}
-
-.queue-nav-item.active::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  background-color: black;
-}
-
-.queue-dropdown {
-  position: relative;
-  display: inline-block;
-}
-
-.dropdown-arrow {
-  font-size: 10px;
-  margin-left: 4px;
-}
-
-.dropdown-content {
-  display: none;
-  position: absolute;
-  background-color: white;
-  min-width: 160px;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-  border-radius: 4px;
-  z-index: 10;
-  top: 100%;
-  left: 0;
-}
-
-
-.queue-dropdown:hover .dropdown-content {
-  display: block;
-}
-
-.top-tier {
-  font-family: "Roboto";
-  font-size: 11px;
-  line-height: 14px;
-  color: rgb(255, 255, 255);
-  font-weight: 700;
-  background-color: #4f84ea; /* Blue background color */
-  padding: 3px 8px; /* Inner spacing */
-  border-radius: 10px; /* Rounded corners */
-  display: inline-block; /* Proper block formatting */
-  letter-spacing: 0.5px; /* Optional: slight letter spacing for better readability */
-  text-align: right;
-  align-items: right;
-  margin-left: 5px;
-}
-
 .peak-rank .rank-icon-container {
   height: 44px;
   width: 44px;
@@ -746,11 +659,8 @@ export default {
 .rank-history-container {
   width: auto;
   height: auto;
-  border-radius: 0px;
-  margin-bottom: 20px;
-  padding: 24px;
   box-sizing: border-box;
-  padding-left: 400px;
+  margin-top: 5px;
 }
 
 .rank-history {
@@ -776,10 +686,9 @@ export default {
   line-height: 20px;
 }
 
-/* Add white background boxes around each rank row */
 .rank-row {
   display: flex;
-  flex-direction: column; /* This is the key change - stack items vertically */
+  flex-direction: column;
   align-items: flex-start;
   margin-bottom: 16px;
   font-weight: 700;
@@ -819,13 +728,6 @@ export default {
 .rank-info {
   display: flex;
   flex-direction: column;
-}
-
-.queue-type {
-  font-size: 14px;
-  color: #7d7d7d;
-  margin: 0 0 4px 0;
-  font-weight: 500;
 }
 
 .rankText {
